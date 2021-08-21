@@ -1,11 +1,11 @@
-import Vue from 'vue'
+import { reactive } from 'vue'
 import { users } from '@/assets/db/users'
 import { projects } from '@/assets/db/projects'
 import { folders } from '@/assets/db/folders'
 import { documents } from '@/assets/db/documents'
 import { columns } from '@/assets/db/columns'
 
-export default Vue.observable({
+export default reactive({
   state: {
     users,
     columns,
