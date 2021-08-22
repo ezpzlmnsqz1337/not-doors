@@ -1,6 +1,10 @@
 <template>
   <div class="__documentsHeader">
-    <div v-for="d in openDocuments" :key="`ad${d.uid}`" class="__item" :class="{__active: activeDocument && d.uid === activeDocument.uid}" @click="openDocument(d.uid)" >
+    <div v-for="d in openDocuments" :key="`ad${d.uid}`"
+      class="__item"
+      :class="{__active: activeDocument && d.uid === activeDocument.uid}"
+      @click="openDocument(d.uid)"
+    >
       <span>{{ d.name }}</span>
       <span class="__close" @click.stop="closeDocument(d.uid)">×</span>
     </div>
@@ -11,10 +15,12 @@
 
 export default {
   name: 'DocumentsHeader',
-  data: function () {
-    return {
-      openDocuments: this.$store.state.openDocuments,
-      activeDocument: this.$store.state.activeDocument
+  computed: {
+    openDocuments: function () {
+      return this.$store.state.openDocuments
+    },
+    activeDocument: function () {
+      return this.$store.state.activeDocument
     }
   },
   methods: {

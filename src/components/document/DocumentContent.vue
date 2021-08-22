@@ -21,12 +21,10 @@ export default {
   components: {
     Field
   },
-  data: function () {
-    return {
-      activeDocument: this.$store.state.activeDocument
-    }
-  },
   computed: {
+    activeDocument: function () {
+      return this.$store.state.activeDocument
+    },
     columns: function () {
       return this.$store.state.columns.filter(x => this.activeDocument.columns.includes(x.uid))
     },
