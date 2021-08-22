@@ -39,6 +39,7 @@ export default {
 
 <style scoped>
 .__projects {
+  padding-top: 1rem;
 }
 
 .__item {
@@ -47,6 +48,10 @@ export default {
   font-size: 1rem;
   cursor: pointer;
   font-weight: bold;
+}
+
+.__project {
+  padding: 0 1rem;
 }
 
 .__project:hover{

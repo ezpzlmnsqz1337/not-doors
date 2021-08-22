@@ -31,11 +31,7 @@ export default {
 
 <style scoped>
 .__documentsSection {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 24rem;
+  flex: 1;
   background-color: #242424;
 }
 </style>

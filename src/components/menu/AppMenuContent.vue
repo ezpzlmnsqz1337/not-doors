@@ -22,12 +22,7 @@ export default {
 
 <style scoped>
 .__appMenuContent {
-  position: absolute;
-  text-align: left;
-  left: 4rem;
-  padding: 1rem;
   width: 20rem;
-  height: 100vh;
   color: white;
   background-color: #424242;
 }

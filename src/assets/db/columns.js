@@ -1,24 +1,28 @@
 export const columns = [
   {
     uid: 1,
-    name: 'ID',
+    displayName: 'ID',
+    name: 'id',
     type: 'number'
   },
   {
     uid: 2,
-    name: 'Type',
+    displayName: 'Type',
+    name: 'type',
     type: 'enum',
     multiple: false,
     values: ['DEF', 'RDEF', 'REAL', 'PROSE']
   },
   {
     uid: 3,
-    name: 'Text',
+    displayName: 'Text',
+    name: 'text',
     type: 'string'
   },
   {
     uid: 4,
-    name: 'Classification',
+    displayName: 'Classification',
+    name: 'classification',
     type: 'enum',
     multiple: true,
     values: ['Safety-related', 'Security', 'Functional', 'Non-functional', 'Future']

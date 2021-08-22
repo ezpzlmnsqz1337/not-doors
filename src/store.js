@@ -19,7 +19,8 @@ export default reactive({
     openProjects: [],
     openFolders: [],
     openDocuments: [],
-    activeDocument: null
+    activeDocument: null,
+    activeMenuContent: 'projects'
   },
   addProject ({ name }) {
     const uid = Math.max(this.state.projects.map(x => x.uid))
@@ -69,6 +70,9 @@ export default reactive({
   closeDocument (documentId) {
     const index = this.state.openDocuments.findIndex(x => x.uid === documentId)
     this.state.openDocuments.splice(index, 1)
-    this.activeDocument = this.state.openDocuments[0]
+    this.state.activeDocument = this.state.openDocuments[0]
+  },
+  setActiveMenuContent (type) {
+    this.state.activeMenuContent = type
   }
 })

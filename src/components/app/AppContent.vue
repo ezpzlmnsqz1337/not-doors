@@ -1,7 +1,7 @@
 <template>
   <div class="__appContent">
     <AppMenu />
-    <AppMenuContent />
+    <AppMenuContent  v-if="activeMenuContent" />
     <DocumentsSection />
   </div>
 </template>
@@ -17,6 +17,11 @@ export default {
     AppMenu,
     AppMenuContent,
     DocumentsSection
+  },
+  computed: {
+    activeMenuContent: function () {
+      return this.$store.state.activeMenuContent
+    }
   }
 }
 </script>
@@ -26,5 +31,6 @@ export default {
   position: absolute;
   height: calc(100vh - 2rem);
   width: 100%;
+  display: flex;
 }
 </style>

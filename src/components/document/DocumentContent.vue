@@ -1,11 +1,13 @@
 <template>
   <div class="__documentContent">
-    <div v-for="o in objects" :key="`object${o.id}`" class="__object">
-      <div>{{o.id}}</div>
-      <div>{{o.type}}</div>
-      <div>{{o.text}}</div>
-      <div>{{o.classifictaion}}</div>
-    </div>
+    <table class="__table">
+      <tr>
+        <th v-for="c in columns" :key="c.name" class="__header" >{{ c.displayName }}</th>
+      </tr>
+      <tr v-for="o in objects" :key="`object${o.id}`">
+        <td v-for="c in columns" :key="o.name + c.name" class="__column">{{ o[c.name] }}</td>
+      </tr>
+    </table>
   </div>
 </template>
 
@@ -19,6 +21,9 @@ export default {
     }
   },
   computed: {
+    columns: function () {
+      return this.$store.state.columns.filter(x => this.activeDocument.columns.includes(x.uid))
+    },
     objects: function () {
       return this.$store.state.objects.filter(x => x.documentId === this.activeDocument.uid)
     }
@@ -28,21 +33,29 @@ export default {
 
 <style scoped>
 .__documentContent {
-  flex-direction: row;
-  border-bottom: 1px solid gray;
-}
-
-.__object{
   display: flex;
+  flex-direction: row;
 }
 
-.__object>div{
-  flex-grow: 1;
-  height: 1.5rem;
-  color: white;
-  text-align: left;
-  border-right: 1px solid gray;
+.__table {
+  flex: 1;
+}
+
+.__column {
+  background-color: #8b8b8b;
   padding: 0 0.7rem;
-  line-height: 1.5rem;
+  resize: both;
+}
+
+.__header {
+  text-align: left;
+  border-bottom: 2px solid gray;
+  border-right: 1px solid gray;
+  resize: both;
+}
+
+.__header:hover {
+  background-color: #2970b6;
+  cursor: pointer;
 }
 </style>
