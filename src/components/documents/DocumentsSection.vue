@@ -1,5 +1,6 @@
 <template>
   <div class="__documentsSection">
+    <div v-if="!areOpenDocuments" class="__placeholder">No open documents</div>
     <DocumentsHeader v-if="areOpenDocuments" />
     <DocumentsContent v-if="areOpenDocuments" />
   </div>
@@ -33,5 +34,15 @@ export default {
 .__documentsSection {
   flex: 1;
   background-color: #242424;
+}
+
+.__placeholder {
+  width: 100%;
+  height: 100%;
+  font-size: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: gray;
 }
 </style>

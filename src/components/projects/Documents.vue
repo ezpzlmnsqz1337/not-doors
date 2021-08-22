@@ -1,26 +1,35 @@
 <template>
   <div class="__documents">
-    <div class="__item" v-for="d in documents" :key="`doc${d.uid}`" @click.stop="openDocument(d.uid)">
-      {{d.name}}
+    <div v-for="d in documents" :key="`doc${d.uid}`"
+      class="__item"
+      :class="{__active: isActive(d.uid)}"
+      @click.stop="openDocument(d.uid)"
+    >{{ d.name }}
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Folders',
+  name: 'Documents',
   props: {
     folder: {
       type: Object,
       default: null
     }
   },
-  data: function () {
-    return {
-      documents: this.$store.state.documents.filter(x => x.folderId === this.folder.uid && x.projectId === this.folder.projectId)
+  computed: {
+    activeDocument: function () {
+      return this.$store.state.activeDocument
+    },
+    documents: function () {
+      return this.$store.state.documents.filter(x => x.folderId === this.folder.uid)
     }
   },
   methods: {
+    isActive (documentId) {
+      return this.activeDocument && this.activeDocument.uid === documentId
+    },
     openDocument: function (documentId) {
       this.$store.openDocument(documentId)
     }
@@ -43,6 +52,10 @@ export default {
 }
 
 .__item:hover{
+  background-color: #2970b6;
+}
+
+.__item.__active {
   background-color: #2970b6;
 }
 </style>

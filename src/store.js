@@ -1,22 +1,23 @@
 import { reactive } from 'vue'
-import { users } from '@/assets/db/users'
-import { objects } from '@/assets/db/objects'
-import { projects } from '@/assets/db/projects'
-import { folders } from '@/assets/db/folders'
-import { documents } from '@/assets/db/documents'
-import { columns } from '@/assets/db/columns'
+// import { users } from '@/assets/db/users'
+// import { objects } from '@/assets/db/objects'
+// import { projects } from '@/assets/db/projects'
+// import { folders } from '@/assets/db/folders'
+// import { documents } from '@/assets/db/documents'
+// import { columns } from '@/assets/db/columns'
 import eb from '@/eventBus'
 import EventType from '@/constants/EventType'
 import MenuItem from './constants/MenuItem'
+import { v4 as uuidv4 } from 'uuid'
 
 export default reactive({
   state: {
-    users,
-    columns,
-    projects,
-    documents,
-    folders,
-    objects,
+    users: [],
+    columns: [],
+    projects: [],
+    documents: [],
+    folders: [],
+    objects: [],
     openProjects: [],
     openFolders: [],
     openDocuments: [],
@@ -27,23 +28,31 @@ export default reactive({
       { id: MenuItem.CONTENT, name: 'Content', icon: 'list', activeDocument: true }
     ]
   },
-  addProject ({ name }) {
-    const uid = Math.max(this.state.projects.map(x => x.uid))
-    this.state.projects.push({ uid, name })
+  addProject (name) {
+    this.state.projects.push({ uid: uuidv4(), name })
   },
   removeProject (projectId) {
     const index = this.state.projects.findIndex(x => x.uid === projectId)
-    if (!index) throw new Error(`Project ${projectId} not found`)
+    if (index === -1) throw new Error(`Project ${projectId} not found`)
+    this.state.folders.filter(x => x.projectId === projectId).forEach(x => this.removeFolder(x.uid))
     this.state.projects.splice(index, 1)
   },
-  addFolderToProject (projectId, folder) {
-    const project = this.findProject(projectId)
-    if (!project) throw new Error(`Project ${projectId} not found`)
-    this.state.folders.push({ ...folder, projectId })
+  addFolderToProject (projectId, name) {
+    this.state.folders.push({ uid: uuidv4(), name, projectId })
   },
-  removeFolderFromProject (projectId, folderId) {
-    const index = this.state.folders.findIndex(x => x.uid === folderId && x.projectId === projectId)
-    if (!index) throw new Error(`Folder ${folderId} not found`)
+  removeFolder (folderId) {
+    const index = this.state.folders.findIndex(x => x.uid === folderId)
+    if (index === -1) throw new Error(`Folder ${folderId} not found`)
+    this.state.documents.filter(x => x.folderId === folderId).forEach(x => this.removeDocument(x.uid))
+    this.state.folders.splice(index, 1)
+  },
+  addDocumentToFolder (folderId, name) {
+    this.state.documents.push({ uid: uuidv4(), name, folderId, data: [] })
+  },
+  removeDocument (documentId) {
+    const index = this.state.documents.findIndex(x => x.uid === documentId)
+    if (index === -1) throw new Error(`Document ${document} not found`)
+    this.state.documents.splice(index, 1)
   },
   addObjectToDocument (documentId, index, object) {
     const doc = this.findDocument(documentId)
@@ -52,7 +61,7 @@ export default reactive({
   removeObjectFromDocument (documentId, objectId) {
     const doc = this.findDocument(documentId)
     const index = doc.data.findIndex(x => x.uid === objectId)
-    if (!index) throw new Error(`Object ${objectId} not found`)
+    if (index === -1) throw new Error(`Object ${objectId} not found`)
     doc.data.splice(index, 1)
   },
   findProject (projectId) {
@@ -60,10 +69,35 @@ export default reactive({
     if (!project) throw new Error(`Project ${projectId} not found`)
     return project
   },
+  findFolder (folderId) {
+    const folder = this.state.folders.filter(x => x.uid === folderId).pop()
+    if (!folder) throw new Error(`Folder ${folderId} not found`)
+    return folder
+  },
   findDocument (documentId) {
     const doc = this.state.documents.filter(x => x.uid === documentId).pop()
     if (!doc) throw new Error(`Document ${documentId} not found`)
     return doc
+  },
+  openProject (projectId) {
+    const openProjects = this.state.openProjects
+    const index = openProjects.findIndex(x => x === projectId)
+    if (index === -1) openProjects.push(projectId)
+  },
+  closeProject (projectId) {
+    const openProjects = this.state.openProjects
+    const index = openProjects.findIndex(x => x === projectId)
+    if (index !== -1) openProjects.splice(index, 1)
+  },
+  openFolder (folderId) {
+    const openFolders = this.state.openFolders
+    const index = openFolders.findIndex(x => x === folderId)
+    if (index === -1) openFolders.push(folderId)
+  },
+  closeFolder (folderId) {
+    const openFolders = this.state.openFolders
+    const index = openFolders.findIndex(x => x === folderId)
+    if (index !== -1) openFolders.splice(index, 1)
   },
   openDocument (documentId) {
     const od = this.state.openDocuments.map(x => x.uid)

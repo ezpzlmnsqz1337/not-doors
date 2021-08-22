@@ -33,7 +33,7 @@ export default {
 
 <style scoped>
 .__appMenu {
-  width: 4rem;
+  width: 3rem;
   background-color: #5d5d5d;
   text-align: center;
 }
