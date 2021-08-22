@@ -2,7 +2,7 @@
   <div class="__projects">
     <div v-for="p in projects" :key="`project${p.uid}`" class="__item" @click="toggleProject(p.uid)">
       <div class="__project">
-        <span class="__arrow" :class="{__open: openProjects.includes(p.uid)}">></span>
+        <span class="__arrow" :class="{__open: openProjects.includes(p.uid)}">&#8250;</span>
         <span>{{ p.name }}</span>
       </div>
       <Folders v-if="openProjects.includes(p.uid)" :project="p" />
@@ -39,7 +39,7 @@ export default {
 
 <style scoped>
 .__projects {
-  padding-top: 1rem;
+  user-select: none;
 }
 
 .__item {

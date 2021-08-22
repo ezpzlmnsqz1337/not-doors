@@ -34,7 +34,7 @@ export default {
 }
 
 .__item {
-  padding-left: 2rem;
+  padding-left: 3rem;
   color: white;
   line-height: 2rem;
   font-size: 0.9rem;

@@ -2,7 +2,7 @@
   <div class="__folders">
     <div class="__item" v-for="f in folders" :key="`folder${f.uid}`">
       <div class="__folder" @click.stop="toggleFolder(f.uid)">
-        <span class="__arrow" :class="{__open: openFolders.includes(f.uid)}">></span>
+        <span class="__arrow" :class="{__open: openFolders.includes(f.uid)}">&#8250;</span>
         <span>{{ f.name }}</span>
       </div>
       <Documents v-if="openFolders.includes(f.uid)" :folder="f"/>
@@ -45,10 +45,10 @@ export default {
 
 <style scoped>
 .__folders {
-
 }
 
 .__item {
+  user-select: none;
   color: white;
   line-height: 2rem;
   font-size: 0.9rem;
@@ -57,7 +57,7 @@ export default {
 }
 
 .__folder{
-  padding-left: 1rem;
+  padding-left: 2rem;
 }
 
 .__folder:hover{

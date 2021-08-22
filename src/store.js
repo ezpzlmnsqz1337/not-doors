@@ -7,6 +7,7 @@ import { documents } from '@/assets/db/documents'
 import { columns } from '@/assets/db/columns'
 import eb from '@/eventBus'
 import EventType from '@/constants/EventType'
+import MenuItem from './constants/MenuItem'
 
 export default reactive({
   state: {
@@ -20,7 +21,11 @@ export default reactive({
     openFolders: [],
     openDocuments: [],
     activeDocument: null,
-    activeMenuContent: 'projects'
+    activeMenuContent: MenuItem.PROJECTS,
+    menuItems: [
+      { id: MenuItem.PROJECTS, name: 'Projects', icon: 'folder', activeDocument: false },
+      { id: MenuItem.CONTENT, name: 'Content', icon: 'list', activeDocument: true }
+    ]
   },
   addProject ({ name }) {
     const uid = Math.max(this.state.projects.map(x => x.uid))
@@ -74,5 +79,15 @@ export default reactive({
   },
   setActiveMenuContent (type) {
     this.state.activeMenuContent = type
+  },
+  getMenuItem (id) {
+    const item = this.state.menuItems.filter(x => x.id === id).pop()
+    if (!item) throw new Error(`Menu item ${id} not found!`)
+    return item
+  },
+  findObject (objectId) {
+    const obj = this.state.objects.filter(x => x.id === objectId).pop()
+    if (!obj) throw new Error(`Object ${objectId} not found`)
+    return obj
   }
 })
