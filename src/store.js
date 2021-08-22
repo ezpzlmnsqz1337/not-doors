@@ -4,7 +4,7 @@ import { reactive } from 'vue'
 // import { projects } from '@/assets/db/projects'
 // import { folders } from '@/assets/db/folders'
 // import { documents } from '@/assets/db/documents'
-// import { columns } from '@/assets/db/columns'
+import { columns } from '@/assets/db/columns'
 import eb from '@/eventBus'
 import EventType from '@/constants/EventType'
 import MenuItem from './constants/MenuItem'
@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid'
 export default reactive({
   state: {
     users: [],
-    columns: [],
+    columns,
     projects: [],
     documents: [],
     folders: [],
@@ -22,6 +22,7 @@ export default reactive({
     openFolders: [],
     openDocuments: [],
     activeDocument: null,
+    activeObject: null,
     activeMenuContent: MenuItem.PROJECTS,
     menuItems: [
       { id: MenuItem.PROJECTS, name: 'Projects', icon: 'folder', activeDocument: false },
@@ -47,16 +48,18 @@ export default reactive({
     this.state.folders.splice(index, 1)
   },
   addDocumentToFolder (folderId, name) {
-    this.state.documents.push({ uid: uuidv4(), name, folderId, data: [] })
+    this.state.documents.push({ uid: uuidv4(), name, folderId })
   },
   removeDocument (documentId) {
     const index = this.state.documents.findIndex(x => x.uid === documentId)
     if (index === -1) throw new Error(`Document ${document} not found`)
     this.state.documents.splice(index, 1)
   },
-  addObjectToDocument (documentId, index, object) {
-    const doc = this.findDocument(documentId)
-    doc.data.splice(index, 0, object)
+  addObjectToDocument (documentId, object) {
+    const id = this.state.objects
+      .filter(x => x.documentId === documentId)
+      .reduce((acc, { id: curr }) => curr > acc ? curr : acc, 0) + 1
+    this.state.objects.push({ uid: uuidv4(), id, ...object, documentId })
   },
   removeObjectFromDocument (documentId, objectId) {
     const doc = this.findDocument(documentId)
@@ -120,8 +123,11 @@ export default reactive({
     return item
   },
   findObject (objectId) {
-    const obj = this.state.objects.filter(x => x.id === objectId).pop()
+    const obj = this.state.objects.filter(x => x.uid === objectId).pop()
     if (!obj) throw new Error(`Object ${objectId} not found`)
     return obj
+  },
+  setActiveObject (object) {
+    this.state.activeObject = object
   }
 })

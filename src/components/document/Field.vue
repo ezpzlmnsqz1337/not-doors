@@ -1,5 +1,5 @@
 <template>
-  <div class="__field">
+  <div class="__field" @click.stop>
     <div v-if="column.type === 'string'" :class="{__bold: object.isHeading}">{{ parseText() }}</div>
     <div v-if="column.type === 'number'">{{ object[column.name] }}</div>
     <div v-if="column.type === 'enum'">
@@ -8,14 +8,14 @@
         class="__noBreak"
       >
         <input
-          :id="`${object.id}${index}`"
+          :id="`${object.uid}${index}`"
           :type="column.multiple ? 'checkbox' : 'radio'"
-          :name="`${object.id}`"
+          :name="`${object.uid}`"
           :checked="object[column.name].includes(v)"
           :value="v"
           @input="setEnumValue"
         />
-        <label :for="`${object.id}${index}`">{{ v }}</label>
+        <label :for="`${object.uid}${index}`">{{ v }}</label>
       </div>
     </div>
   </div>
@@ -39,7 +39,7 @@ export default {
       return this.object[this.column.name]
     },
     setEnumValue (e) {
-      const o = this.$store.findObject(this.object.id)
+      const o = this.$store.findObject(this.object.uid)
       if (this.column.multiple) {
         const index = o[this.column.name].findIndex(x => x === e.target.value)
         if (index !== -1) {

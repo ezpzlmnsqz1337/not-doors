@@ -1,12 +1,15 @@
+
+import { v4 as uuidv4 } from 'uuid'
+
 export const columns = [
   {
-    uid: 1,
+    uid: uuidv4(),
     displayName: 'ID',
     name: 'id',
     type: 'number'
   },
   {
-    uid: 2,
+    uid: uuidv4(),
     displayName: 'Type',
     name: 'type',
     type: 'enum',
@@ -14,13 +17,13 @@ export const columns = [
     values: ['DEF', 'RDEF', 'REAL', 'PROSE']
   },
   {
-    uid: 3,
+    uid: uuidv4(),
     displayName: 'Text',
     name: 'text',
     type: 'string'
   },
   {
-    uid: 4,
+    uid: uuidv4(),
     displayName: 'Classification',
     name: 'classification',
     type: 'enum',
