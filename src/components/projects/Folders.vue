@@ -1,9 +1,9 @@
 <template>
   <div class="__folders">
     <div class="__item" v-for="f in folders" :key="`folder${f.uid}`">
-      <div class="__folder">
+      <div class="__folder" @click.stop="toggleFolder(f.uid)">
         <span class="__arrow" :class="{__open: openFolders.includes(f.uid)}">></span>
-        <span @click="toggleFolder(f.uid)">{{ f.name }}</span>
+        <span>{{ f.name }}</span>
       </div>
       <Documents v-if="openFolders.includes(f.uid)" :folder="f"/>
     </div>
@@ -27,7 +27,7 @@ export default {
   data: function () {
     return {
       folders: this.$store.state.folders.filter(x => x.projectId === this.project.uid),
-      openFolders: []
+      openFolders: this.$store.state.openFolders
     }
   },
   methods: {

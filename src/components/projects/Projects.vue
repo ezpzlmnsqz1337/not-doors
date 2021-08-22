@@ -1,9 +1,9 @@
 <template>
   <div class="__projects">
-    <div v-for="p in projects" :key="`project${p.uid}`" class="__item" >
+    <div v-for="p in projects" :key="`project${p.uid}`" class="__item" @click="toggleProject(p.uid)">
       <div class="__project">
         <span class="__arrow" :class="{__open: openProjects.includes(p.uid)}">></span>
-        <span  @click="toggleProject(p.uid)">{{ p.name }}</span>
+        <span>{{ p.name }}</span>
       </div>
       <Folders v-if="openProjects.includes(p.uid)" :project="p" />
     </div>
@@ -21,7 +21,7 @@ export default {
   data: function () {
     return {
       projects: this.$store.state.projects,
-      openProjects: []
+      openProjects: this.$store.state.openProjects
     }
   },
   methods: {
@@ -39,7 +39,6 @@ export default {
 
 <style scoped>
 .__projects {
-  text-align: left;
 }
 
 .__item {

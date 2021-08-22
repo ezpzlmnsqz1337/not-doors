@@ -1,13 +1,12 @@
 <template>
   <div class="__documents">
-    <div class="__item" v-for="d in documents" :key="`doc${d.uid}`">
+    <div class="__item" v-for="d in documents" :key="`doc${d.uid}`" @click.stop="openDocument(d.uid)">
       {{d.name}}
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
   name: 'Folders',
   props: {
@@ -22,13 +21,8 @@ export default {
     }
   },
   methods: {
-    toggleFolder: function (folderId) {
-      const index = this.openFolders.findIndex(x => x === folderId)
-      if (index === -1) {
-        this.openFolders.push(folderId)
-      } else {
-        this.openFolders.splice(index, 1)
-      }
+    openDocument: function (documentId) {
+      this.$store.openDocument(documentId)
     }
   }
 }
@@ -40,7 +34,7 @@ export default {
 }
 
 .__item {
-  padding-left: 1rem;
+  padding-left: 2rem;
   color: white;
   line-height: 2rem;
   font-size: 0.9rem;

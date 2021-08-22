@@ -4,11 +4,10 @@ export const documents = [
     name: 'P1 DOC1_R',
     projectId: 1,
     folderId: 1,
-    columns: [1, 2, 3, 4],
-    data: []
+    columns: [1, 2, 3, 4]
   },
   {
-    uid: 1,
+    uid: 2,
     name: 'P1 DOC2_A',
     projectId: 1,
     folderId: 2,
@@ -16,7 +15,7 @@ export const documents = [
     data: []
   },
   {
-    uid: 1,
+    uid: 3,
     name: 'P1 DOC3_IF',
     projectId: 1,
     folderId: 3,
@@ -24,7 +23,7 @@ export const documents = [
     data: []
   },
   {
-    uid: 1,
+    uid: 4,
     name: 'P2 DOC1_R',
     projectId: 2,
     folderId: 4,
@@ -32,7 +31,7 @@ export const documents = [
     data: []
   },
   {
-    uid: 1,
+    uid: 5,
     name: 'P2 DOC2_A',
     projectId: 2,
     folderId: 5,
@@ -40,7 +39,7 @@ export const documents = [
     data: []
   },
   {
-    uid: 1,
+    uid: 6,
     name: 'P2 DOC3_IF',
     projectId: 2,
     folderId: 6,

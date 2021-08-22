@@ -19,6 +19,7 @@ export default {
   bottom: 0;
   width: 4rem;
   background-color: #5d5d5d;
+  text-align: center;
 }
 
 .__item {

@@ -1,17 +1,41 @@
 <template>
   <div class="__documentsSection">
-    <DocumentsHeader />
-    <DocumentsContent />
+    <DocumentsHeader v-if="areOpenDocuments" />
+    <DocumentsContent v-if="areOpenDocuments" />
   </div>
 </template>
 
 <script>
+import DocumentsHeader from '@/components/documents/DocumentsHeader'
+import DocumentsContent from '@/components/documents/DocumentsContent'
+
 export default {
-  name: 'DocumentsSection'
+  name: 'DocumentsSection',
+  components: {
+    DocumentsHeader,
+    DocumentsContent
+  },
+  data: function () {
+    return {
+      openDocuments: this.$store.state.openDocuments,
+      activeDocument: this.$store.state.activeDocument
+    }
+  },
+  computed: {
+    areOpenDocuments: function () {
+      return this.openDocuments.length > 0
+    }
+  }
 }
 </script>
 
 <style scoped>
 .__documentsSection {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 24rem;
+  background-color: #242424;
 }
 </style>
