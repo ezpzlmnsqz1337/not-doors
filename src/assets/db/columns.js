@@ -6,7 +6,8 @@ export const columns = [
     uid: uuidv4(),
     displayName: 'ID',
     name: 'id',
-    type: 'number'
+    type: 'number',
+    width: 150
   },
   {
     uid: uuidv4(),
@@ -14,13 +15,15 @@ export const columns = [
     name: 'type',
     type: 'enum',
     multiple: false,
-    values: ['DEF', 'RDEF', 'REAL', 'PROSE']
+    values: ['DEF', 'RDEF', 'REAL', 'PROSE'],
+    width: 150
   },
   {
     uid: uuidv4(),
     displayName: 'Text',
     name: 'text',
-    type: 'string'
+    type: 'string',
+    width: 150
   },
   {
     uid: uuidv4(),
@@ -28,6 +31,7 @@ export const columns = [
     name: 'classification',
     type: 'enum',
     multiple: true,
-    values: ['Safety-related', 'Security', 'Functional', 'Non-functional', 'Future']
+    values: ['Safety-related', 'Security', 'Functional', 'Non-functional', 'Future'],
+    width: 150
   }
 ]

@@ -2,7 +2,10 @@
   <div class="__documentContent">
     <table class="__table">
       <tr>
-        <th v-for="c in columns" :key="c.name" class="__header" >{{ c.displayName }}</th>
+        <th v-for="c in columns" :key="c.name" class="__header" :width="`${c.width}px`">
+          <span>{{ c.displayName }}</span>
+          <div class="__resize" @mousedown="startResize($event, c.uid)" />
+        </th>
       </tr>
       <tr v-for="o in objects"
         :key="`object${o.uid}`"
@@ -27,7 +30,30 @@ export default {
   components: {
     Field
   },
+  data: function () {
+    return {
+      resizing: null,
+      startX: 0,
+      startWidth: 0
+    }
+  },
+  mounted: function () {
+    document.addEventListener('mousemove', e => {
+      if (this.resizing) {
+        this.resizing.width = this.startWidth + (e.pageX - this.startX)
+      }
+    })
+    document.addEventListener('mouseup', () => this.stopResize())
+  },
   methods: {
+    startResize (e, columnId) {
+      this.startX = e.pageX
+      this.resizing = this.$store.findColumn(columnId)
+      this.startWidth = this.resizing.width
+    },
+    stopResize () {
+      this.resizing = null
+    },
     addObject () {
       this.$store.addObjectToDocument(this.activeDocument.uid, {
         order: 4,
@@ -62,12 +88,10 @@ export default {
 
 <style scoped>
 .__documentContent {
-  display: flex;
-  flex-direction: column;
 }
 
 .__table {
-  flex: 1;
+  width: 100%;
 }
 
 .__column {
@@ -99,5 +123,18 @@ tr.__row.__active {
 
 .__bold {
   font-weight: bold;
+}
+
+.__resize {
+  float: right;
+  cursor: col-resize;
+  width: 0.2rem;
+  height: 1rem;
+  background-color: green;
+  user-select: none;
+}
+
+.__resize:hover {
+  background-color: red;
 }
 </style>

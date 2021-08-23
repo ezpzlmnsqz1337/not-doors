@@ -1,6 +1,20 @@
 <template>
-  <div class="__field" @click.stop>
-    <div v-if="column.type === 'string'" :class="{__bold: object.isHeading}">{{ parseText() }}</div>
+  <div class="__field" >
+    <div v-if="column.type === 'string'" :class="{__bold: object.isHeading}" @click="editText(true)">
+      <span v-if="!edit">{{ parseText() }}</span>
+      <textarea
+        v-if="edit"
+        v-model.lazy="text"
+        @blur="editText(false)"
+        @change="resize()"
+        @cut="resize()"
+        @paste="resize()"
+        @drop="resize()"
+        @keydown="resize()"
+        @focus="resize()"
+        ref="edit"
+        class="__textarea"></textarea>
+    </div>
     <div v-if="column.type === 'number'">{{ object[column.name] }}</div>
     <div v-if="column.type === 'enum'">
       <div v-for="(v, index) in column.values"
@@ -14,6 +28,7 @@
           :checked="object[column.name].includes(v)"
           :value="v"
           @input="setEnumValue"
+          @click.stop
         />
         <label :for="`${object.uid}${index}`">{{ v }}</label>
       </div>
@@ -23,7 +38,7 @@
 
 <script>
 export default {
-  name: 'DocumentsContent',
+  name: 'Field',
   props: {
     object: {
       type: Object,
@@ -34,7 +49,33 @@ export default {
       default: null
     }
   },
+  data: function () {
+    return {
+      edit: false
+    }
+  },
+  computed: {
+    text: {
+      get: function () {
+        return this.object.text
+      },
+      set: function (value) {
+        this.$store.findObject(this.object.uid).text = value
+      }
+    }
+  },
   methods: {
+    resize () {
+      const text = this.$refs.edit
+      setTimeout(() => {
+        text.style.height = 'auto'
+        text.style.height = text.scrollHeight + 'px'
+      }, 0)
+    },
+    editText (edit) {
+      this.edit = edit
+      if (edit) this.$nextTick(() => this.$refs.edit.focus())
+    },
     parseText () {
       return this.object[this.column.name]
     },
@@ -88,5 +129,15 @@ export default {
 
 .__bold {
   font-weight: bold;
+}
+
+.__textarea {
+  outline: none;
+  background-color: #e6e6e6;
+  width: 100%;
+  border: none;
+  resize: vertical;
+  overflow: hidden;
+  border-radius: 0.2rem;
 }
 </style>

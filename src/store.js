@@ -129,5 +129,10 @@ export default reactive({
   },
   setActiveObject (object) {
     this.state.activeObject = object
+  },
+  findColumn (columnId) {
+    const column = this.state.columns.filter(x => x.uid === columnId).pop()
+    if (!column) throw new Error(`Column ${columnId} not found`)
+    return column
   }
 })
