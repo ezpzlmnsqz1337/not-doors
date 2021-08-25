@@ -7,7 +7,7 @@ export const columns = [
     displayName: 'ID',
     name: 'id',
     type: 'number',
-    width: 150
+    width: 50
   },
   {
     uid: uuidv4(),
@@ -16,14 +16,14 @@ export const columns = [
     type: 'enum',
     multiple: false,
     values: ['DEF', 'RDEF', 'REAL', 'PROSE'],
-    width: 150
+    width: 80
   },
   {
     uid: uuidv4(),
     displayName: 'Text',
     name: 'text',
     type: 'string',
-    width: 150
+    width: 620
   },
   {
     uid: uuidv4(),

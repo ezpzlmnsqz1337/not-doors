@@ -1,9 +1,9 @@
 import { reactive } from 'vue'
-// import { users } from '@/assets/db/users'
-// import { objects } from '@/assets/db/objects'
-// import { projects } from '@/assets/db/projects'
-// import { folders } from '@/assets/db/folders'
-// import { documents } from '@/assets/db/documents'
+import { users } from '@/assets/db/users'
+import { objects } from '@/assets/db/objects'
+import { projects } from '@/assets/db/projects'
+import { folders } from '@/assets/db/folders'
+import { documents } from '@/assets/db/documents'
 import { columns } from '@/assets/db/columns'
 import eb from '@/eventBus'
 import EventType from '@/constants/EventType'
@@ -12,12 +12,12 @@ import { v4 as uuidv4 } from 'uuid'
 
 export default reactive({
   state: {
-    users: [],
+    users,
     columns,
-    projects: [],
-    documents: [],
-    folders: [],
-    objects: [],
+    projects,
+    documents,
+    folders,
+    objects,
     openProjects: [],
     openFolders: [],
     openDocuments: [],

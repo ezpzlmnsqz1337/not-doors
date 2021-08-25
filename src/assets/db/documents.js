@@ -1,49 +1,41 @@
+import { v4 as uuidv4 } from 'uuid'
+import { folders } from '@/assets/db/folders'
+
 export const documents = [
   {
-    uid: 1,
+    uid: uuidv4(),
     name: 'P1 DOC1_R',
-    projectId: 1,
-    folderId: 1,
+    folderId: folders.at(0).uid,
     columns: [1, 2, 3, 4]
   },
   {
-    uid: 2,
+    uid: uuidv4(),
     name: 'P1 DOC2_A',
-    projectId: 1,
-    folderId: 2,
-    columns: [1, 2, 3, 4],
-    data: []
+    folderId: folders.at(1).uid,
+    columns: [1, 2, 3, 4]
   },
   {
-    uid: 3,
+    uid: uuidv4(),
     name: 'P1 DOC3_IF',
-    projectId: 1,
-    folderId: 3,
-    columns: [1, 2, 3, 4],
-    data: []
+    folderId: folders.at(2).uid,
+    columns: [1, 2, 3, 4]
   },
   {
-    uid: 4,
+    uid: uuidv4(),
     name: 'P2 DOC1_R',
-    projectId: 2,
-    folderId: 4,
-    columns: [1, 2, 3, 4],
-    data: []
+    folderId: folders.at(3).uid,
+    columns: [1, 2, 3, 4]
   },
   {
-    uid: 5,
+    uid: uuidv4(),
     name: 'P2 DOC2_A',
-    projectId: 2,
-    folderId: 5,
-    columns: [1, 2, 3, 4],
-    data: []
+    folderId: folders.at(4).uid,
+    columns: [1, 2, 3, 4]
   },
   {
-    uid: 6,
+    uid: uuidv4(),
     name: 'P2 DOC3_IF',
-    projectId: 2,
-    folderId: 6,
-    columns: [1, 2, 3, 4],
-    data: []
+    folderId: folders.at(5).uid,
+    columns: [1, 2, 3, 4]
   }
 ]

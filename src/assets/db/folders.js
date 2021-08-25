@@ -1,38 +1,41 @@
+import { v4 as uuidv4 } from 'uuid'
+import { projects } from '@/assets/db/projects'
+
 export const folders = [
   {
-    uid: 1,
+    uid: uuidv4(),
     name: 'Requirements',
-    projectId: 1,
+    projectId: projects.at(0).uid,
     parentFolderId: 0
   },
   {
-    uid: 2,
+    uid: uuidv4(),
     name: 'Architecture',
-    projectId: 1,
+    projectId: projects.at(0).uid,
     parentFolderId: 0
   },
   {
-    uid: 3,
+    uid: uuidv4(),
     name: 'Validation',
-    projectId: 1,
+    projectId: projects.at(0).uid,
     parentFolderId: 0
   },
   {
-    uid: 4,
+    uid: uuidv4(),
     name: 'Requirements',
-    projectId: 2,
+    projectId: projects.at(0).uid,
     parentFolderId: 0
   },
   {
-    uid: 5,
+    uid: uuidv4(),
     name: 'Architecture',
-    projectId: 2,
+    projectId: projects.at(0).uid,
     parentFolderId: 0
   },
   {
-    uid: 6,
+    uid: uuidv4(),
     name: 'Validation',
-    projectId: 2,
+    projectId: projects.at(0).uid,
     parentFolderId: 0
   }
 ]

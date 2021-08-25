@@ -88,10 +88,11 @@ export default {
 
 <style scoped>
 .__documentContent {
+  position: absolute;
 }
 
 .__table {
-  width: 100%;
+  width: max-content;
 }
 
 .__column {

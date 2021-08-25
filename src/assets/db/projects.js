@@ -1,10 +1,12 @@
+import { v4 as uuidv4 } from 'uuid'
+
 export const projects = [
   {
-    uid: 1,
+    uid: uuidv4(),
     name: 'Project 1'
   },
   {
-    uid: 2,
+    uid: uuidv4(),
     name: 'Project 2'
   }
 ]
