@@ -1,10 +1,13 @@
 <template>
   <div class="__documents">
-    <div v-for="d in documents" :key="`doc${d.uid}`"
+    <div
+      v-for="d in documents"
+      :key="`doc${d.uid}`"
       class="__item"
       :class="{__active: isActive(d.uid)}"
       @click.stop="openDocument(d.uid)"
-    >{{ d.name }}
+    >
+      {{ d.name }}
     </div>
   </div>
 </template>

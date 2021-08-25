@@ -1,44 +1,37 @@
 <template>
-  <div class="__field" >
-    <div v-if="column.type === 'string'" :class="{__bold: object.isHeading}" @click="editText(true)">
-      <span v-if="!edit">{{ parseText() }}</span>
-      <textarea
-        v-if="edit"
-        v-model.lazy="text"
-        @blur="editText(false)"
-        @change="resize()"
-        @cut="resize()"
-        @paste="resize()"
-        @drop="resize()"
-        @keydown="resize()"
-        @focus="resize()"
-        ref="edit"
-        class="__textarea"></textarea>
-    </div>
-    <div v-if="column.type === 'number'">{{ object[column.name] }}</div>
-    <div v-if="column.type === 'enum'">
-      <div v-for="(v, index) in column.values"
-        :key="`enum-${v}${index}${object[column.name]}`"
-        class="__noBreak"
-      >
-        <input
-          :id="`${object.uid}${index}`"
-          :type="column.multiple ? 'checkbox' : 'radio'"
-          :name="`${object.uid}`"
-          :checked="object[column.name].includes(v)"
-          :value="v"
-          @input="setEnumValue"
-          @click.stop
-        />
-        <label :for="`${object.uid}${index}`">{{ v }}</label>
-      </div>
-    </div>
+  <div class="__field">
+    <TextField
+      v-if="column.type === 'string'"
+      :object="object"
+      :name="column.name"
+    />
+    <NumberField
+      v-if="column.type === 'number'"
+      :object="object"
+      :name="column.name"
+    />
+    <EnumField
+      v-if="column.type === 'enum'"
+      :object="object"
+      :name="column.name"
+      :values="column.values"
+      :multiple="column.multiple"
+    />
   </div>
 </template>
 
 <script>
+import NumberField from '@/components/document/NumberField'
+import EnumField from '@/components/document/EnumField'
+import TextField from '@/components/document/TextField'
+
 export default {
   name: 'Field',
+  components: {
+    NumberField,
+    EnumField,
+    TextField
+  },
   props: {
     object: {
       type: Object,
@@ -47,50 +40,6 @@ export default {
     column: {
       type: Object,
       default: null
-    }
-  },
-  data: function () {
-    return {
-      edit: false
-    }
-  },
-  computed: {
-    text: {
-      get: function () {
-        return this.object.text
-      },
-      set: function (value) {
-        this.$store.findObject(this.object.uid).text = value
-      }
-    }
-  },
-  methods: {
-    resize () {
-      const text = this.$refs.edit
-      setTimeout(() => {
-        text.style.height = 'auto'
-        text.style.height = text.scrollHeight + 'px'
-      }, 0)
-    },
-    editText (edit) {
-      this.edit = edit
-      if (edit) this.$nextTick(() => this.$refs.edit.focus())
-    },
-    parseText () {
-      return this.object[this.column.name]
-    },
-    setEnumValue (e) {
-      const o = this.$store.findObject(this.object.uid)
-      if (this.column.multiple) {
-        const index = o[this.column.name].findIndex(x => x === e.target.value)
-        if (index !== -1) {
-          o[this.column.name].splice(index, 1)
-        } else {
-          o[this.column.name].push(e.target.value)
-        }
-      } else {
-        o[this.column.name] = e.target.value
-      }
     }
   }
 }
@@ -138,6 +87,5 @@ export default {
   border: none;
   resize: vertical;
   overflow: hidden;
-  border-radius: 0.2rem;
 }
 </style>

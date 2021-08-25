@@ -1,7 +1,13 @@
 <template>
   <div class="__content">
-    <div class="__heading">{{ activeDocument.name }}</div>
-    <div v-for="h in headings" :key="`heading${h.uid}`" class="__item">
+    <div class="__heading">
+      {{ activeDocument.name }}
+    </div>
+    <div
+      v-for="h in headings"
+      :key="`heading${h.uid}`"
+      class="__item"
+    >
       {{ `${h.chapter}. ${h.text}` }}
     </div>
   </div>

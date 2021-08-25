@@ -1,6 +1,11 @@
 <template>
   <div class="__documentsSection">
-    <div v-if="!areOpenDocuments" class="__placeholder">No open documents</div>
+    <div
+      v-if="!areOpenDocuments"
+      class="__placeholder"
+    >
+      No open documents
+    </div>
     <DocumentsHeader v-if="areOpenDocuments" />
     <DocumentsContent v-if="areOpenDocuments" />
   </div>

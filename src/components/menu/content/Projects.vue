@@ -1,22 +1,57 @@
 <template>
   <div class="__projects">
     <ProjectsControls />
-    <div v-for="p in projects" :key="`project${p.uid}`" class="__item" @click="toggleProject(p.uid)">
-      <div class="__project" >
-        <span class="__arrow" :class="{__open: openProjects.includes(p.uid)}">&#8250;</span>
+    <div
+      v-for="p in projects"
+      :key="`project${p.uid}`"
+      class="__item"
+      @click="toggleProject(p.uid)"
+    >
+      <div class="__project">
+        <span
+          class="__arrow"
+          :class="{__open: openProjects.includes(p.uid)}"
+        >&#8250;</span>
         <span class="__name">{{ p.name }}</span>
         <div class="__controls">
-          <span class="material-icons __control" @click.stop="renameProject(p.uid)">edit</span>
-          <span class="material-icons __control" @click.stop="removeProject(p.uid)">delete</span>
-          <span class="material-icons __control" @click.stop="showFolderTemplate(true, p.uid)">add_box</span>
+          <span
+            class="material-icons __control"
+            @click.stop="renameProject(p.uid)"
+          >edit</span>
+          <span
+            class="material-icons __control"
+            @click.stop="removeProject(p.uid)"
+          >delete</span>
+          <span
+            class="material-icons __control"
+            @click.stop="showFolderTemplate(true, p.uid)"
+          >add_box</span>
         </div>
       </div>
-      <div v-if="showTemplate && p.uid === projectId" class="__template">
-        <input type="text" v-model="folderName" @keydown="handleKeyDown($event)" @click.stop ref="name" />
-        <span class="material-icons __control" @click.stop="addFolderToProject(projectId)">done</span>
-        <span class="material-icons __control" @click.stop="showFolderTemplate(false)">close</span>
+      <div
+        v-if="showTemplate && p.uid === projectId"
+        class="__template"
+      >
+        <input
+          ref="name"
+          v-model="folderName"
+          type="text"
+          @keydown="handleKeyDown($event)"
+          @click.stop
+        >
+        <span
+          class="material-icons __control"
+          @click.stop="addFolderToProject(projectId)"
+        >done</span>
+        <span
+          class="material-icons __control"
+          @click.stop="showFolderTemplate(false)"
+        >close</span>
       </div>
-      <Folders v-if="openProjects.includes(p.uid)" :project="p" />
+      <Folders
+        v-if="openProjects.includes(p.uid)"
+        :project="p"
+      />
     </div>
   </div>
 </template>
@@ -37,6 +72,14 @@ export default {
       showTemplate: false,
       folderName: 'FolderName',
       projectId: ''
+    }
+  },
+  computed: {
+    projects: function () {
+      return this.$store.state.projects
+    },
+    openProjects: function () {
+      return this.$store.state.openProjects
     }
   },
   methods: {
@@ -72,14 +115,6 @@ export default {
       this.openProject(projectId)
       this.folderName = 'FolderName'
       this.showTemplate = false
-    }
-  },
-  computed: {
-    projects: function () {
-      return this.$store.state.projects
-    },
-    openProjects: function () {
-      return this.$store.state.openProjects
     }
   }
 }

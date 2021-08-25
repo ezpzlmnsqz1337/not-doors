@@ -1,12 +1,17 @@
 <template>
   <div class="__documentsHeader">
-    <div v-for="d in openDocuments" :key="`ad${d.uid}`"
+    <div
+      v-for="d in openDocuments"
+      :key="`ad${d.uid}`"
       class="__item"
       :class="{__active: activeDocument && d.uid === activeDocument.uid}"
       @click="openDocument(d.uid)"
     >
       <span>{{ d.name }}</span>
-      <span class="__close" @click.stop="closeDocument(d.uid)">×</span>
+      <span
+        class="__close"
+        @click.stop="closeDocument(d.uid)"
+      >×</span>
     </div>
   </div>
 </template>

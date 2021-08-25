@@ -1,25 +1,48 @@
 <template>
-  <div class="__documentContent">
-    <table class="__table">
-      <tr>
-        <th v-for="c in columns" :key="c.name" class="__header" :width="`${c.width}px`">
-          <span>{{ c.displayName }}</span>
-          <div class="__resize" @mousedown="startResize($event, c.uid)" />
-        </th>
-      </tr>
-      <tr v-for="o in objects"
-        :key="`object${o.uid}`"
-        class="__row"
-        :class="{__active: activeObject && activeObject.uid === o.uid}"
-        @click="setActiveObject(o)"
+  <PerfectScrollbar class="__scroll">
+    <div class="__documentContent">
+      <table class="__table">
+        <tr>
+          <th
+            v-for="c in columns"
+            :key="c.name"
+            class="__header"
+            :width="`${c.width}px`"
+          >
+            <span>{{ c.displayName }}</span>
+            <div
+              class="__resize"
+              @mousedown="startResize($event, c.uid)"
+            />
+          </th>
+        </tr>
+        <tr
+          v-for="o in objects"
+          :key="`object${o.uid}`"
+          class="__row"
+          :class="{__active: activeObject && activeObject.uid === o.uid}"
+          @click="setActiveObject(o)"
+        >
+          <td
+            v-for="c in columns"
+            :key="o.name + c.name"
+            class="__column"
+          >
+            <Field
+              :object="o"
+              :column="c"
+            />
+          </td>
+        </tr>
+      </table>
+      <button
+        class="__add"
+        @click.prevent="addObject()"
       >
-        <td v-for="c in columns" :key="o.name + c.name" class="__column">
-          <Field :object="o" :column="c" />
-        </td>
-      </tr>
-    </table>
-    <button class="__add" @click.prevent="addObject()">+</button>
-  </div>
+        +
+      </button>
+    </div>
+  </PerfectScrollbar>
 </template>
 
 <script>
@@ -35,6 +58,20 @@ export default {
       resizing: null,
       startX: 0,
       startWidth: 0
+    }
+  },
+  computed: {
+    activeObject: function () {
+      return this.$store.state.activeObject
+    },
+    activeDocument: function () {
+      return this.$store.state.activeDocument
+    },
+    columns: function () {
+      return this.$store.state.columns
+    },
+    objects: function () {
+      return this.$store.state.objects.filter(x => x.documentId === this.activeDocument.uid)
     }
   },
   mounted: function () {
@@ -68,20 +105,6 @@ export default {
     setActiveObject (object) {
       this.$store.setActiveObject(object)
     }
-  },
-  computed: {
-    activeObject: function () {
-      return this.$store.state.activeObject
-    },
-    activeDocument: function () {
-      return this.$store.state.activeDocument
-    },
-    columns: function () {
-      return this.$store.state.columns
-    },
-    objects: function () {
-      return this.$store.state.objects.filter(x => x.documentId === this.activeDocument.uid)
-    }
   }
 }
 </script>
@@ -89,14 +112,11 @@ export default {
 <style scoped>
 .__documentContent {
   position: absolute;
+  margin-bottom: 5rem;
 }
 
 .__table {
   width: max-content;
-}
-
-.__column {
-  cursor: pointer;
 }
 
 tr.__row {
@@ -137,5 +157,10 @@ tr.__row.__active {
 
 .__resize:hover {
   background-color: red;
+}
+
+.__scroll {
+  height: 100%;
+  overflow: scroll;
 }
 </style>

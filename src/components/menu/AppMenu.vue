@@ -1,7 +1,16 @@
 <template>
   <div class="__appMenu">
-    <div class="__item" v-for="i in items" :key="`item${i.name}`" :class="getItemClass(i.id)" @click="toggle(i.id)">
-      <span class="material-icons" :title="i.name">{{ i.icon }}</span>
+    <div
+      v-for="i in items"
+      :key="`item${i.name}`"
+      class="__item"
+      :class="getItemClass(i.id)"
+      @click="toggle(i.id)"
+    >
+      <span
+        class="material-icons"
+        :title="i.name"
+      >{{ i.icon }}</span>
     </div>
   </div>
 </template>
@@ -9,6 +18,14 @@
 <script>
 export default {
   name: 'AppMenu',
+  computed: {
+    items: function () {
+      return this.$store.state.menuItems.filter(x => x.activeDocument ? this.$store.state.activeDocument : true)
+    },
+    activeMenuContent: function () {
+      return this.$store.state.activeMenuContent
+    }
+  },
   methods: {
     toggle: function (itemId) {
       const active = this.$store.state.activeMenuContent === itemId ? null : itemId
@@ -18,14 +35,6 @@ export default {
       return {
         __selected: this.activeMenuContent === activeItem
       }
-    }
-  },
-  computed: {
-    items: function () {
-      return this.$store.state.menuItems.filter(x => x.activeDocument ? this.$store.state.activeDocument : true)
-    },
-    activeMenuContent: function () {
-      return this.$store.state.activeMenuContent
     }
   }
 }

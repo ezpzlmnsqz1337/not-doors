@@ -1,32 +1,69 @@
 <template>
   <div class="__folders">
-    <div v-for="f in folders" :key="`folder${f.uid}`" class="__item">
-      <div class="__folder" @click.stop="toggleFolder(f.uid)">
-        <span class="__arrow" :class="{__open: openFolders.includes(f.uid)}">&#8250;</span>
-        <span v-if="!showRename" class="__name">{{ f.name }}</span>
-        <input v-if="showRename"
-          type="text"
+    <div
+      v-for="f in folders"
+      :key="`folder${f.uid}`"
+      class="__item"
+    >
+      <div
+        class="__folder"
+        @click.stop="toggleFolder(f.uid)"
+      >
+        <span
+          class="__arrow"
+          :class="{__open: openFolders.includes(f.uid)}"
+        >&#8250;</span>
+        <span
+          v-if="!showRename"
+          class="__name"
+        >{{ f.name }}</span>
+        <input
+          v-if="showRename"
+          ref="rename"
           v-model="folderName"
+          type="text"
           @keydown="handleKeyDownRenameFolder($event)"
-          @click.stop ref="rename"
-        />
+          @click.stop
+        >
         <div class="__controls">
-          <span class="material-icons __control" @click.stop="showRenameInput(true, f)">edit</span>
-          <span class="material-icons __control" @click.stop="removeFolder(f.uid)">delete</span>
-          <span class="material-icons __control" @click.stop="showDocumentTemplate(true, f.uid)">add_box</span>
+          <span
+            class="material-icons __control"
+            @click.stop="showRenameInput(true, f)"
+          >edit</span>
+          <span
+            class="material-icons __control"
+            @click.stop="removeFolder(f.uid)"
+          >delete</span>
+          <span
+            class="material-icons __control"
+            @click.stop="showDocumentTemplate(true, f.uid)"
+          >add_box</span>
         </div>
       </div>
-      <div v-if="showTemplate && f.uid === folderId" class="__template">
-        <input type="text"
+      <div
+        v-if="showTemplate && f.uid === folderId"
+        class="__template"
+      >
+        <input
+          ref="name"
           v-model="documentName"
+          type="text"
           @keydown="handleKeyDownCreateDocument($event)"
           @click.stop
-          ref="name"
-        />
-        <span class="material-icons __control" @click.stop="addDocumentToFolder(folderId)">done</span>
-        <span class="material-icons __control" @click.stop="showDocumentTemplate(false)">close</span>
+        >
+        <span
+          class="material-icons __control"
+          @click.stop="addDocumentToFolder(folderId)"
+        >done</span>
+        <span
+          class="material-icons __control"
+          @click.stop="showDocumentTemplate(false)"
+        >close</span>
       </div>
-      <Documents v-if="openFolders.includes(f.uid)" :folder="f"/>
+      <Documents
+        v-if="openFolders.includes(f.uid)"
+        :folder="f"
+      />
     </div>
   </div>
 </template>
@@ -54,6 +91,14 @@ export default {
       showTemplate: false,
       documentName: 'DocumentName',
       folderId: ''
+    }
+  },
+  computed: {
+    folders: function () {
+      return this.$store.state.folders.filter(x => x.projectId === this.project.uid)
+    },
+    openFolders: function () {
+      return this.$store.state.openFolders
     }
   },
   methods: {
@@ -110,14 +155,6 @@ export default {
       this.documentName = 'DocumentName'
       this.showTemplate = false
       this.folderId = ''
-    }
-  },
-  computed: {
-    folders: function () {
-      return this.$store.state.folders.filter(x => x.projectId === this.project.uid)
-    },
-    openFolders: function () {
-      return this.$store.state.openFolders
     }
   }
 }

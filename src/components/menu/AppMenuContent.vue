@@ -1,8 +1,13 @@
 <template>
   <div class="__appMenuContent">
-    <div class="__heading">{{ heading }}</div>
-    <Projects v-if="showProjects"/>
-    <Content v-if="showContent" :activeDocument="activeDocument" />
+    <div class="__heading">
+      {{ heading }}
+    </div>
+    <Projects v-if="showProjects" />
+    <Content
+      v-if="showContent"
+      :active-document="activeDocument"
+    />
   </div>
 </template>
 

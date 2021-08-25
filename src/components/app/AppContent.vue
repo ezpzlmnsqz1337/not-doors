@@ -1,7 +1,7 @@
 <template>
   <div class="__appContent">
     <AppMenu />
-    <AppMenuContent  v-if="activeMenuContent" />
+    <AppMenuContent v-if="activeMenuContent" />
     <DocumentsSection />
   </div>
 </template>

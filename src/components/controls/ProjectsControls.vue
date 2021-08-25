@@ -1,12 +1,29 @@
 <template>
   <div class="__controls">
-    <span class="__heading" >Controls</span>
-    <span class="material-icons __control" @click="showProjectTemplate(true)">add_box</span>
+    <span class="__heading">Controls</span>
+    <span
+      class="material-icons __control"
+      @click="showProjectTemplate(true)"
+    >add_box</span>
   </div>
-  <div v-if="showTemplate" class="__template">
-    <input type="text" v-model="projectName" @keydown="handleKeyDown($event)" ref="name" />
-    <span class="material-icons __control" @click="addProject()">done</span>
-    <span class="material-icons __control" @click.stop="showProjectTemplate(false)">close</span>
+  <div
+    v-if="showTemplate"
+    class="__template"
+  >
+    <input
+      ref="name"
+      v-model="projectName"
+      type="text"
+      @keydown="handleKeyDown($event)"
+    >
+    <span
+      class="material-icons __control"
+      @click="addProject()"
+    >done</span>
+    <span
+      class="material-icons __control"
+      @click.stop="showProjectTemplate(false)"
+    >close</span>
   </div>
 </template>
 

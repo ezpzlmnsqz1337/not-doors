@@ -20,6 +20,5 @@ export default {
   background-color: #242424;
   position: relative;
   height: calc(100% - 2rem);
-  overflow: scroll;
 }
 </style>
