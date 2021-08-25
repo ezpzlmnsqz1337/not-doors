@@ -65,6 +65,7 @@ export default {
       return this.$store.state.activeObject
     },
     activeDocument: function () {
+      this.$store.calculateChapters(this.$store.state.activeDocument.uid)
       return this.$store.state.activeDocument
     },
     columns: function () {
@@ -162,5 +163,12 @@ tr.__row.__active {
 .__scroll {
   height: 100%;
   overflow: scroll;
+}
+
+tr::after{
+  content: '';
+  display: inline-block;
+  height: 1rem;
+  background-color: red;
 }
 </style>

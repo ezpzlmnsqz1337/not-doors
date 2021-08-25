@@ -50,42 +50,4 @@ export default {
   cursor: pointer;
   padding: 0.2rem 0.7rem;
 }
-
-.__field label:hover, .__field input:hover {
-  cursor: pointer;
-  color: #a4a4a4;
-}
-
-.__field:hover input, .__field:hover label{
-
-}
-
-.__enum input, .__enum label {
-  display: none;
-}
-
-.__enum:hover input, .__enum:hover label {
-  display: inherit;
-}
-
-.__enum > .__show > label {
-  display: inherit;
-}
-
-.__noBreak{
-  white-space: nowrap;
-}
-
-.__bold {
-  font-weight: bold;
-}
-
-.__textarea {
-  outline: none;
-  background-color: #e6e6e6;
-  width: 100%;
-  border: none;
-  resize: vertical;
-  overflow: hidden;
-}
 </style>

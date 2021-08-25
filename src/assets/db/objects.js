@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { documents } from '@/assets/db/documents'
 
-const [ch1Id, ch2Id, ch3Id] = [uuidv4(), uuidv4(), uuidv4()]
+const [ch1Id, ch2Id, ch21Id, ch22Id, ch221Id, ch3Id] = [uuidv4(), uuidv4(), uuidv4(), uuidv4(), uuidv4(), uuidv4()]
 
 export const objects = [
   {
@@ -60,7 +60,7 @@ export const objects = [
     parentId: ch2Id
   },
   {
-    uid: ch3Id,
+    uid: ch21Id,
     id: 6,
     order: 2,
     documentId: documents.at(0).uid,
@@ -79,6 +79,50 @@ export const objects = [
     type: 'PROSE',
     classification: [],
     isHeading: false,
-    parentId: ch3Id
+    parentId: ch21Id
+  },
+  {
+    uid: ch22Id,
+    id: 8,
+    order: 3,
+    documentId: documents.at(0).uid,
+    text: 'This is my 2.2 chapter',
+    type: 'PROSE',
+    classification: [],
+    isHeading: true,
+    parentId: ch2Id
+  },
+  {
+    uid: uuidv4(),
+    id: 9,
+    order: 1,
+    documentId: documents.at(0).uid,
+    text: 'And this is its text',
+    type: 'PROSE',
+    classification: [],
+    isHeading: false,
+    parentId: ch22Id
+  },
+  {
+    uid: ch221Id,
+    id: 10,
+    order: 2,
+    documentId: documents.at(0).uid,
+    text: 'This is my 2.2.1 chapter',
+    type: 'PROSE',
+    classification: [],
+    isHeading: true,
+    parentId: ch22Id
+  },
+  {
+    uid: ch3Id,
+    id: 11,
+    order: 3,
+    documentId: documents.at(0).uid,
+    text: 'This is my 3 chapter',
+    type: 'PROSE',
+    classification: [],
+    isHeading: true,
+    parentId: 0
   }
 ]

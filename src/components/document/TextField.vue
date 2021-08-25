@@ -1,10 +1,16 @@
 <template>
   <div
-    :class="{__bold: object.isHeading}"
     @click="editText(true)"
   >
     <span
+      v-if="object.isHeading"
+      class="__heading"
+    >
+      {{ object.chapter }}.
+    </span>
+    <span
       v-if="!edit"
+      :class="{__heading: object.isHeading}"
       class="__text"
     >{{ parseText() }}</span>
     <textarea
@@ -63,6 +69,7 @@ export default {
       console.log('Here: ', this.object[this.name])
       this.edit = edit
       if (edit) this.$nextTick(() => this.$refs.edit.focus())
+      if (!edit) this.$store.calculateChapters(this.$store.state.activeDocument.uid)
     },
     parseText () {
       return this.object[this.name]
@@ -76,7 +83,8 @@ export default {
   white-space: nowrap;
 }
 
-.__bold {
+.__heading {
+  font-size: 1rem;
   font-weight: bold;
 }
 

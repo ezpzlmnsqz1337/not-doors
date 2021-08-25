@@ -134,5 +134,21 @@ export default reactive({
     const column = this.state.columns.filter(x => x.uid === columnId).pop()
     if (!column) throw new Error(`Column ${columnId} not found`)
     return column
+  },
+  calculateChapters (documentId) {
+    // get document objects
+    const objects = this.state.objects.filter(x => x.documentId === documentId && x.isHeading)
+    // get root objects
+    this.calculateChaptersDeep(objects)
+  },
+  calculateChaptersDeep (objects, parentId = 0, chapter = '') {
+    console.log('CH: ', chapter)
+    objects
+      .filter(x => x.parentId === parentId)
+      .sort((a, b) => a.order - b.order)
+      .forEach((x, index) => {
+        x.chapter = chapter ? `${chapter}.${index + 1}` : `${index + 1}`
+        this.calculateChaptersDeep(objects, x.uid, x.chapter)
+      })
   }
 })
