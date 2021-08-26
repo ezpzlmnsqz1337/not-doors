@@ -22,7 +22,7 @@
           class="__row"
           :class="{__active: activeObject && activeObject.uid === o.uid}"
           @click="handleRowClick($event, o)"
-          @contextmenu.prevent="showActions($event, true)"
+          @contextmenu.prevent="handleRowContextMenu($event, o, true)"
         >
           <td
             v-for="c in columns"
@@ -37,6 +37,7 @@
         </tr>
       </table>
       <button
+        v-if="!objects.length"
         class="__add"
         @click.prevent="addObject()"
       >
@@ -48,6 +49,7 @@
     v-show="actions"
     ref="actions"
     :object="activeObject"
+    @hide="showActions(false)"
   />
 </template>
 
@@ -81,7 +83,7 @@ export default {
       return this.$store.state.columns
     },
     objects: function () {
-      return this.$store.state.objects.filter(x => x.documentId === this.activeDocument.uid)
+      return this.$store.getSortedObjects(this.activeDocument.uid)
     }
   },
   mounted: function () {
@@ -102,26 +104,23 @@ export default {
       this.resizing = null
     },
     addObject () {
-      this.$store.addObjectToDocument(this.activeDocument.uid, {
-        order: 4,
-        type: 'PROSE',
-        text: 'Dummy text',
-        classification: [],
-        isHeading: false,
-        chapter: 0,
-        parentId: 0
-      })
+      this.$store.addFirstObjectToDocument(this.activeDocument.uid)
     },
-    handleRowClick (e, object) {
+    handleRowClick (object) {
       this.setActiveObject(object)
-      this.showActions(e, false)
+      this.showActions(false)
     },
     setActiveObject (object) {
       this.$store.setActiveObject(object)
     },
-    showActions ({ clientX: x, clientY: y }, show) {
+    handleRowContextMenu (e, object, show) {
+      this.setActiveObject(object)
+      this.showActions(show, e)
+    },
+    showActions (show, e) {
       this.actions = show
       if (!show) return
+      const { clientX: x, clientY: y } = e
       const { offsetWidth: w, offsetHeight: h } = this.$refs.actions.$el
       const { innerWidth: wv, innerHeight: wh } = window
       this.$refs.actions.$el.style.left = `${x + w > wv ? x - w : x}px`

@@ -55,17 +55,20 @@ export default reactive({
     if (index === -1) throw new Error(`Document ${document} not found`)
     this.state.documents.splice(index, 1)
   },
-  addObjectToDocument (documentId, object) {
-    const id = this.state.objects
-      .filter(x => x.documentId === documentId)
-      .reduce((acc, { id: curr }) => curr > acc ? curr : acc, 0) + 1
-    this.state.objects.push({ uid: uuidv4(), id, ...object, documentId })
-  },
-  removeObjectFromDocument (documentId, objectId) {
-    const doc = this.findDocument(documentId)
-    const index = doc.data.findIndex(x => x.uid === objectId)
-    if (index === -1) throw new Error(`Object ${objectId} not found`)
-    doc.data.splice(index, 1)
+  addFirstObjectToDocument (documentId, object) {
+    this.state.objects.push({
+      ...object,
+      uid: uuidv4(),
+      id: 1,
+      parentId: 0,
+      order: 1,
+      isHeading: true,
+      documentId,
+      classification: [],
+      type: 'PROSE',
+      text: 'Dummy text'
+
+    })
   },
   findProject (projectId) {
     const project = this.state.projects.filter(x => x.uid === projectId).pop()
@@ -142,7 +145,6 @@ export default reactive({
     this.calculateChaptersDeep(objects)
   },
   calculateChaptersDeep (objects, parentId = 0, chapter = '') {
-    console.log('CH: ', chapter)
     objects
       .filter(x => x.parentId === parentId)
       .sort((a, b) => a.order - b.order)
@@ -150,5 +152,73 @@ export default reactive({
         x.chapter = chapter ? `${chapter}.${index + 1}` : `${index + 1}`
         this.calculateChaptersDeep(objects, x.uid, x.chapter)
       })
+  },
+  addObjectAfter (objectId, newObject) {
+    const { order, parentId, documentId } = this.findObject(objectId)
+    // get objects from same document
+    const documentObjects = this.getDocumentObjects(documentId)
+    // get objects on the same level, greater then the "after" object, increment their order
+    documentObjects
+      .filter(x => x.parentId === parentId && x.order > order)
+      .forEach(x => x.order++)
+    // construct new object
+    const id = Math.max(...documentObjects.map(x => x.id)) + 1
+    this.state.objects.push({
+      ...newObject,
+      uid: uuidv4(),
+      id,
+      order: order + 1,
+      documentId,
+      parentId,
+      classification: [],
+      isHeading: false
+    })
+  },
+  addObjectBelow (objectId, newObject) {
+    const { documentId } = this.findObject(objectId)
+    // get objects from same document
+    const documentObjects = this.getDocumentObjects(documentId)
+
+    documentObjects
+      .filter(x => x.parentId === objectId)
+      .forEach(x => x.order++)
+    // construct new object
+    const id = Math.max(...documentObjects.map(x => x.id)) + 1
+    this.state.objects.push({
+      ...newObject,
+      uid: uuidv4(),
+      id,
+      order: 1,
+      documentId,
+      parentId: objectId,
+      classification: [],
+      isHeading: false
+    })
+  },
+  getSortedObjects (documentId) {
+    const documentObjects = this.getDocumentObjects(documentId)
+    const result = []
+    this.getObjectChildren(result, documentObjects)
+    return result
+  },
+  getObjectChildren (result = [], objects, parentId = 0) {
+    objects
+      .filter(x => x.parentId === parentId)
+      .sort((a, b) => a.order - b.order)
+      .forEach(x => {
+        result.push(x)
+        this.getObjectChildren(result, objects, x.uid)
+      })
+  },
+  getDocumentObjects (documentId) {
+    return this.state.objects.filter(x => x.documentId === documentId)
+  },
+  removeObject (objectId) {
+    const { parentId, documentId, order } = this.findObject(objectId)
+    this.getDocumentObjects(documentId)
+      .filter(x => x.parentId === parentId && x.order > order)
+      .forEach(x => x.order--)
+    const index = this.state.objects.findIndex(x => x.uid === objectId)
+    this.state.objects.splice(index, 1)
   }
 })

@@ -22,7 +22,7 @@ export default {
   --active: #205b95;
   --text-light1: #ffffff;
   --text-light2: gray;
-  --text-dark: #ffffff;
+  --text-dark1: #242424;
   --bg-dark1: #8b8b8b;
   --bg-dark2: #5d5d5d;
   --bg-dark3: #424242;
@@ -31,6 +31,8 @@ export default {
   --bg-light1: #ffffff;
   --bg-light2: #a0a0a0;
   --bg-light3: #707070;
+  --border-light1: #ffffff;
+  --border-dark1: #424242;
 }
 
 * {

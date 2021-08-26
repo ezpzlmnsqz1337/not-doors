@@ -4,11 +4,11 @@
       {{ activeDocument.name }}
     </div>
     <div
-      v-for="h in headings"
-      :key="`heading${h.uid}`"
+      v-for="o in objects"
+      :key="`object${o.uid}`"
       class="__item"
     >
-      {{ `${h.chapter}. ${h.text}` }}
+      {{ getItem(o) }}
     </div>
   </div>
 </template>
@@ -23,9 +23,21 @@ export default {
       default: null
     }
   },
+  data: function () {
+    return {
+      onlyHeadings: false
+    }
+  },
   computed: {
-    headings: function () {
-      return this.$store.state.objects.filter(x => x.documentId === this.activeDocument.uid && x.isHeading)
+    objects: function () {
+      return this.$store.getSortedObjects(this.activeDocument.uid).filter(x => !this.onlyHeadings || x.isHeading)
+    }
+  },
+  methods: {
+    getItem ({ chapter, text, parentId, isHeading }) {
+      if (isHeading) return `${chapter}. ${text}`
+      return this.$store.findObject(parentId).chapter.split('')
+        .reduce(acc => acc + '-', '') + ` ${text}`
     }
   }
 }

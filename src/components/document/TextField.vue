@@ -66,13 +66,12 @@ export default {
       }, 0)
     },
     editText (edit) {
-      console.log('Here: ', this.object[this.name])
       this.edit = edit
       if (edit) this.$nextTick(() => this.$refs.edit.focus())
       if (!edit) this.$store.calculateChapters(this.$store.state.activeDocument.uid)
     },
     parseText () {
-      return this.object[this.name]
+      return this.object[this.name] + this.object.order
     }
   }
 }
