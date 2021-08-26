@@ -94,7 +94,7 @@ export default {
 
 .__textarea {
   outline: none;
-  background-color: #e6e6e6;
+  background-color: var(--bg-light);
   width: 100%;
   border: none;
   resize: vertical;

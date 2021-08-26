@@ -21,13 +21,13 @@
           :key="`object${o.uid}`"
           class="__row"
           :class="{__active: activeObject && activeObject.uid === o.uid}"
-          @click="setActiveObject(o)"
+          @click="handleRowClick($event, o)"
+          @contextmenu.prevent="showActions($event, true)"
         >
           <td
             v-for="c in columns"
             :key="o.name + c.name"
             class="__column"
-            @click="showActions($event, !actions, o, c)"
           >
             <Field
               :object="o"
@@ -44,22 +44,22 @@
       </button>
     </div>
   </PerfectScrollbar>
-  <div
+  <ObjectActions
     v-show="actions"
     ref="actions"
-    class="__actions"
-  >
-    Actions here!
-  </div>
+    :object="activeObject"
+  />
 </template>
 
 <script>
 import Field from '@/components/document/Field'
+import ObjectActions from '@/components/document/ObjectActions'
 
 export default {
   name: 'DocumentsContent',
   components: {
-    Field
+    Field,
+    ObjectActions
   },
   data: function () {
     return {
@@ -112,14 +112,20 @@ export default {
         parentId: 0
       })
     },
+    handleRowClick (e, object) {
+      this.setActiveObject(object)
+      this.showActions(e, false)
+    },
     setActiveObject (object) {
       this.$store.setActiveObject(object)
     },
-    showActions (e, show, o, c) {
+    showActions ({ clientX: x, clientY: y }, show) {
       this.actions = show
       if (!show) return
-      this.$refs.actions.style.left = `${e.clientX + 20}px`
-      this.$refs.actions.style.top = `${e.clientY + 20}px`
+      const { offsetWidth: w, offsetHeight: h } = this.$refs.actions.$el
+      const { innerWidth: wv, innerHeight: wh } = window
+      this.$refs.actions.$el.style.left = `${x + w > wv ? x - w : x}px`
+      this.$refs.actions.$el.style.top = `${y + h > wh ? y - h : y}px`
     }
   }
 }
@@ -136,15 +142,15 @@ export default {
 }
 
 tr.__row {
-  background-color: #8b8b8b;
+  background-color: var(--bg-dark1);
 }
 
 tr.__row:hover {
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 
 tr.__row.__active {
-  background-color: #205b95;
+  background-color: var(--active);
 }
 
 .__header {
@@ -154,7 +160,7 @@ tr.__row.__active {
 }
 
 .__header:hover {
-  background-color: #2970b6;
+  background-color: var(--hover);
   cursor: pointer;
 }
 
@@ -178,12 +184,5 @@ tr.__row.__active {
 .__scroll {
   height: 100%;
   overflow: scroll;
-}
-
-.__actions {
-  width: 200px;
-  height: 200px;
-  background-color: red;
-  position: fixed;
 }
 </style>

@@ -47,7 +47,7 @@ export default {
 
 .__item {
   padding-left: 3rem;
-  color: white;
+  color: var(--text-light1);
   line-height: 2rem;
   font-size: 0.9rem;
   cursor: pointer;
@@ -55,10 +55,10 @@ export default {
 }
 
 .__item:hover{
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 
 .__item.__active {
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 </style>

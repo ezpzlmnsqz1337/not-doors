@@ -18,8 +18,8 @@ export default {
   padding: 0 1rem;
   font-size: 1rem;
   text-align: center;
-  color: #ebe9e9;
+  color: var(--text-light1);
   font-weight: bold;
-  background-color: #a0a0a0;
+  background-color: var(--bg-dark2);
 }
 </style>

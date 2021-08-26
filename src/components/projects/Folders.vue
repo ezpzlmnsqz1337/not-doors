@@ -163,7 +163,7 @@ export default {
 <style scoped>
 .__item {
   user-select: none;
-  color: white;
+  color: var(--text-light1);
   line-height: 2rem;
   font-size: 0.9rem;
   cursor: pointer;
@@ -177,7 +177,7 @@ export default {
 }
 
 .__folder:hover{
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 
 .__folder .__name {
@@ -197,9 +197,9 @@ export default {
 
 .__control:hover {
   cursor: pointer;
-  color: gray;
+  color: var(--text-light2);
   border-radius: 0.2rem;
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 
 .__template {

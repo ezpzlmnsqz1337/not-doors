@@ -38,7 +38,7 @@ export default {
 <style scoped>
 .__documentsSection {
   flex: 1;
-  background-color: #242424;
+  background-color: var(--bg-dark5);
 }
 
 .__placeholder {
@@ -48,6 +48,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: gray;
+  color: var(--text-light2);
 }
 </style>

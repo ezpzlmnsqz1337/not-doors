@@ -45,6 +45,6 @@ export default {
 
 .__item:hover {
   cursor: pointer;
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 </style>

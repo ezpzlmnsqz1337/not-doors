@@ -43,7 +43,7 @@ export default {
 <style scoped>
 .__appMenu {
   width: 3rem;
-  background-color: #5d5d5d;
+  background-color: var(--bg-dark2);
   text-align: center;
 }
 
@@ -51,7 +51,7 @@ export default {
   user-select: none;
   width: 100%;
   height: 3rem;
-  color: white;
+  color: var(--text-light1);
 }
 
 .__item > span {
@@ -60,11 +60,11 @@ export default {
 }
 
 .__item:hover, .__item.__selected:hover {
-  background-color: #2970b6;
+  background-color: var(--hover);
   cursor: pointer;
 }
 
 .__item.__selected {
-  background-color: #424242;
+  background-color: var(--bg-dark4);
 }
 </style>

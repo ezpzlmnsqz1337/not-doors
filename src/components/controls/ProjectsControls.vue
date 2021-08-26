@@ -65,7 +65,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   padding-right: 1rem;
-  background-color: #3a3a3a;
+  background-color: var(--bg-dark4);
   padding: 0.2rem 1rem;
 }
 
@@ -78,9 +78,9 @@ export default {
 
 .__control:hover {
   cursor: pointer;
-  background-color: #2970b6;
+  background-color: var(--hover);
   border-radius: 0.2rem;
-  color: gray;
+  color: var(--text-light2);
 }
 
 .__template {

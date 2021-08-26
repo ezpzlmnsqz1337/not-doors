@@ -42,7 +42,7 @@ export default {
 <style scoped>
 .__documentsHeader {
   height: 2rem;
-  background-color: #424141;
+  background-color: var(--bg-dark3);
 }
 
 .__item:first-child{
@@ -55,17 +55,17 @@ export default {
   border-left: 1px solid black;
   display: inline-block;
   line-height: 2rem;
-  background-color: gray;
-  color: white;
+  background-color: var(--text-light2);
+  color: var(--text-light1);
   cursor: pointer;
 }
 
 .__item:hover, .__item.__active:hover {
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 
 .__item.__active {
-  background-color: #242424;
+  background-color: var(--bg-dark5);
 }
 
 .__item:hover .__close, .__item.__active .__close{
@@ -82,7 +82,7 @@ export default {
 }
 
 .__close:hover {
-  background-color: gray;
+  background-color: var(--text-light2);
   border-radius: 0.2rem;
 }
 </style>

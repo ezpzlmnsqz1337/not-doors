@@ -126,7 +126,7 @@ export default {
 }
 
 .__item {
-  color: white;
+  color: var(--text-light1);
   line-height: 2rem;
   font-size: 1rem;
   cursor: pointer;
@@ -140,7 +140,7 @@ export default {
 }
 
 .__project:hover{
-  background-color: #2970b6;
+  background-color: var(--hover);
 }
 
 .__project .__name {
@@ -168,8 +168,8 @@ export default {
 .__control:hover {
   cursor: pointer;
   border-radius: 0.2rem;
-  color: gray;
-  background-color: #2970b6;
+  color: var(--text-light2);
+  background-color: var(--hover);
 }
 
 .__template {

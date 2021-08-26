@@ -45,8 +45,8 @@ export default {
 <style scoped>
 .__appMenuContent {
   width: 20rem;
-  color: white;
-  background-color: #424242;
+  color: var(--text-light1);
+  background-color: var(--bg-dark4);
 }
 
 .__heading {

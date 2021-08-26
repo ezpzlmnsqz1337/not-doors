@@ -17,7 +17,7 @@ export default {
 
 <style scoped>
 .__documentsContent {
-  background-color: #242424;
+  background-color: var(--bg-dark5);
   position: relative;
   height: calc(100% - 2rem);
 }
