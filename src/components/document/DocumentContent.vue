@@ -27,6 +27,7 @@
             v-for="c in columns"
             :key="o.name + c.name"
             class="__column"
+            @click="showActions($event, !actions, o, c)"
           >
             <Field
               :object="o"
@@ -43,6 +44,13 @@
       </button>
     </div>
   </PerfectScrollbar>
+  <div
+    v-show="actions"
+    ref="actions"
+    class="__actions"
+  >
+    Actions here!
+  </div>
 </template>
 
 <script>
@@ -57,7 +65,8 @@ export default {
     return {
       resizing: null,
       startX: 0,
-      startWidth: 0
+      startWidth: 0,
+      actions: false
     }
   },
   computed: {
@@ -105,6 +114,12 @@ export default {
     },
     setActiveObject (object) {
       this.$store.setActiveObject(object)
+    },
+    showActions (e, show, o, c) {
+      this.actions = show
+      if (!show) return
+      this.$refs.actions.style.left = `${e.clientX + 20}px`
+      this.$refs.actions.style.top = `${e.clientY + 20}px`
     }
   }
 }
@@ -165,10 +180,10 @@ tr.__row.__active {
   overflow: scroll;
 }
 
-tr::after{
-  content: '';
-  display: inline-block;
-  height: 1rem;
+.__actions {
+  width: 200px;
+  height: 200px;
   background-color: red;
+  position: fixed;
 }
 </style>

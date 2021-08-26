@@ -1,6 +1,6 @@
 <template>
   <div
-    @click="editText(true)"
+    @click.stop="editText(true)"
   >
     <span
       v-if="object.isHeading"

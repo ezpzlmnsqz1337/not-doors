@@ -41,15 +41,15 @@ export default {
   methods: {
     setEnumValue (e) {
       const o = this.$store.findObject(this.object.uid)
-      if (this.column.multiple) {
-        const index = o[this.column.name].findIndex(x => x === e.target.value)
+      if (this.multiple) {
+        const index = o[this.name].findIndex(x => x === e.target.value)
         if (index !== -1) {
-          o[this.column.name].splice(index, 1)
+          o[this.name].splice(index, 1)
         } else {
-          o[this.column.name].push(e.target.value)
+          o[this.name].push(e.target.value)
         }
       } else {
-        o[this.column.name] = e.target.value
+        o[this.name] = e.target.value
       }
     }
   }
