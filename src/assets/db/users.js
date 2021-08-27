@@ -1,17 +1,29 @@
+import { v4 as uuidv4 } from 'uuid'
+
 export const users = [
   {
-    uid: 1,
-    name: 'Admin',
+    uid: uuidv4(),
+    name: 'Karl Adminmann',
     role: 'admin'
   },
   {
-    uid: 2,
-    name: 'Karl Mustermann',
+    uid: uuidv4(),
+    name: 'Karl Developermann',
     role: 'developer'
   },
   {
-    uid: 2,
-    name: 'Bob Josh',
+    uid: uuidv4(),
+    name: 'Karl Testermann',
+    role: 'tester'
+  },
+  {
+    uid: uuidv4(),
+    name: 'Karl Validatormann',
     role: 'validator'
+  },
+  {
+    uid: uuidv4(),
+    name: 'Karl Qualitymann',
+    role: 'quality'
   }
 ]

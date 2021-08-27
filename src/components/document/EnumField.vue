@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     setEnumValue (e) {
-      const o = this.$store.findObject(this.object.uid)
+      const o = this.$store.getObjectById(this.object.uid)
       if (this.multiple) {
         const index = o[this.name].findIndex(x => x === e.target.value)
         if (index !== -1) {

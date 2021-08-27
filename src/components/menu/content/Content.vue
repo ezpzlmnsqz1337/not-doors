@@ -36,7 +36,7 @@ export default {
   methods: {
     getItem ({ chapter, text, parentId, isHeading }) {
       if (isHeading) return `${chapter}. ${text}`
-      return this.$store.findObject(parentId).chapter.split('')
+      return this.$store.getObjectById(parentId).chapter.split('')
         .reduce(acc => acc + '-', '') + ` ${text}`
     }
   }

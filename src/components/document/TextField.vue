@@ -53,7 +53,7 @@ export default {
         return this.object[this.name]
       },
       set: function (value) {
-        this.$store.findObject(this.object.uid)[this.name] = value
+        this.$store.getObjectById(this.object.uid)[this.name] = value
       }
     }
   },

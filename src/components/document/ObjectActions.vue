@@ -63,7 +63,7 @@ export default {
       this.$emit('hide')
     },
     toggleTitle: function () {
-      this.$store.findObject(this.object.uid).isHeading = !this.object.isHeading
+      this.$store.getObjectById(this.object.uid).isHeading = !this.object.isHeading
     },
     delete: function () {
       this.$store.removeObject(this.object.uid)

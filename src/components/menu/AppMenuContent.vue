@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     heading: function () {
-      return this.$store.getMenuItem(this.activeMenuContent).name
+      return this.$store.getMenuItemById(this.activeMenuContent).name
     },
     activeDocument: function () {
       return this.$store.state.activeDocument

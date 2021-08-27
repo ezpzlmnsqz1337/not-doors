@@ -97,7 +97,7 @@ export default {
   methods: {
     startResize (e, columnId) {
       this.startX = e.pageX
-      this.resizing = this.$store.findColumn(columnId)
+      this.resizing = this.$store.getColumnById(columnId)
       this.startWidth = this.resizing.width
     },
     stopResize () {

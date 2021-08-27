@@ -124,7 +124,7 @@ export default {
       }
     },
     renameFolder (folderId, name) {
-      this.$store.findFolder(folderId).name = name
+      this.$store.getFolderById(folderId).name = name
       this.showRename = false
       this.renameFolderId = ''
       this.folderName = ''
