@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
-import App from '@/App.vue'
-import store from '@/store'
+import App from '@/App'
+import store from '@/store/index.js'
 import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 import 'material-icons/iconfont/material-icons.css'

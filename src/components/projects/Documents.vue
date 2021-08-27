@@ -1,11 +1,11 @@
 <template>
   <div class="__documents">
     <div
-      v-for="d in documents"
+      v-for="d in getFolderDocuments(folder.uid)"
       :key="`doc${d.uid}`"
       class="__item"
       :class="{__active: isActive(d.uid)}"
-      @click.stop="openDocument(d.uid)"
+      @click.stop="openDocument({document: d})"
     >
       {{ d.name }}
     </div>
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations, mapState } from 'vuex'
 export default {
   name: 'Documents',
   props: {
@@ -22,19 +23,13 @@ export default {
     }
   },
   computed: {
-    activeDocument: function () {
-      return this.$store.state.activeDocument
-    },
-    documents: function () {
-      return this.$store.state.documents.filter(x => x.folderId === this.folder.uid)
-    }
+    ...mapState(['activeDocument']),
+    ...mapGetters(['getFolderDocuments'])
   },
   methods: {
+    ...mapMutations(['openDocument']),
     isActive (documentId) {
       return this.activeDocument && this.activeDocument.uid === documentId
-    },
-    openDocument: function (documentId) {
-      this.$store.openDocument(documentId)
     }
   }
 }

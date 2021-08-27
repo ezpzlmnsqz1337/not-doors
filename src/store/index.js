@@ -1,5 +1,5 @@
 import { createStore, createLogger } from 'vuex'
-import users from '@/modules/users'
+import users from '@/store/modules/users'
 import { objects } from '@/assets/db/objects'
 import { projects } from '@/assets/db/projects'
 import { folders } from '@/assets/db/folders'
@@ -62,6 +62,12 @@ export default createStore({
       if (!column) throw new Error(`Column ${columnId} not found`)
       return column
     },
+    getProjectFolders: (state) => (projectId) => {
+      return state.folders.filter(x => x.projectId === projectId)
+    },
+    getFolderDocuments: (state) => (folderId) => {
+      return state.documents.filter(x => x.folderId === folderId)
+    },
     getDocumentObjects: (state) => (documentId) => {
       return state.objects.filter(x => x.documentId === documentId)
     },
@@ -85,19 +91,19 @@ export default createStore({
     addProject (state, { name }) {
       state.projects.push({ uid: uuidv4(), name })
     },
-    removeProject (state, { project }) {
-      if (!project) return
-      const index = state.projects.findIndex(x => x.uid === project.uid)
-      state.folders.filter(x => x.projectId === project.uid).forEach(x => this.removeFolder(x))
+    renameProject (state, { project, name }) {
+      project.name = name
+    },
+    removeProjectAtIndex (state, { index }) {
       state.projects.splice(index, 1)
     },
     addFolder (state, { projectId, name }) {
       state.folders.push({ uid: uuidv4(), name, projectId })
     },
-    removeFolder (state, { folder }) {
-      if (!folder) return
-      const index = state.folders.findIndex(x => x.uid === folder.uid)
-      state.documents.filter(x => x.folderId === folder.uid).forEach(x => this.removeDocument(x))
+    renameFolder (state, { folder, name }) {
+      folder.name = name
+    },
+    removeFolderAtIndex (state, { index }) {
       state.folders.splice(index, 1)
     },
     addDocument (state, { folderId, name }) {
@@ -108,9 +114,8 @@ export default createStore({
       const index = state.documents.findIndex(x => x.uid === document.uid)
       state.documents.splice(index, 1)
     },
-    addFirstObjectToDocument (state, { documentId, object }) {
+    addFirstObjectToDocument (state, { documentId }) {
       state.objects.push({
-        ...object,
         uid: uuidv4(),
         id: 1,
         parentId: 0,
@@ -128,24 +133,25 @@ export default createStore({
     },
     closeProject (state, { project }) {
       const openProjects = state.openProjects
-      const index = openProjects.findIndex(x => x === project.uid)
+      const index = openProjects.findIndex(x => x === project)
       if (index !== -1) openProjects.splice(index, 1)
     },
     openFolder (state, { folder }) {
-      if (!folder) state.openFolders.push(folder)
+      if (!folder) return
+      state.openFolders.push(folder)
     },
     closeFolder (state, { folder }) {
       const openFolders = state.openFolders
-      const index = openFolders.findIndex(x => x === folder.uid)
+      const index = openFolders.findIndex(x => x === folder)
       if (index !== -1) openFolders.splice(index, 1)
     },
     openDocument (state, { document }) {
-      const od = state.openDocuments.map(x => x.uid)
-      if (!od.includes(document.uid)) state.openDocuments.push(document)
+      const openDocuments = state.openDocuments
+      if (!openDocuments.includes(document)) openDocuments.push(document)
       state.activeDocument = document
     },
     closeDocument (state, { document }) {
-      const index = state.openDocuments.findIndex(x => x.uid === document.uid)
+      const index = state.openDocuments.findIndex(x => x === document)
       if (index === -1) return
       state.openDocuments.splice(index, 1)
       state.activeDocument = state.openDocuments.at(0)
@@ -156,8 +162,11 @@ export default createStore({
     setActiveObject (state, { object }) {
       state.activeObject = object
     },
+    setColumnWidth (state, { column, width }) {
+      column.width = width
+    },
     calculateChapters (state, { document }) {
-      const hs = state.objects.filter(x => x.documentId === document && x.isHeading)
+      const hs = state.objects.filter(x => x.documentId === document.uid && x.isHeading)
       const calculateChaptersDeep = (headings, parentId = 0, chapter = '') => {
         headings
           .filter(x => x.parentId === parentId)
@@ -191,18 +200,18 @@ export default createStore({
         isHeading: false
       })
     },
-    addObjectBelow (state, { object, data }) {
+    addObjectBelow (state, { object, newObject }) {
       const { documentId, uid } = object
 
       const objects = state.objects.filter(x => x.documentId === documentId)
       objects
-        .filter(x.parentId === uid)
+        .filter(x => x.parentId === uid)
         .forEach(x => x.order++)
 
       const id = objects.reduce((acc, { id }) => id > acc ? id : acc, 0)
 
       state.objects.push({
-        ...data,
+        ...newObject,
         uid: uuidv4(),
         id,
         order: 1,
@@ -219,6 +228,26 @@ export default createStore({
         .forEach(x => x.order--)
       const index = state.objects.findIndex(x => x.uid === uid)
       state.objects.splice(index, 1)
+    },
+    toggleObjectTitle (state, { object }) {
+      object.isHeading = !object.isHeading
+    },
+    setObjectProperty (state, { object, key, value }) {
+      object[key] = value
+    }
+  },
+  actions: {
+    removeProject ({ commit, dispatch, state }, { project }) {
+      if (!project) return
+      const index = state.projects.findIndex(x => x.uid === project.uid)
+      state.folders.filter(x => x.projectId === project.uid).forEach(x => dispatch('removeFolder', { folder: x }))
+      commit('removeProjectAtIndex', { index })
+    },
+    removeFolder ({ commit, state }, { folder }) {
+      if (!folder) return
+      const index = state.folders.findIndex(x => x.uid === folder.uid)
+      state.documents.filter(x => x.folderId === folder.uid).forEach(x => commit('removeDocument', { document: x }))
+      commit('removeFolderAtIndex', { index })
     }
   },
   strict: debug,

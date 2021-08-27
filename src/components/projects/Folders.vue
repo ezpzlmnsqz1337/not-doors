@@ -1,26 +1,27 @@
 <template>
   <div class="__folders">
     <div
-      v-for="f in folders"
+      v-for="f in getProjectFolders(project.uid)"
       :key="`folder${f.uid}`"
       class="__item"
     >
       <div
         class="__folder"
-        @click.stop="toggleFolder(f.uid)"
+        @click.stop="toggleFolder(f)"
       >
         <span
           class="__arrow"
-          :class="{__open: openFolders.includes(f.uid)}"
+          :class="{__open: openFolders.includes(f)}"
         >&#8250;</span>
         <span
-          v-if="!showRename"
+          v-if="!showRename || (f.uid !== folder.uid)"
           class="__name"
         >{{ f.name }}</span>
         <input
-          v-if="showRename"
+          v-show="showRename && f.uid === folder.uid"
           ref="rename"
           v-model="folderName"
+          class="__rename"
           type="text"
           @keydown="handleKeyDownRenameFolder($event)"
           @click.stop
@@ -32,16 +33,16 @@
           >edit</span>
           <span
             class="material-icons __control"
-            @click.stop="removeFolder(f.uid)"
+            @click.stop="removeFolder({folder: f})"
           >delete</span>
           <span
             class="material-icons __control"
-            @click.stop="showDocumentTemplate(true, f.uid)"
+            @click.stop="showDocumentTemplate(true, f)"
           >add_box</span>
         </div>
       </div>
       <div
-        v-if="showTemplate && f.uid === folderId"
+        v-if="showTemplate && f.uid === folder.uid"
         class="__template"
       >
         <input
@@ -53,7 +54,7 @@
         >
         <span
           class="material-icons __control"
-          @click.stop="addDocumentToFolder(folderId)"
+          @click.stop="addDocumentToFolder(folder)"
         >done</span>
         <span
           class="material-icons __control"
@@ -61,7 +62,7 @@
         >close</span>
       </div>
       <Documents
-        v-if="openFolders.includes(f.uid)"
+        v-if="openFolders.includes(f)"
         :folder="f"
       />
     </div>
@@ -71,6 +72,7 @@
 <script>
 import Documents from '@/components/projects/Documents'
 import Key from '@/constants/Key'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'Folders',
@@ -87,61 +89,53 @@ export default {
     return {
       showRename: false,
       folderName: '',
-      renameFolderId: '',
       showTemplate: false,
       documentName: 'DocumentName',
-      folderId: ''
+      folder: {}
     }
   },
   computed: {
-    folders: function () {
-      return this.$store.state.folders.filter(x => x.projectId === this.project.uid)
-    },
-    openFolders: function () {
-      return this.$store.state.openFolders
-    }
+    ...mapState(['openFolders']),
+    ...mapGetters(['getProjectFolders', 'getFolderById'])
   },
   methods: {
-    toggleFolder: function (folderId) {
-      const isOpen = this.openFolders.includes(folderId)
+    ...mapMutations(['openFolder', 'closeFolder', 'addDocument']),
+    ...mapMutations({ rf: 'renameFolder' }),
+    ...mapActions(['removeFolder']),
+    toggleFolder: function (folder) {
+      const isOpen = this.openFolders.includes(folder)
       if (!isOpen) {
-        this.$store.openFolder(folderId)
+        this.openFolder({ folder })
       } else {
-        this.$store.closeFolder(folderId)
+        this.closeFolder({ folder })
       }
-    },
-    openFolder (folderId) {
-      this.$store.openFolder(folderId)
     },
     showRenameInput (show, folder) {
       this.showRename = show
       if (show) {
-        this.renameFolderId = folder.uid
+        this.folder = folder
         this.folderName = folder.name
         this.$nextTick(() =>
           this.$refs.rename.select()
         )
       }
     },
-    renameFolder (folderId, name) {
-      this.$store.getFolderById(folderId).name = name
+    renameFolder (folder, name) {
+      this.rf({ folder, name })
       this.showRename = false
-      this.renameFolderId = ''
+      this.folder = {}
       this.folderName = ''
     },
     handleKeyDownRenameFolder: function (e) {
-      if (e.keyCode === Key.ENTER) this.renameFolder(this.renameFolderId, this.folderName)
+      if (e.keyCode === Key.ENTER) this.renameFolder(this.folder, this.folderName)
       if (e.keyCode === Key.ESCAPE) this.showRenameInput(false)
     },
-    removeFolder (folderId) {
-      this.$store.removeFolder(folderId)
-    },
     handleKeyDownCreateDocument: function (e) {
-      if (e.keyCode === Key.ENTER) this.addDocumentToFolder(this.folderId)
+      if (e.keyCode === Key.ENTER) this.addDocumentToFolder(this.folder)
       if (e.keyCode === Key.ESCAPE) this.showDocumentTemplate(false)
     },
-    showDocumentTemplate: function (show, folderId) {
-      this.folderId = folderId
+    showDocumentTemplate: function (show, folder) {
+      this.folder = folder
       this.showTemplate = show
       if (show) {
         this.$nextTick(() =>
@@ -149,12 +143,12 @@ export default {
         )
       }
     },
-    addDocumentToFolder: function (folderId) {
-      this.$store.addDocumentToFolder(folderId, this.documentName)
-      this.openFolder(folderId)
+    addDocumentToFolder: function (folder) {
+      this.addDocument({ folderId: folder.uid, name: this.documentName })
+      this.openFolder({ folder })
       this.documentName = 'DocumentName'
       this.showTemplate = false
-      this.folderId = ''
+      this.folder = {}
     }
   }
 }
@@ -222,5 +216,9 @@ export default {
 
 .__arrow.__open{
   transform: rotate(90deg);
+}
+
+.__rename {
+  flex: 1;
 }
 </style>

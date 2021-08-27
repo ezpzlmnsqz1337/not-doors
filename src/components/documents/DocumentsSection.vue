@@ -14,6 +14,7 @@
 <script>
 import DocumentsHeader from '@/components/documents/DocumentsHeader'
 import DocumentsContent from '@/components/documents/DocumentsContent'
+import { mapState } from 'vuex'
 
 export default {
   name: 'DocumentsSection',
@@ -21,13 +22,8 @@ export default {
     DocumentsHeader,
     DocumentsContent
   },
-  data: function () {
-    return {
-      openDocuments: this.$store.state.openDocuments,
-      activeDocument: this.$store.state.activeDocument
-    }
-  },
   computed: {
+    ...mapState(['openDocuments']),
     areOpenDocuments: function () {
       return this.openDocuments.length > 0
     }

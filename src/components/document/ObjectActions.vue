@@ -20,6 +20,7 @@
 <script>
 import Button from '@/components/ui/Button'
 import ButtonType from '@/constants/ButtonType'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Field',
@@ -37,36 +38,71 @@ export default {
     return {
       ButtonType,
       actions: [
-        { type: ButtonType.SUCCESS, title: 'Add object', icon: 'add_box', click: this.addObject, condition: () => true },
-        { type: ButtonType.SECONDARY, title: 'Add object below', icon: 'library_add', click: this.addObjectBelow, condition: () => this.object && this.object.isHeading },
-        { type: ButtonType.PRIMARY, title: 'Toggle heading', icon: 'title', click: this.toggleTitle, condition: () => this.object && this.$store.getDocumentObjects(this.object.documentId).length > 1 },
-        { type: ButtonType.DANGER, title: 'Remove object', icon: 'delete', click: this.delete, condition: () => true }
+        {
+          type: ButtonType.SUCCESS,
+          title: 'Add object',
+          icon: 'add_box',
+          click: this.addObject,
+          condition: () => true
+        },
+        {
+          type: ButtonType.SECONDARY,
+          title: 'Add object below',
+          icon: 'library_add',
+          click: this.addObjectBelow,
+          condition: () => this.object && this.object.isHeading
+        },
+        {
+          type: ButtonType.PRIMARY,
+          title: 'Toggle heading',
+          icon: 'title',
+          click: this.toggleTitle,
+          condition: () => this.object && this.getDocumentObjects(this.object.documentId).length > 1
+        },
+        {
+          type: ButtonType.DANGER,
+          title: 'Remove object',
+          icon: 'delete',
+          click: this.delete,
+          condition: () => true
+        }
       ]
     }
   },
+  computed: {
+    ...mapGetters(['getDocumentObjects'])
+  },
   methods: {
+    ...mapMutations(['toggleObjectTitle']),
+    ...mapMutations({ addAfter: 'addObjectAfter', addBelow: 'addObjectBelow', ro: 'removeObject' }),
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },
     addObject: function () {
-      this.$store.addObjectAfter(this.object.uid, {
-        type: 'PROSE',
-        text: 'Object text'
+      this.addAfter({
+        object: this.object,
+        newObject: {
+          type: 'PROSE',
+          text: 'Object text'
+        }
       })
       this.$emit('hide')
     },
     addObjectBelow: function () {
-      this.$store.addObjectBelow(this.object.uid, {
-        type: 'PROSE',
-        text: 'Object below text'
+      this.addBelow({
+        object: this.object,
+        newObject: {
+          type: 'PROSE',
+          text: 'Object below text'
+        }
       })
       this.$emit('hide')
     },
     toggleTitle: function () {
-      this.$store.getObjectById(this.object.uid).isHeading = !this.object.isHeading
+      this.toggleObjectTitle({ object: this.object })
     },
     delete: function () {
-      this.$store.removeObject(this.object.uid)
+      this.ro({ object: this.object })
       this.$emit('hide')
     }
   }

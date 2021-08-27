@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'EnumField',
   props: {
@@ -38,19 +39,25 @@ export default {
       default: () => []
     }
   },
+  computed: {
+    ...mapGetters(['getObjectById'])
+  },
   methods: {
+    ...mapMutations(['setObjectProperty']),
     setEnumValue (e) {
-      const o = this.$store.getObjectById(this.object.uid)
+      const object = this.getObjectById(this.object.uid)
+      let values = [...object[this.name]]
       if (this.multiple) {
-        const index = o[this.name].findIndex(x => x === e.target.value)
+        const index = values.findIndex(x => x === e.target.value)
         if (index !== -1) {
-          o[this.name].splice(index, 1)
+          values.splice(index, 1)
         } else {
-          o[this.name].push(e.target.value)
+          values.push(e.target.value)
         }
       } else {
-        o[this.name] = e.target.value
+        values = e.target.value
       }
+      this.setObjectProperty({ object, key: this.name, value: values })
     }
   }
 }

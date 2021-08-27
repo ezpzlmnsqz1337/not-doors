@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Content',
@@ -29,14 +30,15 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['getObjectById', 'getSortedObjects']),
     objects: function () {
-      return this.$store.getSortedObjects(this.activeDocument.uid).filter(x => !this.onlyHeadings || x.isHeading)
+      return this.getSortedObjects(this.activeDocument.uid).filter(x => !this.onlyHeadings || x.isHeading)
     }
   },
   methods: {
     getItem ({ chapter, text, parentId, isHeading }) {
       if (isHeading) return `${chapter}. ${text}`
-      return this.$store.getObjectById(parentId).chapter.split('')
+      return this.getObjectById(parentId).chapter.split('')
         .reduce(acc => acc + '-', '') + ` ${text}`
     }
   }

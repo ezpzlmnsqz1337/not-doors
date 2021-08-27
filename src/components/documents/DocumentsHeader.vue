@@ -5,36 +5,27 @@
       :key="`ad${d.uid}`"
       class="__item"
       :class="{__active: activeDocument && d.uid === activeDocument.uid}"
-      @click="openDocument(d.uid)"
+      @click="openDocument({document: d})"
     >
       <span>{{ d.name }}</span>
       <span
         class="__close"
-        @click.stop="closeDocument(d.uid)"
+        @click.stop="closeDocument({document: d})"
       >×</span>
     </div>
   </div>
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'DocumentsHeader',
   computed: {
-    openDocuments: function () {
-      return this.$store.state.openDocuments
-    },
-    activeDocument: function () {
-      return this.$store.state.activeDocument
-    }
+    ...mapState(['openDocuments', 'activeDocument'])
   },
   methods: {
-    closeDocument (documentId) {
-      this.$store.closeDocument(documentId)
-    },
-    openDocument (documentId) {
-      this.$store.openDocument(documentId)
-    }
+    ...mapMutations(['closeDocument', 'openDocument'])
   }
 }
 </script>

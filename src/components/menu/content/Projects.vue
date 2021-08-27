@@ -5,43 +5,55 @@
       v-for="p in projects"
       :key="`project${p.uid}`"
       class="__item"
-      @click="toggleProject(p.uid)"
+      @click="toggleProject(p)"
     >
       <div class="__project">
         <span
           class="__arrow"
-          :class="{__open: openProjects.includes(p.uid)}"
+          :class="{__open: openProjects.includes(p)}"
         >&#8250;</span>
-        <span class="__name">{{ p.name }}</span>
+        <span
+          v-if="!showRename || (p.uid !== project.uid)"
+          class="__name"
+        >{{ p.name }}</span>
+        <input
+          v-show="showRename && p.uid === project.uid"
+          ref="rename"
+          v-model="projectName"
+          class="__rename"
+          type="text"
+          @keydown="handleKeyDownRenameProject($event)"
+          @click.stop
+        >
         <div class="__controls">
           <span
             class="material-icons __control"
-            @click.stop="renameProject(p.uid)"
+            @click.stop="showRenameInput(true, p)"
           >edit</span>
           <span
             class="material-icons __control"
-            @click.stop="removeProject(p.uid)"
+            @click.stop="removeProject({project: p})"
           >delete</span>
           <span
             class="material-icons __control"
-            @click.stop="showFolderTemplate(true, p.uid)"
+            @click.stop="showFolderTemplate(true, p)"
           >add_box</span>
         </div>
       </div>
       <div
-        v-if="showTemplate && p.uid === projectId"
+        v-if="showTemplate && p.uid === project.uid"
         class="__template"
       >
         <input
           ref="name"
           v-model="folderName"
           type="text"
-          @keydown="handleKeyDown($event)"
+          @keydown="handleKeyDownCreateFolder($event)"
           @click.stop
         >
         <span
           class="material-icons __control"
-          @click.stop="addFolderToProject(projectId)"
+          @click.stop="addFolderToProject(project)"
         >done</span>
         <span
           class="material-icons __control"
@@ -49,7 +61,7 @@
         >close</span>
       </div>
       <Folders
-        v-if="openProjects.includes(p.uid)"
+        v-if="openProjects.includes(p)"
         :project="p"
       />
     </div>
@@ -60,6 +72,7 @@
 import Folders from '@/components/projects/Folders'
 import ProjectsControls from '@/components/controls/ProjectsControls'
 import Key from '@/constants/Key'
+import { mapActions, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'Projects',
@@ -71,38 +84,52 @@ export default {
     return {
       showTemplate: false,
       folderName: 'FolderName',
-      projectId: ''
+      showRename: false,
+      projectName: '',
+      project: {}
     }
   },
   computed: {
-    projects: function () {
-      return this.$store.state.projects
-    },
-    openProjects: function () {
-      return this.$store.state.openProjects
-    }
+    ...mapState(['projects', 'openProjects'])
   },
   methods: {
-    toggleProject: function (projectId) {
-      const isOpen = this.openProjects.includes(projectId)
+    ...mapMutations(['openProject', 'closeProject', 'addFolder']),
+    ...mapMutations({ rp: 'renameProject' }),
+    ...mapActions(['removeProject']),
+    toggleProject: function (project) {
+      const isOpen = this.openProjects.includes(project)
       if (!isOpen) {
-        this.$store.openProject(projectId)
+        this.openProject({ project })
       } else {
-        this.$store.closeProject(projectId)
+        this.closeProject({ project })
       }
     },
-    removeProject: function (projectId) {
-      this.$store.removeProject(projectId)
+    showRenameInput (show, project) {
+      this.showRename = show
+      if (show) {
+        this.project = project
+        this.projectName = project.name
+        this.$nextTick(() =>
+          this.$refs.rename.select()
+        )
+      }
     },
-    openProject: function (projectId) {
-      this.$store.openProject(projectId)
+    renameProject (project, name) {
+      this.rp({ project, name })
+      this.showRename = false
+      this.project = {}
+      this.projectName = ''
     },
-    handleKeyDown: function (e) {
-      if (e.keyCode === Key.ENTER) this.addFolderToProject(this.projectId)
+    handleKeyDownRenameProject: function (e) {
+      if (e.keyCode === Key.ENTER) this.renameProject(this.project, this.projectName)
+      if (e.keyCode === Key.ESCAPE) this.showRenameInput(false)
+    },
+    handleKeyDownCreateFolder: function (e) {
+      if (e.keyCode === Key.ENTER) this.addFolderToProject(this.project)
       if (e.keyCode === Key.ESCAPE) this.showFolderTemplate(false)
     },
-    showFolderTemplate: function (show, projectId) {
-      this.projectId = projectId
+    showFolderTemplate: function (show, project) {
+      this.project = project
       this.showTemplate = show
       if (show) {
         this.$nextTick(() =>
@@ -110,9 +137,9 @@ export default {
         )
       }
     },
-    addFolderToProject: function (projectId) {
-      this.$store.addFolderToProject(projectId, this.folderName)
-      this.openProject(projectId)
+    addFolderToProject: function (project) {
+      this.addFolder({ projectId: project.uid, name: this.folderName })
+      this.openProject({ project })
       this.folderName = 'FolderName'
       this.showTemplate = false
     }
@@ -192,5 +219,9 @@ export default {
 
 .__arrow.__open{
   transform: rotate(90deg);
+}
+
+.__rename {
+  flex: 1;
 }
 </style>

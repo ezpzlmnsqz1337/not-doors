@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 export default {
   name: 'TextField',
   props: {
@@ -53,11 +54,12 @@ export default {
         return this.object[this.name]
       },
       set: function (value) {
-        this.$store.getObjectById(this.object.uid)[this.name] = value
+        this.setObjectProperty({ object: this.object, key: this.name, value })
       }
     }
   },
   methods: {
+    ...mapMutations(['setObjectProperty']),
     resize () {
       const text = this.$refs.edit
       setTimeout(() => {
@@ -68,10 +70,9 @@ export default {
     editText (edit) {
       this.edit = edit
       if (edit) this.$nextTick(() => this.$refs.edit.focus())
-      if (!edit) this.$store.calculateChapters(this.$store.state.activeDocument.uid)
     },
     parseText () {
-      return this.object[this.name] + this.object.order
+      return this.object[this.name]
     }
   }
 }

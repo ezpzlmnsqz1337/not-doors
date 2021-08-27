@@ -4,8 +4,8 @@
       v-for="i in items"
       :key="`item${i.name}`"
       class="__item"
-      :class="getItemClass(i.id)"
-      @click="toggle(i.id)"
+      :class="getItemClass(i)"
+      @click="toggle(i)"
     >
       <span
         class="material-icons"
@@ -16,24 +16,24 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex'
 export default {
   name: 'AppMenu',
   computed: {
+    ...mapState(['activeMenuContent', 'menuItems', 'activeDocument']),
     items: function () {
-      return this.$store.state.menuItems.filter(x => x.activeDocument ? this.$store.state.activeDocument : true)
-    },
-    activeMenuContent: function () {
-      return this.$store.state.activeMenuContent
+      return this.menuItems.filter(x => x.activeDocument ? this.activeDocument : true)
     }
   },
   methods: {
-    toggle: function (itemId) {
-      const active = this.$store.state.activeMenuContent === itemId ? null : itemId
-      this.$store.setActiveMenuContent(active)
+    ...mapMutations(['setActiveMenuContent']),
+    toggle: function ({ id }) {
+      const active = this.activeMenuContent === id ? null : id
+      this.setActiveMenuContent({ type: active })
     },
-    getItemClass (activeItem) {
+    getItemClass ({ id }) {
       return {
-        __selected: this.activeMenuContent === activeItem
+        __selected: this.activeMenuContent === id
       }
     }
   }

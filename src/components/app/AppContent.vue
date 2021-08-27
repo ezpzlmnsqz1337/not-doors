@@ -10,6 +10,7 @@
 import AppMenu from '@/components/menu/AppMenu'
 import AppMenuContent from '@/components/menu/AppMenuContent'
 import DocumentsSection from '@/components/documents/DocumentsSection'
+import { mapState } from 'vuex'
 
 export default {
   name: 'AppContent',
@@ -19,9 +20,7 @@ export default {
     DocumentsSection
   },
   computed: {
-    activeMenuContent: function () {
-      return this.$store.state.activeMenuContent
-    }
+    ...mapState(['activeMenuContent'])
   }
 }
 </script>

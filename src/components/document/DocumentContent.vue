@@ -12,7 +12,7 @@
             <span>{{ c.displayName }}</span>
             <div
               class="__resize"
-              @mousedown="startResize($event, c.uid)"
+              @mousedown="startResize($event, c)"
             />
           </th>
         </tr>
@@ -39,7 +39,7 @@
       <button
         v-if="!objects.length"
         class="__add"
-        @click.prevent="addObject()"
+        @click.prevent="addFirstObjectToDocument({documentId: activeDocument.uid})"
       >
         +
       </button>
@@ -56,6 +56,7 @@
 <script>
 import Field from '@/components/document/Field'
 import ObjectActions from '@/components/document/ObjectActions'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'DocumentsContent',
@@ -72,49 +73,38 @@ export default {
     }
   },
   computed: {
-    activeObject: function () {
-      return this.$store.state.activeObject
-    },
-    activeDocument: function () {
-      this.$store.calculateChapters(this.$store.state.activeDocument.uid)
-      return this.$store.state.activeDocument
-    },
-    columns: function () {
-      return this.$store.state.columns
-    },
+    ...mapState(['activeObject']),
+    ...mapState(['activeDocument', 'columns']),
+    ...mapGetters(['getSortedObjects']),
     objects: function () {
-      return this.$store.getSortedObjects(this.activeDocument.uid)
+      this.calculateChapters({ document: this.activeDocument })
+      return this.getSortedObjects(this.activeDocument.uid)
     }
   },
   mounted: function () {
     document.addEventListener('mousemove', e => {
       if (this.resizing) {
-        this.resizing.width = this.startWidth + (e.pageX - this.startX)
+        this.setColumnWidth({ column: this.resizing, width: this.startWidth + (e.pageX - this.startX) })
       }
     })
     document.addEventListener('mouseup', () => this.stopResize())
   },
   methods: {
-    startResize (e, columnId) {
+    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setColumnWidth']),
+    startResize (e, column) {
       this.startX = e.pageX
-      this.resizing = this.$store.getColumnById(columnId)
-      this.startWidth = this.resizing.width
+      this.resizing = column
+      this.startWidth = column.width
     },
     stopResize () {
       this.resizing = null
     },
-    addObject () {
-      this.$store.addFirstObjectToDocument(this.activeDocument.uid)
-    },
     handleRowClick (object) {
-      this.setActiveObject(object)
+      this.setActiveObject({ object })
       this.showActions(false)
     },
-    setActiveObject (object) {
-      this.$store.setActiveObject(object)
-    },
     handleRowContextMenu (e, object, show) {
-      this.setActiveObject(object)
+      this.setActiveObject({ object })
       this.showActions(show, e)
     },
     showActions (show, e) {

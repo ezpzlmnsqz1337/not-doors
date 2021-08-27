@@ -15,6 +15,7 @@
 import Projects from '@/components/menu/content/Projects'
 import Content from '@/components/menu/content/Content'
 import MenuItem from '@/constants/MenuItem'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'AppMenuContent',
@@ -23,14 +24,10 @@ export default {
     Content
   },
   computed: {
+    ...mapGetters(['getMenuItemById']),
+    ...mapState(['activeDocument', 'activeMenuContent']),
     heading: function () {
-      return this.$store.getMenuItemById(this.activeMenuContent).name
-    },
-    activeDocument: function () {
-      return this.$store.state.activeDocument
-    },
-    activeMenuContent: function () {
-      return this.$store.state.activeMenuContent
+      return this.getMenuItemById(this.activeMenuContent).name
     },
     showProjects: function () {
       return this.activeMenuContent === MenuItem.PROJECTS

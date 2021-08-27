@@ -13,6 +13,7 @@ export const objects = [
     text: 'My first chapter',
     classification: [],
     isHeading: true,
+    chapter: '',
     parentId: 0
   },
   {
@@ -24,6 +25,7 @@ export const objects = [
     text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Quisque tincidunt scelerisque libero. In dapibus augue non sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed vel lectus.',
     classification: [],
     isHeading: false,
+    chapter: '',
     parentId: ch1Id
   },
   {
@@ -35,6 +37,7 @@ export const objects = [
     text: 'Maecenas sollicitudin. Mauris suscipit, ligula sit amet pharetra semper, nibh ante cursus purus, vel sagittis velit mauris vel metus.',
     classification: [],
     isHeading: false,
+    chapter: '',
     parentId: ch1Id
   },
   {
@@ -46,6 +49,7 @@ export const objects = [
     text: 'My second chapter',
     classification: [],
     isHeading: true,
+    chapter: '',
     parentId: 0
   },
   {
@@ -57,6 +61,7 @@ export const objects = [
     type: 'DEF',
     classification: ['Security'],
     isHeading: false,
+    chapter: '',
     parentId: ch2Id
   },
   {
@@ -68,6 +73,7 @@ export const objects = [
     type: 'PROSE',
     classification: [],
     isHeading: true,
+    chapter: '',
     parentId: ch2Id
   },
   {
@@ -79,6 +85,7 @@ export const objects = [
     type: 'PROSE',
     classification: [],
     isHeading: false,
+    chapter: '',
     parentId: ch21Id
   },
   {
@@ -90,6 +97,7 @@ export const objects = [
     type: 'PROSE',
     classification: [],
     isHeading: true,
+    chapter: '',
     parentId: ch2Id
   },
   {
@@ -101,6 +109,7 @@ export const objects = [
     type: 'PROSE',
     classification: [],
     isHeading: false,
+    chapter: '',
     parentId: ch22Id
   },
   {
@@ -112,6 +121,7 @@ export const objects = [
     type: 'PROSE',
     classification: [],
     isHeading: true,
+    chapter: '',
     parentId: ch22Id
   },
   {
@@ -123,6 +133,7 @@ export const objects = [
     type: 'PROSE',
     classification: [],
     isHeading: true,
+    chapter: '',
     parentId: 0
   }
 ]
