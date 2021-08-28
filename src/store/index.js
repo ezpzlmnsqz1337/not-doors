@@ -221,6 +221,9 @@ export default createStore({
         isHeading: false
       })
     },
+    updateObjectsOrder (state, { newOrder }) {
+      state.objects = newOrder
+    },
     removeObject (state, { object }) {
       const { parentId, documentId, order, uid } = object
       state.objects.filter(x => x.documentId === documentId)
@@ -234,6 +237,15 @@ export default createStore({
     },
     setObjectProperty (state, { object, key, value }) {
       object[key] = value
+    },
+    moveObjectAfter (state, { after, object }) {
+      state.objects.filter(x => x.uid !== after.uid && x.parentId === after.parentId && x.order > after.order).forEach(x => x.order++)
+      state.objects.filter(x => x.uid !== object.uid && x.parentId === object.parentId && x.order > object.order).forEach(x => x.order--)
+      object.parentId = after.parentId
+      object.order = after.order + 1
+    },
+    moveObjectBelow (state, { below, object }) {
+
     }
   },
   actions: {

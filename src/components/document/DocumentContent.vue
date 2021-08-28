@@ -16,25 +16,35 @@
             />
           </th>
         </tr>
-        <tr
-          v-for="o in objects"
-          :key="`object${o.uid}`"
-          class="__row"
-          :class="{__active: activeObject && activeObject.uid === o.uid}"
-          @click="handleRowClick($event, o)"
-          @contextmenu.prevent="handleRowContextMenu($event, o, true)"
+        <draggable
+          v-model="myObjects"
+          tag="transition-group"
+          :component-data="{name:'flip-list'}"
+          v-bind="dragOptions"
+          item-key="uid"
+          @start="dragStart($event)"
+          @end="dragEnd($event)"
         >
-          <td
-            v-for="c in columns"
-            :key="o.name + c.name"
-            class="__column"
-          >
-            <Field
-              :object="o"
-              :column="c"
-            />
-          </td>
-        </tr>
+          <template #item="{element:o}">
+            <tr
+              class="__row"
+              :class="{__active: activeObject && activeObject.uid === o.uid}"
+              @click="handleRowClick(o)"
+              @contextmenu.prevent="handleRowContextMenu($event, o, true)"
+            >
+              <td
+                v-for="c in columns"
+                :key="o.name + c.name"
+                class="__column"
+              >
+                <Field
+                  :object="o"
+                  :column="c"
+                />
+              </td>
+            </tr>
+          </template>
+        </draggable>
       </table>
       <button
         v-if="!objects.length"
@@ -48,7 +58,7 @@
   <ObjectActions
     ref="actions"
     :object="activeObject"
-    @hide="showActions(false)"
+    @hide="hideActions()"
   />
 </template>
 
@@ -56,27 +66,45 @@
 import Field from '@/components/document/Field'
 import ObjectActions from '@/components/document/ObjectActions'
 import { mapGetters, mapMutations, mapState } from 'vuex'
+import draggable from 'vuedraggable'
 
 export default {
   name: 'DocumentsContent',
   components: {
     Field,
-    ObjectActions
+    ObjectActions,
+    draggable
   },
   data: function () {
     return {
       resizing: null,
       startX: 0,
-      startWidth: 0
+      startWidth: 0,
+      draggedElement: null
     }
   },
   computed: {
     ...mapState(['activeObject']),
     ...mapState(['activeDocument', 'columns']),
-    ...mapGetters(['getSortedObjects']),
+    ...mapGetters(['getSortedObjects', 'getDocumentObjects']),
     objects: function () {
       this.calculateChapters({ document: this.activeDocument })
       return this.getSortedObjects(this.activeDocument.uid)
+    },
+    myObjects: {
+      get: function () {
+        return this.objects
+      },
+      set: function (value) {
+        console.log(value.length)
+      }
+    },
+    dragOptions () {
+      return {
+        animation: 200,
+        disabled: false,
+        ghostClass: 'ghost'
+      }
     }
   },
   mounted: function () {
@@ -86,10 +114,23 @@ export default {
       }
     })
     document.addEventListener('mouseup', () => this.stopResize())
-    document.addEventListener('click', () => this.showActions(false))
+    document.addEventListener('click', () => this.hideActions())
   },
   methods: {
-    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setColumnWidth']),
+    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter']),
+    dragStart ({ oldIndex }) {
+      this.draggedElement = this.objects.at(oldIndex - 1)
+    },
+    dragEnd ({ oldIndex, newIndex }) {
+      if (oldIndex === newIndex) return
+      const id = oldIndex < newIndex ? 1 : 2
+      const payload = {
+        object: this.draggedElement,
+        after: this.objects.at(newIndex - id)
+      }
+      this.moveObjectAfter(payload)
+      console.log('Payload: ', payload.object.id, payload.after.id)
+    },
     startResize (e, column) {
       this.startX = e.pageX
       this.resizing = column
@@ -100,27 +141,26 @@ export default {
     },
     handleRowClick (object) {
       this.setActiveObject({ object })
-      this.showActions(false)
+      this.hideActions()
     },
     handleRowContextMenu (e, object, show) {
       this.setActiveObject({ object })
-      this.showActions(show, e)
+      this.showActions(e)
     },
-    showActions (show, e) {
-      if (!show) {
-        this.$refs.actions.$el.style.transform = 'rotateX(90deg)'
-        setTimeout(() => {
-          this.$refs.actions.$el.style.left = '-100vw'
-          this.$refs.actions.$el.style.top = '-100vh'
-        }, 200)
-        return
-      }
+    showActions (e) {
       const { clientX: x, clientY: y } = e
       const { offsetWidth: w, offsetHeight: h } = this.$refs.actions.$el
       const { innerWidth: wv, innerHeight: wh } = window
       this.$refs.actions.$el.style.transform = 'rotateX(0deg)'
       this.$refs.actions.$el.style.left = `${x + w > wv ? x - w : x}px`
       this.$refs.actions.$el.style.top = `${y + h > wh ? y - h : y}px`
+    },
+    hideActions () {
+      this.$refs.actions.$el.style.transform = 'rotateX(90deg)'
+      setTimeout(() => {
+        this.$refs.actions.$el.style.left = '-100vw'
+        this.$refs.actions.$el.style.top = '-100vh'
+      }, 200)
     }
   }
 }
