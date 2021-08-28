@@ -33,6 +33,7 @@ export default {
   --bg-light3: #707070;
   --border-light1: #ffffff;
   --border-dark1: #424242;
+  --anchor: #2183df;
 }
 
 * {
@@ -54,6 +55,17 @@ body {
   margin-top: 0;
 }
 
+input[type=text], input[type=password], input[type=email] {
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  border: none;
+}
+
+a {
+  color: var(--anchor);
+}
+
+/* custom scrollbar overrides */
 .ps .ps__rail-x:hover, .ps .ps__rail-y:hover, .ps .ps__rail-x:focus, .ps .ps__rail-y:focus, .ps .ps__rail-x.ps--clicking, .ps .ps__rail-y.ps--clicking {
   background-color: transparent !important;
 }

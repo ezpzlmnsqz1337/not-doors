@@ -45,7 +45,7 @@ import ButtonType from '@/constants/ButtonType'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
-  name: 'Field',
+  name: 'ObjectActions',
   components: {
     Button
   },

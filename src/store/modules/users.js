@@ -12,18 +12,29 @@ const getters = {
 
 // actions
 const actions = {
-
+  login ({ commit, state }, { email, password }) {
+    // fake login for now
+    const user = state.users.find(x => x.email === email && x.password === password)
+    if (!user) return
+    commit('setUser', { user })
+  },
+  logout ({ commit }) {
+    // fake logout for now
+    commit('setUser', { user: null })
+  }
 }
 
 // mutations
 const mutations = {
-  addUser (state, user) {
+  addUser (state, { user }) {
     state.items.push(user)
   },
-
-  removeUser (state, userId) {
-    const index = state.users.findIndex(x => x.uid === userId)
+  removeUser (state, { user }) {
+    const index = state.users.findIndex(x => x.uid === user.uid)
     state.users.splice(index, 1)
+  },
+  setUser (state, { user }) {
+    state.activeUser = user
   }
 }
 
