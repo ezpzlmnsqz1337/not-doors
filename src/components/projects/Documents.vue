@@ -1,9 +1,10 @@
 <template>
   <div class="__documents">
     <div
-      v-for="d in getFolderDocuments(folder.uid)"
+      v-for="d in getDocuments(folder.uid)"
       :key="`doc${d.uid}`"
       class="__item"
+      :style="`padding-left: ${level}rem`"
       :class="{__active: isActive(d.uid)}"
       @click.stop="openDocument({document: d})"
     >
@@ -20,11 +21,15 @@ export default {
     folder: {
       type: Object,
       default: null
+    },
+    level: {
+      type: Number,
+      default: 3
     }
   },
   computed: {
     ...mapState(['activeDocument']),
-    ...mapGetters(['getFolderDocuments'])
+    ...mapGetters(['getDocuments'])
   },
   methods: {
     ...mapMutations(['openDocument']),
@@ -41,7 +46,6 @@ export default {
 }
 
 .__item {
-  padding-left: 3rem;
   color: var(--text-light1);
   line-height: 2rem;
   font-size: 0.9rem;

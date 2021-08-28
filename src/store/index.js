@@ -62,11 +62,11 @@ export default createStore({
       if (!column) throw new Error(`Column ${columnId} not found`)
       return column
     },
-    getProjectFolders: (state) => (projectId) => {
-      return state.folders.filter(x => x.projectId === projectId)
+    getFolders: (state) => (parentId) => {
+      return state.folders.filter(x => x.parentId === parentId)
     },
-    getFolderDocuments: (state) => (folderId) => {
-      return state.documents.filter(x => x.folderId === folderId)
+    getDocuments: (state) => (parentId) => {
+      return state.documents.filter(x => x.parentId === parentId)
     },
     getDocumentObjects: (state) => (documentId) => {
       return state.objects.filter(x => x.documentId === documentId)
@@ -97,8 +97,8 @@ export default createStore({
     removeProjectAtIndex (state, { index }) {
       state.projects.splice(index, 1)
     },
-    addFolder (state, { projectId, name }) {
-      state.folders.push({ uid: uuidv4(), name, projectId })
+    addFolder (state, { parent, name }) {
+      state.folders.push({ uid: uuidv4(), name, parentId: parent.uid })
     },
     renameFolder (state, { folder, name }) {
       folder.name = name
@@ -106,8 +106,8 @@ export default createStore({
     removeFolderAtIndex (state, { index }) {
       state.folders.splice(index, 1)
     },
-    addDocument (state, { folderId, name }) {
-      state.documents.push({ uid: uuidv4(), name, folderId })
+    addDocument (state, { parent, name }) {
+      state.documents.push({ uid: uuidv4(), name, parentId: parent.uid, columns: state.columns })
     },
     removeDocument (state, document) {
       if (!document) return
@@ -243,11 +243,27 @@ export default createStore({
       state.folders.filter(x => x.projectId === project.uid).forEach(x => dispatch('removeFolder', { folder: x }))
       commit('removeProjectAtIndex', { index })
     },
+    toggleProject ({ commit, state }, { project }) {
+      const isOpen = state.openProjects.includes(project)
+      if (!isOpen) {
+        commit('openProject', { project })
+      } else {
+        commit('closeProject', { project })
+      }
+    },
     removeFolder ({ commit, state }, { folder }) {
       if (!folder) return
       const index = state.folders.findIndex(x => x.uid === folder.uid)
       state.documents.filter(x => x.folderId === folder.uid).forEach(x => commit('removeDocument', { document: x }))
       commit('removeFolderAtIndex', { index })
+    },
+    toggleFolder ({ commit, state }, { folder }) {
+      const isOpen = state.openFolders.includes(folder)
+      if (!isOpen) {
+        commit('openFolder', { folder })
+      } else {
+        commit('closeFolder', { folder })
+      }
     }
   },
   strict: debug,
