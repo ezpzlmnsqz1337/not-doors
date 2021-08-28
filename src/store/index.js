@@ -25,6 +25,7 @@ export default createStore({
     openDocuments: [],
     activeDocument: null,
     activeObject: null,
+    hoverObject: null,
     activeMenuContent: MenuItem.PROJECTS,
     menuItems: [
       { id: MenuItem.PROJECTS, name: 'Projects', icon: 'folder', activeDocument: false },
@@ -159,7 +160,12 @@ export default createStore({
     setActiveMenuContent (state, { type }) {
       state.activeMenuContent = type
     },
+    setHoverObject (state, { object }) {
+      if (state.hoverObject === object) return
+      state.hoverObject = object
+    },
     setActiveObject (state, { object }) {
+      if (state.activeObject === object) return
       state.activeObject = object
     },
     setColumnWidth (state, { column, width }) {

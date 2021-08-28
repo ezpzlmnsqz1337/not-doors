@@ -1,5 +1,14 @@
 <template>
-  <div class="__projects">
+  <div
+    v-if="!activeUser"
+    class="__notLoggedIn"
+  >
+    Login to access projects
+  </div>
+  <div
+    v-if="activeUser"
+    class="__projects"
+  >
     <ProjectsControls />
     <CategoryListItems
       :categories="projects"
@@ -36,7 +45,8 @@ export default {
     CategoryListItems
   },
   computed: {
-    ...mapState(['projects', 'openProjects'])
+    ...mapState(['projects', 'openProjects']),
+    ...mapState('users', ['activeUser'])
   },
   methods: {
     ...mapMutations(['openProject', 'closeProject', 'addFolder', 'renameProject']),
@@ -48,5 +58,9 @@ export default {
 <style scoped>
 .__projects {
   user-select: none;
+}
+
+.__notLoggedIn {
+  padding-left: 1rem;
 }
 </style>

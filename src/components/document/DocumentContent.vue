@@ -28,9 +28,11 @@
           <template #item="{element:o}">
             <tr
               class="__row"
-              :class="{__active: activeObject && activeObject.uid === o.uid}"
+              :class="{__active: activeObject && activeObject.uid === o.uid, __hover: hoverObject && hoverObject.uid === o.uid}"
               @click="handleRowClick(o)"
               @contextmenu.prevent="handleRowContextMenu($event, o, true)"
+              @mouseover="setHoverObject({object: o})"
+              @mouseout="setHoverObject({object: null})"
             >
               <td
                 v-for="c in columns"
@@ -84,8 +86,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['activeObject']),
-    ...mapState(['activeDocument', 'columns']),
+    ...mapState(['activeObject', 'activeDocument', 'columns', 'hoverObject']),
     ...mapGetters(['getSortedObjects', 'getDocumentObjects']),
     objects: function () {
       this.calculateChapters({ document: this.activeDocument })
@@ -109,7 +110,7 @@ export default {
     document.addEventListener('click', () => this.hideActions())
   },
   methods: {
-    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter', 'moveObjectBelow']),
+    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setHoverObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter', 'moveObjectBelow']),
     dragStart ({ oldIndex }) {
       this.draggedElement = this.objects.at(oldIndex - 1)
     },
@@ -174,6 +175,10 @@ tr.__row {
 }
 
 tr.__row:hover {
+  background-color: var(--hover);
+}
+
+tr.__row.__hover {
   background-color: var(--hover);
 }
 
