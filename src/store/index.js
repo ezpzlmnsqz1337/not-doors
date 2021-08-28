@@ -187,7 +187,7 @@ export default createStore({
         .filter(x => x.parentId === parentId && x.order > order)
         .forEach(x => x.order++)
 
-      const id = objects.reduce((acc, { id }) => id > acc ? id : acc, 0)
+      const id = objects.reduce((acc, { id }) => id > acc ? id : acc, 0) + 1
 
       state.objects.push({
         ...newObject,
@@ -208,7 +208,7 @@ export default createStore({
         .filter(x => x.parentId === uid)
         .forEach(x => x.order++)
 
-      const id = objects.reduce((acc, { id }) => id > acc ? id : acc, 0)
+      const id = objects.reduce((acc, { id }) => id > acc ? id : acc, 0) + 1
 
       state.objects.push({
         ...newObject,

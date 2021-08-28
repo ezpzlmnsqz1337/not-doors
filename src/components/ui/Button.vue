@@ -2,7 +2,7 @@
   <button
     :class="btnClass()"
     :title="title"
-    @click="$emit('click')"
+    @click.stop="$emit('click')"
   >
     <slot />
   </button>

@@ -1,18 +1,40 @@
 <template>
   <div
     class="__actions"
+    @click.stop
   >
     <div class="__heading">
       Actions
     </div>
     <Button
-      v-for="(a, index) in getActions()"
-      :key="`action${index}`"
-      :type="a.type"
-      :title="a.title"
-      @click="a.click"
+      :type="ButtonType.SUCCESS"
+      title="Add object"
+      @click="addObjectAfter()"
     >
-      <span class="material-icons-outlined __icon">{{ a.icon }}</span>
+      <span class="material-icons-outlined __icon">add_box</span>
+    </Button>
+    <Button
+      v-if="object && object.isHeading"
+      :type="ButtonType.SECONDARY"
+      title="Add object below"
+      @click="addObjectBelow()"
+    >
+      <span class="material-icons-outlined __icon">library_add</span>
+    </Button>
+    <Button
+      v-if="object && getDocumentObjects(object.documentId).length > 1"
+      :type="ButtonType.PRIMARY"
+      title="Toggle heading"
+      @click="toggleObjectTitle({object})"
+    >
+      <span class="material-icons-outlined __icon">title</span>
+    </Button>
+    <Button
+      :type="ButtonType.DANGER"
+      title="Remove object"
+      @click="deleteObject()"
+    >
+      <span class="material-icons-outlined __icon">delete</span>
     </Button>
   </div>
 </template>
@@ -36,37 +58,7 @@ export default {
   emits: ['hide'],
   data: function () {
     return {
-      ButtonType,
-      actions: [
-        {
-          type: ButtonType.SUCCESS,
-          title: 'Add object',
-          icon: 'add_box',
-          click: this.addObject,
-          condition: () => true
-        },
-        {
-          type: ButtonType.SECONDARY,
-          title: 'Add object below',
-          icon: 'library_add',
-          click: this.addObjectBelow,
-          condition: () => this.object && this.object.isHeading
-        },
-        {
-          type: ButtonType.PRIMARY,
-          title: 'Toggle heading',
-          icon: 'title',
-          click: this.toggleTitle,
-          condition: () => this.object && this.getDocumentObjects(this.object.documentId).length > 1
-        },
-        {
-          type: ButtonType.DANGER,
-          title: 'Remove object',
-          icon: 'delete',
-          click: this.delete,
-          condition: () => true
-        }
-      ]
+      ButtonType
     }
   },
   computed: {
@@ -78,7 +70,7 @@ export default {
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },
-    addObject: function () {
+    addObjectAfter: function () {
       this.addAfter({
         object: this.object,
         newObject: {
@@ -98,10 +90,7 @@ export default {
       })
       this.$emit('hide')
     },
-    toggleTitle: function () {
-      this.toggleObjectTitle({ object: this.object })
-    },
-    delete: function () {
+    deleteObject: function () {
       this.ro({ object: this.object })
       this.$emit('hide')
     }
@@ -116,6 +105,10 @@ export default {
   border: 1px solid var(--border-dark1);
   border-radius: 0.2rem;
   position: fixed;
+  left: -100vw;
+  top: -100vh;
+  transform: rotateX(90deg);
+  transition: transform 0.2s;
 }
 
 .__heading {

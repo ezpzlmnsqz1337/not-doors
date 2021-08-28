@@ -46,7 +46,6 @@
     </div>
   </PerfectScrollbar>
   <ObjectActions
-    v-show="actions"
     ref="actions"
     :object="activeObject"
     @hide="showActions(false)"
@@ -68,8 +67,7 @@ export default {
     return {
       resizing: null,
       startX: 0,
-      startWidth: 0,
-      actions: false
+      startWidth: 0
     }
   },
   computed: {
@@ -88,6 +86,7 @@ export default {
       }
     })
     document.addEventListener('mouseup', () => this.stopResize())
+    document.addEventListener('click', () => this.showActions(false))
   },
   methods: {
     ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setColumnWidth']),
@@ -108,11 +107,18 @@ export default {
       this.showActions(show, e)
     },
     showActions (show, e) {
-      this.actions = show
-      if (!show) return
+      if (!show) {
+        this.$refs.actions.$el.style.transform = 'rotateX(90deg)'
+        setTimeout(() => {
+          this.$refs.actions.$el.style.left = '-100vw'
+          this.$refs.actions.$el.style.top = '-100vh'
+        }, 200)
+        return
+      }
       const { clientX: x, clientY: y } = e
       const { offsetWidth: w, offsetHeight: h } = this.$refs.actions.$el
       const { innerWidth: wv, innerHeight: wh } = window
+      this.$refs.actions.$el.style.transform = 'rotateX(0deg)'
       this.$refs.actions.$el.style.left = `${x + w > wv ? x - w : x}px`
       this.$refs.actions.$el.style.top = `${y + h > wh ? y - h : y}px`
     }
