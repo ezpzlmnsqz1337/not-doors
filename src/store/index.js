@@ -245,7 +245,10 @@ export default createStore({
       object.order = after.order + 1
     },
     moveObjectBelow (state, { below, object }) {
-
+      state.objects.filter(x => ![below.uid, object.uid].includes(x.uid) && x.parentId === below.uid).forEach(x => x.order++)
+      state.objects.filter(x => ![below.uid, object.uid].includes(x.uid) && x.parentId === object.parentId && x.order > object.order).forEach(x => x.order--)
+      object.parentId = below.uid
+      object.order = 1
     }
   },
   actions: {

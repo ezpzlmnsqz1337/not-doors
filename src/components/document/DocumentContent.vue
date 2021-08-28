@@ -17,7 +17,7 @@
           </th>
         </tr>
         <draggable
-          v-model="myObjects"
+          :model-value="objects"
           tag="transition-group"
           :component-data="{name:'flip-list'}"
           v-bind="dragOptions"
@@ -91,14 +91,6 @@ export default {
       this.calculateChapters({ document: this.activeDocument })
       return this.getSortedObjects(this.activeDocument.uid)
     },
-    myObjects: {
-      get: function () {
-        return this.objects
-      },
-      set: function (value) {
-        console.log(value.length)
-      }
-    },
     dragOptions () {
       return {
         animation: 200,
@@ -117,19 +109,20 @@ export default {
     document.addEventListener('click', () => this.hideActions())
   },
   methods: {
-    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter']),
+    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter', 'moveObjectBelow']),
     dragStart ({ oldIndex }) {
       this.draggedElement = this.objects.at(oldIndex - 1)
     },
     dragEnd ({ oldIndex, newIndex }) {
       if (oldIndex === newIndex) return
       const id = oldIndex < newIndex ? 1 : 2
-      const payload = {
-        object: this.draggedElement,
-        after: this.objects.at(newIndex - id)
+      const object = this.draggedElement
+      const parent = this.objects.at(newIndex - id)
+      if (parent.isHeading) {
+        this.moveObjectBelow({ below: parent, object })
+      } else {
+        this.moveObjectAfter({ after: parent, object })
       }
-      this.moveObjectAfter(payload)
-      console.log('Payload: ', payload.object.id, payload.after.id)
     },
     startResize (e, column) {
       this.startX = e.pageX
