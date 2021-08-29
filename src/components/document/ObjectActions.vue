@@ -1,7 +1,6 @@
 <template>
   <div
     class="__actions"
-    @click.stop
   >
     <div class="__heading">
       Actions
@@ -25,7 +24,7 @@
       v-if="object && getDocumentObjects(object.documentId).length > 1"
       :type="ButtonType.PRIMARY"
       title="Toggle heading"
-      @click="toggleObjectTitle({object})"
+      @click="toggleObjectTitle()"
     >
       <span class="material-icons-outlined __icon">title</span>
     </Button>
@@ -62,11 +61,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getDocumentObjects'])
+    ...mapGetters(['getDocumentObjects', 'getActiveDocument'])
   },
   methods: {
-    ...mapMutations(['toggleObjectTitle']),
-    ...mapMutations({ addAfter: 'addObjectAfter', addBelow: 'addObjectBelow', ro: 'removeObject' }),
+    ...mapMutations(['calculateChapters']),
+    ...mapMutations({ addAfter: 'addObjectAfter', addBelow: 'addObjectBelow', ro: 'removeObject', tot: 'toggleObjectTitle' }),
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },
@@ -78,6 +77,7 @@ export default {
           text: 'Object text'
         }
       })
+      this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
     },
     addObjectBelow: function () {
@@ -88,10 +88,16 @@ export default {
           text: 'Object below text'
         }
       })
+      this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
+    },
+    toggleObjectTitle: function () {
+      this.tot({ object: this.object })
+      this.calculateChapters({ document: this.getActiveDocument() })
     },
     deleteObject: function () {
       this.ro({ object: this.object })
+      this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
     }
   }

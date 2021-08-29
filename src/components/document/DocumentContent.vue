@@ -28,10 +28,10 @@
           <template #item="{element:o}">
             <tr
               class="__row"
-              :class="{__active: activeObject && activeObject.uid === o.uid, __hover: hoverObject && hoverObject.uid === o.uid}"
+              :class="{__active: activeObject === o.uid, __hover: hoverObject === o.uid}"
               @click="handleRowClick(o)"
               @contextmenu.prevent="handleRowContextMenu($event, o, true)"
-              @mouseover="setHoverObject({object: o})"
+              @mouseover="setHoverObject({ object: o })"
               @mouseout="setHoverObject({object: null})"
             >
               <td
@@ -51,7 +51,7 @@
       <button
         v-if="!objects.length"
         class="__add"
-        @click.prevent="addFirstObjectToDocument({documentId: activeDocument.uid})"
+        @click.prevent="addFirstObjectToDocument({documentId: activeDocument})"
       >
         +
       </button>
@@ -59,7 +59,7 @@
   </PerfectScrollbar>
   <ObjectActions
     ref="actions"
-    :object="activeObject"
+    :object="getActiveObject()"
     @hide="hideActions()"
   />
 </template>
@@ -87,10 +87,9 @@ export default {
   },
   computed: {
     ...mapState(['activeObject', 'activeDocument', 'columns', 'hoverObject']),
-    ...mapGetters(['getSortedObjects', 'getDocumentObjects']),
+    ...mapGetters(['getObjectById', 'getSortedObjects', 'getDocumentObjects', 'getActiveDocument', 'getActiveObject']),
     objects: function () {
-      this.calculateChapters({ document: this.activeDocument })
-      return this.getSortedObjects(this.activeDocument.uid)
+      return this.getSortedObjects(this.activeDocument)
     },
     dragOptions () {
       return {
@@ -124,6 +123,7 @@ export default {
       } else {
         this.moveObjectAfter({ after: parent, object })
       }
+      this.calculateChapters(this.getActiveDocument())
     },
     startResize (e, column) {
       this.startX = e.pageX
@@ -150,6 +150,7 @@ export default {
       this.$refs.actions.$el.style.top = `${y + h > wh ? y - h : y}px`
     },
     hideActions () {
+      if (!this.$refs.actions) return
       this.$refs.actions.$el.style.transform = 'rotateX(90deg)'
       setTimeout(() => {
         this.$refs.actions.$el.style.left = '-100vw'

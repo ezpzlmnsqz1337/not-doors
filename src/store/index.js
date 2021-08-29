@@ -1,14 +1,17 @@
 import { createStore, createLogger } from 'vuex'
 import users from '@/store/modules/users'
-import { objects } from '@/assets/db/objects'
-import { projects } from '@/assets/db/projects'
-import { folders } from '@/assets/db/folders'
-import { documents } from '@/assets/db/documents'
-import { columns } from '@/assets/db/columns'
 import MenuItem from '@/constants/MenuItem'
+import { columns } from '@/assets/db/columns'
 import { v4 as uuidv4 } from 'uuid'
+import createPersistedState from 'vuex-persistedstate'
 
 const debug = process.env.NODE_ENV !== 'production'
+
+const logger = createLogger({
+  filter (mutation, stateBefore, stateAfter) {
+    return !['setHoverObject'].includes(mutation.type)
+  }
+})
 
 export default createStore({
   modules: {
@@ -16,10 +19,10 @@ export default createStore({
   },
   state: {
     columns,
-    projects,
-    documents,
-    folders,
-    objects,
+    projects: [],
+    documents: [],
+    folders: [],
+    objects: [],
     openProjects: [],
     openFolders: [],
     openDocuments: [],
@@ -34,34 +37,22 @@ export default createStore({
   },
   getters: {
     getProjectById: (state) => (projectId) => {
-      const project = state.projects.find(x => x.uid === projectId)
-      if (!project) throw new Error(`Project ${projectId} not found`)
-      return project
+      return state.projects.find(x => x.uid === projectId)
     },
     getFolderById: (state) => (folderId) => {
-      const folder = state.folders.find(x => x.uid === folderId)
-      if (!folder) throw new Error(`Folder ${folderId} not found`)
-      return folder
+      return state.folders.find(x => x.uid === folderId)
     },
     getDocumentById: (state) => (documentId) => {
-      const doc = state.documents.find(x => x.uid === documentId)
-      if (!doc) throw new Error(`Document ${documentId} not found`)
-      return doc
+      return state.documents.find(x => x.uid === documentId)
     },
     getObjectById: (state) => (objectId) => {
-      const obj = state.objects.find(x => x.uid === objectId)
-      if (!obj) throw new Error(`Object ${objectId} not found`)
-      return obj
+      return state.objects.find(x => x.uid === objectId)
     },
     getMenuItemById: (state) => (id) => {
-      const item = state.menuItems.find(x => x.id === id)
-      if (!item) throw new Error(`Menu item ${id} not found!`)
-      return item
+      return state.menuItems.find(x => x.id === id)
     },
     getColumnById: (state) => (columnId) => {
-      const column = state.columns.filter(x => x.uid === columnId).pop()
-      if (!column) throw new Error(`Column ${columnId} not found`)
-      return column
+      return state.columns.find(x => x.uid === columnId)
     },
     getFolders: (state) => (parentId) => {
       return state.folders.filter(x => x.parentId === parentId)
@@ -73,6 +64,8 @@ export default createStore({
       return state.objects.filter(x => x.documentId === documentId)
     },
     getSortedObjects: (state, getters) => (documentId) => {
+      documentId = documentId || state.activeDocument
+      if (!documentId) return []
       const documentObjects = getters.getDocumentObjects(documentId)
       const getObjectChildren = (result = [], objects, parentId = 0) => {
         objects
@@ -86,6 +79,15 @@ export default createStore({
       const result = []
       getObjectChildren(result, documentObjects)
       return result
+    },
+    getOpenDocuments: (state, getters) => () => {
+      return state.openDocuments.map(x => getters.getDocumentById(x))
+    },
+    getActiveDocument: (state, getters) => () => {
+      return getters.getDocumentById(state.activeDocument)
+    },
+    getActiveObject: (state, getters) => () => {
+      return getters.getObjectById(state.activeObject)
     }
   },
   mutations: {
@@ -110,14 +112,16 @@ export default createStore({
     addDocument (state, { parent, name }) {
       state.documents.push({ uid: uuidv4(), name, parentId: parent.uid, columns: state.columns })
     },
-    removeDocument (state, document) {
+    removeDocumentAtIndex (state, { document }) {
       if (!document) return
       const index = state.documents.findIndex(x => x.uid === document.uid)
       state.documents.splice(index, 1)
     },
     addFirstObjectToDocument (state, { documentId }) {
+      console.log(state.objects)
       state.objects.push({
         uid: uuidv4(),
+        chapter: '1',
         id: 1,
         parentId: 0,
         order: 1,
@@ -127,53 +131,56 @@ export default createStore({
         type: 'PROSE',
         text: 'Dummy text'
       })
+      console.log('AFTER: ', state.objects)
     },
-    openProject (state, { project }) {
+    openProject ({ openProjects }, { project }) {
       if (!project) return
-      state.openProjects.push(project)
+      if (!openProjects.includes(project.uid)) openProjects.push(project.uid)
     },
-    closeProject (state, { project }) {
-      const openProjects = state.openProjects
-      const index = openProjects.findIndex(x => x === project)
+    closeProject ({ openProjects }, { project }) {
+      const index = openProjects.findIndex(x => x === project.uid)
       if (index !== -1) openProjects.splice(index, 1)
     },
-    openFolder (state, { folder }) {
+    openFolder ({ openFolders }, { folder }) {
       if (!folder) return
-      state.openFolders.push(folder)
+      if (!openFolders.includes(folder.uid)) openFolders.push(folder.uid)
     },
-    closeFolder (state, { folder }) {
-      const openFolders = state.openFolders
-      const index = openFolders.findIndex(x => x === folder)
+    closeFolder ({ openFolders }, { folder }) {
+      const index = openFolders.findIndex(x => x === folder.uid)
       if (index !== -1) openFolders.splice(index, 1)
     },
     openDocument (state, { document }) {
-      const openDocuments = state.openDocuments
-      if (!openDocuments.includes(document)) openDocuments.push(document)
-      state.activeDocument = document
+      if (!document) return
+      const { openDocuments: od } = state
+      if (!od.includes(document.uid)) od.push(document.uid)
+      state.activeDocument = document.uid
     },
     closeDocument (state, { document }) {
-      const index = state.openDocuments.findIndex(x => x === document)
+      const { openDocuments: od } = state
+      const index = od.findIndex(x => x === document.uid)
       if (index === -1) return
-      state.openDocuments.splice(index, 1)
-      state.activeDocument = state.openDocuments.at(0)
+      od.splice(index, 1)
+      state.activeDocument = od.length > 0 ? od.at(0) : null
     },
     setActiveMenuContent (state, { type }) {
       state.activeMenuContent = type
     },
     setHoverObject (state, { object }) {
-      if (state.hoverObject === object) return
-      state.hoverObject = object
+      if (!object || state.hoverObject === object.uid) return
+      state.hoverObject = object.uid
     },
     setActiveObject (state, { object }) {
-      if (state.activeObject === object) return
-      state.activeObject = object
+      if (!object || state.activeObject === object.uid) return
+      state.activeObject = object.uid
     },
     setColumnWidth (state, { column, width }) {
       column.width = width
     },
     calculateChapters (state, { document }) {
+      if (!document) return
       const hs = state.objects.filter(x => x.documentId === document.uid && x.isHeading)
       const calculateChaptersDeep = (headings, parentId = 0, chapter = '') => {
+        console.log('Chapters deep')
         headings
           .filter(x => x.parentId === parentId)
           .sort((a, b) => a.order - b.order)
@@ -182,7 +189,7 @@ export default createStore({
             calculateChaptersDeep(headings, x.uid, x.chapter)
           })
       }
-
+      console.log('Chapters')
       calculateChaptersDeep(hs)
     },
     addObjectAfter (state, { object, newObject }) {
@@ -265,28 +272,34 @@ export default createStore({
       commit('removeProjectAtIndex', { index })
     },
     toggleProject ({ commit, state }, { project }) {
-      const isOpen = state.openProjects.includes(project)
+      const isOpen = state.openProjects.includes(project.uid)
       if (!isOpen) {
         commit('openProject', { project })
       } else {
         commit('closeProject', { project })
       }
     },
-    removeFolder ({ commit, state }, { folder }) {
+    removeFolder ({ commit, dispatch, state }, { folder }) {
       if (!folder) return
       const index = state.folders.findIndex(x => x.uid === folder.uid)
-      state.documents.filter(x => x.folderId === folder.uid).forEach(x => commit('removeDocument', { document: x }))
+      state.documents.filter(x => x.folderId === folder.uid).forEach(x => dispatch('removeDocument', { document: x }))
       commit('removeFolderAtIndex', { index })
     },
     toggleFolder ({ commit, state }, { folder }) {
-      const isOpen = state.openFolders.includes(folder)
+      const isOpen = state.openFolders.includes(folder.uid)
       if (!isOpen) {
         commit('openFolder', { folder })
       } else {
         commit('closeFolder', { folder })
       }
+    },
+    removeDocument ({ commit, state }, { document }) {
+      if (!document) return
+      const index = state.documents.findIndex(x => x.uid === document.uid)
+      state.objects.filter(x => x.documentId === document.uid).forEach(x => commit('removeObject', { object: x }))
+      commit('removeDocumentAtIndex', { index })
     }
   },
   strict: debug,
-  plugins: debug ? [createLogger()] : []
+  plugins: debug ? [logger, createPersistedState()] : []
 })

@@ -12,7 +12,7 @@
     >
       <span
         class="__arrow"
-        :class="{__open: openCategories.includes(c)}"
+        :class="{__open: openCategories.includes(c.uid)}"
       >&#8250;</span>
       <span
         v-if="!showCategoryRenameInput || (c.uid !== category.uid)"
@@ -27,7 +27,10 @@
         @keydown="handleKeyDownCategoryRename($event)"
         @click.stop
       >
-      <div class="__controls">
+      <div
+        v-show="!showCategoryRenameInput"
+        class="__controls"
+      >
         <span
           class="material-icons __control"
           @click.stop="showCategoryRename(true, c)"
@@ -123,8 +126,16 @@ export default {
     }
   },
   methods: {
+    handleKeyDownCategoryRename: function (e) {
+      if (e.keyCode === Key.ENTER) this.renameCategory(this.category, this.categoryName)
+      if (e.keyCode === Key.ESCAPE) this.showCategoryRename(false)
+    },
+    handleKeyDownSubcategoryCreate: function (e) {
+      if (e.keyCode === Key.ENTER) this.addSubcategory(this.category)
+      if (e.keyCode === Key.ESCAPE) this.showSubcategoryTemplate(false)
+    },
     showCategoryRename (show, category) {
-      this.showCategoryRename = show
+      this.showCategoryRenameInput = show
       if (show) {
         this.category = category
         this.categoryName = category.name
@@ -135,17 +146,9 @@ export default {
     },
     renameCategory (category, name) {
       this.onRename({ [this.categoryKey]: category, name })
-      this.showCategoryRename = false
+      this.showCategoryRenameInput = false
       this.category = {}
       this.categoryName = ''
-    },
-    handleKeyDownCategoryRename: function (e) {
-      if (e.keyCode === Key.ENTER) this.renameCategory(this.category, this.categoryName)
-      if (e.keyCode === Key.ESCAPE) this.showCategoryRenameInput(false)
-    },
-    handleKeyDownSubcategoryCreate: function (e) {
-      if (e.keyCode === Key.ENTER) this.addSubcategory(this.category)
-      if (e.keyCode === Key.ESCAPE) this.showSubcategoryTemplate(false)
     },
     showSubcategoryTemplate: function (show, category) {
       this.category = category

@@ -6,7 +6,7 @@
     <Projects v-if="showProjects" />
     <Content
       v-if="showContent"
-      :active-document="activeDocument"
+      :active-document="getActiveDocument()"
     />
   </div>
 </template>
@@ -24,7 +24,7 @@ export default {
     Content
   },
   computed: {
-    ...mapGetters(['getMenuItemById']),
+    ...mapGetters(['getMenuItemById', 'getActiveDocument']),
     ...mapState(['activeDocument', 'activeMenuContent']),
     heading: function () {
       return this.getMenuItemById(this.activeMenuContent).name
@@ -33,7 +33,7 @@ export default {
       return this.activeMenuContent === MenuItem.PROJECTS
     },
     showContent: function () {
-      return this.activeDocument && this.activeMenuContent === MenuItem.CONTENT
+      return this.getActiveDocument() && this.activeMenuContent === MenuItem.CONTENT
     }
   }
 }

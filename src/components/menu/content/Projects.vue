@@ -23,7 +23,7 @@
     >
       <template #default="slotProps">
         <Folders
-          v-if="openProjects.includes(slotProps.project)"
+          v-if="openProjects.includes(slotProps.project.uid)"
           :parent-id="slotProps.project.uid"
         />
       </template>
@@ -35,7 +35,7 @@
 import Folders from '@/components/projects/Folders'
 import ProjectsControls from '@/components/controls/ProjectsControls'
 import CategoryListItems from '@/components/CategoryListItems'
-import { mapActions, mapMutations, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'Projects',
@@ -45,6 +45,7 @@ export default {
     CategoryListItems
   },
   computed: {
+    ...mapGetters(['getProjectById']),
     ...mapState(['projects', 'openProjects']),
     ...mapState('users', ['activeUser'])
   },

@@ -1,10 +1,10 @@
 <template>
   <div class="__documentsHeader">
     <div
-      v-for="d in openDocuments"
-      :key="`ad${d.uid}`"
+      v-for="d in getOpenDocuments()"
+      :key="`ad${d}`"
       class="__item"
-      :class="{__active: activeDocument && d.uid === activeDocument.uid}"
+      :class="{__active: activeDocument === d.uid }"
       @click="openDocument({document: d})"
     >
       <span>{{ d.name }}</span>
@@ -17,12 +17,13 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'DocumentsHeader',
   computed: {
-    ...mapState(['openDocuments', 'activeDocument'])
+    ...mapGetters(['getDocumentById', 'getOpenDocuments']),
+    ...mapState(['activeDocument'])
   },
   methods: {
     ...mapMutations(['closeDocument', 'openDocument'])

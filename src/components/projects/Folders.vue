@@ -13,12 +13,12 @@
     >
       <template #default="slotProps">
         <Folders
-          v-if="openFolders.includes(slotProps.folder)"
+          v-if="openFolders.includes(slotProps.folder.uid)"
           :parent-id="slotProps.folder.uid"
           :level="level+1"
         />
         <Documents
-          v-if="openFolders.includes(slotProps.folder)"
+          v-if="openFolders.includes(slotProps.folder.uid)"
           :folder="slotProps.folder"
           :level="level+1"
         />

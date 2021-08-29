@@ -9,7 +9,7 @@
     >
       <div
         class="__item"
-        :class="{__active: activeObject && activeObject.uid === o.uid, __hover: hoverObject && hoverObject.uid === o.uid}"
+        :class="{__active: activeObject === o.uid, __hover: hoverObject === o.uid}"
         @click="setActiveObject({object: o})"
         @mouseenter="setHoverObject({object: o})"
         @mouseout="setHoverObject({object: null})"
@@ -50,7 +50,7 @@ export default {
       this.setActiveObject({ object })
     },
     getItem ({ chapter, text, parentId, isHeading }) {
-      if (isHeading) return `${chapter}. ${text}`
+      if (isHeading && chapter) return `${chapter}. ${text}`
       if (parentId === 0) return `${text}`
       return this.getObjectById(parentId).chapter.split('')
         .reduce(acc => acc + '-', '') + ` ${text}`

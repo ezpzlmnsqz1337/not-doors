@@ -15,6 +15,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapState } from 'vuex'
+
 export default {
   name: 'Documents',
   props: {
@@ -34,7 +35,7 @@ export default {
   methods: {
     ...mapMutations(['openDocument']),
     isActive (documentId) {
-      return this.activeDocument && this.activeDocument.uid === documentId
+      return this.activeDocument === documentId
     }
   }
 }

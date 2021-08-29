@@ -14,7 +14,8 @@
     "vue": "^3.0.0",
     "vue3-perfect-scrollbar": "^1.5.5",
     "vuedraggable": "^4.1.0",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vuex-persistedstate": "^4.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
