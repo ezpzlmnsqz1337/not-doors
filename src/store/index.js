@@ -63,22 +63,20 @@ export default createStore({
     getDocumentObjects: (state) => (documentId) => {
       return state.objects.filter(x => x.documentId === documentId)
     },
+    getObjectChildren: (state, getters) => (objects) => {
+      return objects
+        .reduce((acc, cur) => [...acc, cur,
+          ...getters.getObjectChildren(cur.objects.map(x => getters.getObjectById(x)))
+        ], [])
+    },
     getSortedObjects: (state, getters) => (documentId) => {
       documentId = documentId || state.activeDocument
       if (!documentId) return []
-      const documentObjects = getters.getDocumentObjects(documentId)
-      const getObjectChildren = (result = [], objects, parentId = 0) => {
-        objects
-          .filter(x => x.parentId === parentId)
-          .sort((a, b) => a.order - b.order)
-          .forEach(x => {
-            result.push(x)
-            getObjectChildren(result, objects, x.uid)
-          })
-      }
-      const result = []
-      getObjectChildren(result, documentObjects)
-      return result
+      return getters.getDocumentObjects(documentId)
+        .filter(x => x.parentId === 0)
+        .reduce((acc, cur) => [...acc, cur,
+          ...getters.getObjectChildren(cur.objects.map(x => getters.getObjectById(x)))
+        ], [])
     },
     getOpenDocuments: (state, getters) => () => {
       return state.openDocuments.map(x => getters.getDocumentById(x))
@@ -88,6 +86,9 @@ export default createStore({
     },
     getActiveObject: (state, getters) => () => {
       return getters.getObjectById(state.activeObject)
+    },
+    getNextObjectId: (state, getters) => (documentId) => {
+      return getters.getDocumentObjects(documentId).reduce((acc, { id }) => id > acc ? id : acc, 0) + 1
     }
   },
   mutations: {
@@ -124,10 +125,10 @@ export default createStore({
         chapter: '1',
         id: 1,
         parentId: 0,
-        order: 1,
         isHeading: true,
         documentId,
         classification: [],
+        objects: [],
         type: 'PROSE',
         text: 'Dummy text'
       })
@@ -166,82 +167,40 @@ export default createStore({
       state.activeMenuContent = type
     },
     setHoverObject (state, { object }) {
-      if (!object || state.hoverObject === object.uid) return
-      state.hoverObject = object.uid
+      if (object && state.hoverObject === object.uid) return
+      state.hoverObject = object ? object.uid : null
     },
     setActiveObject (state, { object }) {
-      if (!object || state.activeObject === object.uid) return
-      state.activeObject = object.uid
+      if (object && state.activeObject === object.uid) return
+      state.activeObject = object ? object.uid : null
     },
     setColumnWidth (state, { column, width }) {
       column.width = width
     },
-    calculateChapters (state, { document }) {
-      if (!document) return
-      const hs = state.objects.filter(x => x.documentId === document.uid && x.isHeading)
-      const calculateChaptersDeep = (headings, parentId = 0, chapter = '') => {
-        console.log('Chapters deep')
-        headings
-          .filter(x => x.parentId === parentId)
-          .sort((a, b) => a.order - b.order)
-          .forEach((x, index) => {
-            x.chapter = chapter ? `${chapter}.${index + 1}` : `${index + 1}`
-            calculateChaptersDeep(headings, x.uid, x.chapter)
-          })
+    setObjectChapter (state, { object, chapter }) {
+      object.chapter = chapter
+    },
+    addObjectToParent (state, { parent, object, index }) {
+      object = {
+        ...object,
+        uid: uuidv4(),
+        classification: [],
+        isHeading: false,
+        objects: []
       }
-      console.log('Chapters')
-      calculateChaptersDeep(hs)
-    },
-    addObjectAfter (state, { object, newObject }) {
-      const { order, parentId, documentId } = object
-
-      const objects = state.objects.filter(x => x.documentId === documentId)
-      objects
-        .filter(x => x.parentId === parentId && x.order > order)
-        .forEach(x => x.order++)
-
-      const id = objects.reduce((acc, { id }) => id > acc ? id : acc, 0) + 1
-
-      state.objects.push({
-        ...newObject,
-        uid: uuidv4(),
-        id,
-        order: order + 1,
-        documentId,
-        parentId,
-        classification: [],
-        isHeading: false
-      })
-    },
-    addObjectBelow (state, { object, newObject }) {
-      const { documentId, uid } = object
-
-      const objects = state.objects.filter(x => x.documentId === documentId)
-      objects
-        .filter(x => x.parentId === uid)
-        .forEach(x => x.order++)
-
-      const id = objects.reduce((acc, { id }) => id > acc ? id : acc, 0) + 1
-
-      state.objects.push({
-        ...newObject,
-        uid: uuidv4(),
-        id,
-        order: 1,
-        documentId,
-        parentId: uid,
-        classification: [],
-        isHeading: false
-      })
+      state.objects.push(object)
+      parent.objects.splice(index, 0, object.uid)
     },
     updateObjectsOrder (state, { newOrder }) {
       state.objects = newOrder
     },
     removeObject (state, { object }) {
-      const { parentId, documentId, order, uid } = object
-      state.objects.filter(x => x.documentId === documentId)
-        .filter(x => x.parentId === parentId && x.order > order)
-        .forEach(x => x.order--)
+      const { parentId, uid } = object
+      const parent = state.objects.find(x => x.uid === parentId)
+
+      const indexInParent = parent.objects.indexOf(uid)
+      parent.objects.splice(indexInParent, 1)
+
       const index = state.objects.findIndex(x => x.uid === uid)
       state.objects.splice(index, 1)
     },
@@ -265,6 +224,37 @@ export default createStore({
     }
   },
   actions: {
+    addObjectAfter ({ commit, getters }, { object, newObject }) {
+      const { parentId, documentId, uid } = object
+
+      const parent = getters.getObjectById(parentId)
+      const index = parent.objects.indexOf(uid) + 1
+
+      // TODO: have document have max ID
+      const id = getters.getNextObjectId(documentId)
+      newObject = { ...newObject, id, documentId, parentId }
+
+      commit('addObjectToParent', { parent, object: newObject, index })
+    },
+    addObjectBelow ({ commit, getters }, { object, newObject }) {
+      const { documentId, uid: parentId } = object
+
+      const index = 0
+      const id = getters.getNextObjectId(documentId)
+
+      newObject = { ...newObject, id, documentId, parentId }
+      commit('addObjectToParent', { parent: object, object: newObject, index })
+    },
+    calculateChapters ({ getters, dispatch, commit }, { document = null, headings, chapter = '' }) {
+      headings = headings || getters.getDocumentObjects(document.uid).filter(x => x.isHeading && x.parentId === 0)
+      headings
+        .forEach((x, index) => {
+          const ch = chapter ? `${chapter}.${index + 1}` : `${index + 1}`
+          commit('setObjectChapter', { object: x, chapter: ch })
+          const childrenHeadings = x.objects.map(y => getters.getObjectById(y)).filter(y => y.isHeading)
+          dispatch('calculateChapters', { headings: childrenHeadings, chapter: x.chapter })
+        })
+    },
     removeProject ({ commit, dispatch, state }, { project }) {
       if (!project) return
       const index = state.projects.findIndex(x => x.uid === project.uid)

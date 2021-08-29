@@ -1,19 +1,41 @@
 <template>
   <div
-    v-for="(v, index) in values"
-    :key="`enum-${v}${index}${object[name]}`"
-    class="__noBreak"
+    ref="enum"
+    class="__wrapper"
+    @click.stop="showValues = true"
   >
-    <input
-      :id="`${object.uid}${index}`"
-      :type="multiple ? 'checkbox' : 'radio'"
-      :name="`${object.uid}`"
-      :checked="object[name].includes(v)"
-      :value="v"
-      @input="setEnumValue"
-      @click.stop
+    <div
+      class="__normal"
     >
-    <label :for="`${object.uid}${index}`">{{ v }}</label>
+      <div
+        v-for="(s, index) in selected"
+        :key="`selected-${s}${index}${object[name]}`"
+        class="__noBreak"
+      >
+        {{ s }}<div />
+      </div>
+      <div
+        v-if="showValues"
+        class="__hover"
+      >
+        <div
+          v-for="(v, index) in values"
+          :key="`enum-${v}${index}${object[name]}`"
+          class="__noBreak"
+        >
+          <input
+            :id="`${object.uid}${index}`"
+            :type="multiple ? 'checkbox' : 'radio'"
+            :name="`${object.uid}`"
+            :checked="object[name].includes(v)"
+            :value="v"
+            @input="setEnumValue"
+            @click.stop
+          >
+          <label :for="`${object.uid}${index}`">{{ v }}</label>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -39,8 +61,19 @@ export default {
       default: () => []
     }
   },
+  data: function () {
+    return {
+      showValues: false
+    }
+  },
   computed: {
-    ...mapGetters(['getObjectById'])
+    ...mapGetters(['getObjectById']),
+    selected: function () {
+      return this.values.filter(x => this.object[this.name].includes(x))
+    }
+  },
+  created: function () {
+    document.addEventListener('click', e => (this.showValues = false))
   },
   methods: {
     ...mapMutations(['setObjectProperty']),
@@ -64,19 +97,18 @@ export default {
 </script>
 
 <style scoped>
-.__enum input, .__enum label {
-  display: none;
-}
-
-.__enum:hover input, .__enum:hover label {
-  display: inherit;
-}
-
-.__enum > .__show > label {
-  display: inherit;
+.__wrapper {
+  min-height: 1rem;
 }
 
 .__noBreak{
   white-space: nowrap;
+}
+
+.__hover {
+  position: absolute;
+  padding: 0.8rem;
+  background-color: var(--bg-dark2);
+  border-radius: 0.3rem;
 }
 </style>

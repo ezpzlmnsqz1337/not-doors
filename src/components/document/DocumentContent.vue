@@ -1,6 +1,9 @@
 <template>
   <PerfectScrollbar class="__scroll">
-    <div class="__documentContent">
+    <div
+      class="__documentContent"
+      @mouseout="setHoverObject({object: null})"
+    >
       <table class="__table">
         <tr>
           <th
@@ -29,7 +32,7 @@
             <tr
               class="__row"
               :class="{__active: activeObject === o.uid, __hover: hoverObject === o.uid}"
-              @click="handleRowClick(o)"
+              @click.stop="handleRowClick(o)"
               @contextmenu.prevent="handleRowContextMenu($event, o, true)"
               @mouseover="setHoverObject({ object: o })"
               @mouseout="setHoverObject({object: null})"
@@ -67,7 +70,7 @@
 <script>
 import Field from '@/components/document/Field'
 import ObjectActions from '@/components/document/ObjectActions'
-import { mapGetters, mapMutations, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import draggable from 'vuedraggable'
 
 export default {
@@ -106,10 +109,14 @@ export default {
       }
     })
     document.addEventListener('mouseup', () => this.stopResize())
-    document.addEventListener('click', () => this.hideActions())
+    document.addEventListener('click', () => {
+      this.hideActions()
+      this.setActiveObject({ object: null })
+    })
   },
   methods: {
-    ...mapMutations(['calculateChapters', 'addFirstObjectToDocument', 'setActiveObject', 'setHoverObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter', 'moveObjectBelow']),
+    ...mapActions(['calculateChapters']),
+    ...mapMutations(['addFirstObjectToDocument', 'setActiveObject', 'setHoverObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter', 'moveObjectBelow']),
     dragStart ({ oldIndex }) {
       this.draggedElement = this.objects.at(oldIndex - 1)
     },
@@ -123,7 +130,7 @@ export default {
       } else {
         this.moveObjectAfter({ after: parent, object })
       }
-      this.calculateChapters(this.getActiveDocument())
+      this.calculateChapters({ document: this.getActiveDocument() })
     },
     startResize (e, column) {
       this.startX = e.pageX

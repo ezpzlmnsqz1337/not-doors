@@ -6,6 +6,7 @@
       class="__item"
       :class="{__active: activeDocument === d.uid }"
       @click="openDocument({document: d})"
+      @click.middle="closeDocument({document: d})"
     >
       <span>{{ d.name }}</span>
       <span

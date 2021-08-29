@@ -41,7 +41,7 @@
 <script>
 import Button from '@/components/ui/Button'
 import ButtonType from '@/constants/ButtonType'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'ObjectActions',
@@ -64,8 +64,9 @@ export default {
     ...mapGetters(['getDocumentObjects', 'getActiveDocument'])
   },
   methods: {
-    ...mapMutations(['calculateChapters']),
-    ...mapMutations({ addAfter: 'addObjectAfter', addBelow: 'addObjectBelow', ro: 'removeObject', tot: 'toggleObjectTitle' }),
+    ...mapActions(['calculateChapters']),
+    ...mapActions({ addAfter: 'addObjectAfter', addBelow: 'addObjectBelow' }),
+    ...mapMutations({ ro: 'removeObject', tot: 'toggleObjectTitle' }),
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },

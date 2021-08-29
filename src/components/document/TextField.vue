@@ -1,6 +1,6 @@
 <template>
   <div
-    @click.stop="editText(true)"
+    @click="editText(true)"
   >
     <span
       v-if="object.isHeading"
@@ -31,6 +31,7 @@
 
 <script>
 import { mapMutations } from 'vuex'
+
 export default {
   name: 'TextField',
   props: {
