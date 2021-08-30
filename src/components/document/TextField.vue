@@ -73,7 +73,7 @@ export default {
       if (edit) this.$nextTick(() => this.$refs.edit.focus())
     },
     parseText () {
-      return this.object[this.name] + ' - ' + this.object.order
+      return this.object[this.name]
     }
   }
 }

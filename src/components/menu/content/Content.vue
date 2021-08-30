@@ -51,9 +51,9 @@ export default {
     },
     getItem ({ chapter, text, parentId, isHeading }) {
       if (isHeading && chapter) return `${chapter}. ${text}`
-      if (parentId === 0) return `${text}`
-      return this.getObjectById(parentId).chapter.split('')
-        .reduce(acc => acc + '-', '') + ` ${text}`
+      const parent = this.getObjectById(parentId)
+      if (parent.name === 'root') return `${text}`
+      return parent.chapter.split('').reduce(acc => acc + '-', '') + ` ${text}`
     }
   }
 }

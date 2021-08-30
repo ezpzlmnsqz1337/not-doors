@@ -72,8 +72,7 @@ export default createStore({
     getSortedObjects: (state, getters) => (documentId) => {
       documentId = documentId || state.activeDocument
       if (!documentId) return []
-      return getters.getDocumentObjects(documentId)
-        .filter(x => x.parentId === 0)
+      return getters.getTopLevelObjects(documentId)
         .reduce((acc, cur) => [...acc, cur,
           ...getters.getObjectChildren(cur.objects.map(x => getters.getObjectById(x)))
         ], [])
@@ -89,6 +88,12 @@ export default createStore({
     },
     getNextObjectId: (state, getters) => (documentId) => {
       return getters.getDocumentObjects(documentId).reduce((acc, { id }) => id > acc ? id : acc, 0) + 1
+    },
+    getTopLevelObjects: (state, getters) => (documentId) => {
+      return getters.getRootObject(documentId).objects.map(x => getters.getObjectById(x))
+    },
+    getRootObject: (state, getters) => (documentId) => {
+      return getters.getDocumentObjects(documentId).find(x => x.name === 'root')
     }
   },
   mutations: {
@@ -111,7 +116,10 @@ export default createStore({
       state.folders.splice(index, 1)
     },
     addDocument (state, { parent, name }) {
-      state.documents.push({ uid: uuidv4(), name, parentId: parent.uid, columns: state.columns })
+      const documentId = uuidv4()
+      state.documents.push({ uid: documentId, name, parentId: parent.uid, columns: state.columns })
+      // add root object
+      state.objects.push({ uid: uuidv4(), name: 'root', objects: [], invisible: true, documentId })
     },
     removeDocumentAtIndex (state, { document }) {
       if (!document) return
@@ -119,12 +127,15 @@ export default createStore({
       state.documents.splice(index, 1)
     },
     addFirstObjectToDocument (state, { documentId }) {
-      console.log(state.objects)
+      const uid = uuidv4()
+      const parent = state.objects.find(x => x.name === 'root' && x.documentId === documentId)
+      parent.objects.push(uid)
+
       state.objects.push({
-        uid: uuidv4(),
+        uid,
         chapter: '1',
         id: 1,
-        parentId: 0,
+        parentId: parent.uid,
         isHeading: true,
         documentId,
         classification: [],
@@ -211,16 +222,23 @@ export default createStore({
       object[key] = value
     },
     moveObjectAfter (state, { after, object }) {
-      state.objects.filter(x => x.uid !== after.uid && x.parentId === after.parentId && x.order > after.order).forEach(x => x.order++)
-      state.objects.filter(x => x.uid !== object.uid && x.parentId === object.parentId && x.order > object.order).forEach(x => x.order--)
+      const oldParent = state.objects.find(x => x.uid === object.parentId)
+      const i1 = oldParent.objects.indexOf(object.uid)
+      oldParent.objects.splice(i1, 1)
+
+      const newParent = state.objects.find(x => x.uid === after.parentId)
+      const i2 = newParent.objects.indexOf(after.uid) + 1
+      newParent.objects.splice(i2, 0, object.uid)
+
       object.parentId = after.parentId
-      object.order = after.order + 1
     },
     moveObjectBelow (state, { below, object }) {
-      state.objects.filter(x => ![below.uid, object.uid].includes(x.uid) && x.parentId === below.uid).forEach(x => x.order++)
-      state.objects.filter(x => ![below.uid, object.uid].includes(x.uid) && x.parentId === object.parentId && x.order > object.order).forEach(x => x.order--)
+      const oldParent = state.objects.find(x => x.uid === object.parentId)
+      const i1 = oldParent.objects.indexOf(object.uid)
+      oldParent.objects.splice(i1, 1)
+
+      below.objects.splice(0, 0, object.uid)
       object.parentId = below.uid
-      object.order = 1
     }
   },
   actions: {
@@ -246,7 +264,7 @@ export default createStore({
       commit('addObjectToParent', { parent: object, object: newObject, index })
     },
     calculateChapters ({ getters, dispatch, commit }, { document = null, headings, chapter = '' }) {
-      headings = headings || getters.getDocumentObjects(document.uid).filter(x => x.isHeading && x.parentId === 0)
+      headings = headings || getters.getTopLevelObjects(document.uid).filter(x => x.isHeading)
       headings
         .forEach((x, index) => {
           const ch = chapter ? `${chapter}.${index + 1}` : `${index + 1}`
@@ -286,6 +304,7 @@ export default createStore({
     removeDocument ({ commit, state }, { document }) {
       if (!document) return
       const index = state.documents.findIndex(x => x.uid === document.uid)
+      if (state.activeDocument === document.uid) commit('closeDocument')
       state.objects.filter(x => x.documentId === document.uid).forEach(x => commit('removeObject', { object: x }))
       commit('removeDocumentAtIndex', { index })
     }

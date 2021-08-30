@@ -90,7 +90,7 @@ export default {
   },
   computed: {
     ...mapState(['activeObject', 'activeDocument', 'columns', 'hoverObject']),
-    ...mapGetters(['getObjectById', 'getSortedObjects', 'getDocumentObjects', 'getActiveDocument', 'getActiveObject']),
+    ...mapGetters(['getObjectById', 'getSortedObjects', 'getDocumentObjects', 'getActiveDocument', 'getActiveObject', 'getRootObject']),
     objects: function () {
       return this.getSortedObjects(this.activeDocument)
     },
@@ -125,7 +125,9 @@ export default {
       const id = oldIndex < newIndex ? 1 : 2
       const object = this.draggedElement
       const parent = this.objects.at(newIndex - id)
-      if (parent.isHeading) {
+      if (newIndex === 1) {
+        this.moveObjectBelow({ below: this.getRootObject(this.activeDocument), object })
+      } else if (parent.isHeading) {
         this.moveObjectBelow({ below: parent, object })
       } else {
         this.moveObjectAfter({ after: parent, object })
