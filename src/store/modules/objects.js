@@ -74,11 +74,12 @@ const mutations = {
     const { parentId, uid } = object
     const parent = state.objects.find(x => x.uid === parentId)
 
-    const indexInParent = parent.objects.indexOf(uid)
-    parent.objects.splice(indexInParent, 1)
-
     const index = state.objects.findIndex(x => x.uid === uid)
     state.objects.splice(index, 1)
+
+    if (!parent) return
+    const indexInParent = parent.objects.indexOf(uid)
+    parent.objects.splice(indexInParent, 1)
   },
   toggleObjectTitle (state, { object }) {
     object.isHeading = !object.isHeading

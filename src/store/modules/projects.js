@@ -17,7 +17,7 @@ const actions = {
   removeProject ({ commit, dispatch, state, rootState }, { project }) {
     if (!project) return
     const index = state.projects.findIndex(x => x.uid === project.uid)
-    rootState.folders.folders.filter(x => x.projectId === project.uid).forEach(x => dispatch('folders/removeFolder', { folder: x }, { root: true }))
+    rootState.folders.folders.filter(x => x.parentId === project.uid).forEach(x => dispatch('folders/removeFolder', { folder: x }, { root: true }))
     commit('removeProject', { index })
   },
   toggleProject ({ commit, state }, { project }) {

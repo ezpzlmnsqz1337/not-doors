@@ -18,7 +18,8 @@
       :toggle-category="toggleProject"
       :on-rename="renameProject"
       :on-remove="removeProject"
-      :on-add="addFolder"
+      :on-subcategory-add="addFolder"
+      add-subcategory-icon="create_new_folder"
       bold
     >
       <template #default="slotProps">

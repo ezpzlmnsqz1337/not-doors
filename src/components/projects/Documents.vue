@@ -8,7 +8,10 @@
       :class="{__active: isActive(d.uid)}"
       @click.stop="openDocument({document: d})"
     >
-      {{ d.name }}
+      <span
+        class="material-icons"
+      >description</span>
+      <span>{{ d.name }}</span>
     </div>
   </div>
 </template>
@@ -47,11 +50,18 @@ export default {
 }
 
 .__item {
+  display: flex;
   color: var(--text-light1);
   line-height: 2rem;
   font-size: 0.9rem;
   cursor: pointer;
   font-weight: bold;
+}
+
+.__item > .material-icons{
+  line-height: 2rem;
+  font-size: 1rem;
+  margin-right: 0.3rem;
 }
 
 .__item:hover{

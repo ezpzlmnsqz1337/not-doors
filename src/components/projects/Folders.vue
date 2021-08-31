@@ -8,8 +8,13 @@
       :toggle-category="toggleFolder"
       :on-rename="renameFolder"
       :on-remove="removeFolder"
-      :on-add="addDocument"
+      :on-category-add="addFolder"
+      :on-subcategory-add="addDocument"
+      add-category-icon="create_new_folder"
+      add-subcategory-icon="note_add"
+      category-icon="folder"
       :level="level"
+      :nested="true"
     >
       <template #default="slotProps">
         <Folders
@@ -53,7 +58,7 @@ export default {
     ...mapGetters('folders', ['getFolders'])
   },
   methods: {
-    ...mapMutations('folders', ['openFolder', 'closeFolder', 'renameFolder']),
+    ...mapMutations('folders', ['addFolder', 'openFolder', 'closeFolder', 'renameFolder']),
     ...mapActions('documents', ['addDocument']),
     ...mapActions('folders', ['removeFolder', 'toggleFolder'])
   }

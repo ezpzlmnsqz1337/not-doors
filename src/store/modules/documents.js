@@ -55,7 +55,7 @@ const actions = {
   removeDocument ({ commit, state, getters }, { document }) {
     if (!document) return
     const index = state.documents.findIndex(x => x.uid === document.uid)
-    if (state.activeDocument === document.uid) commit('closeDocument')
+    if (state.activeDocument === document.uid) commit('closeDocument', { document })
     getters.getDocumentObjects(document.uid).forEach(x => commit('objects/removeObject', { object: x }, { root: true }))
     commit('removeDocument', { index })
   },
@@ -78,8 +78,10 @@ const mutations = {
   },
   removeDocument (state, { document }) {
     if (!document) return
-    const index = state.documents.findIndex(x => x.uid === document.uid)
+    let index = state.documents.findIndex(x => x.uid === document.uid)
     state.documents.splice(index, 1)
+    index = state.openDocuments.indexOf(document.uid)
+    if (index !== -1) state.openDocuments.splice(index, 1)
   },
   openDocument (state, { document }) {
     if (!document) return

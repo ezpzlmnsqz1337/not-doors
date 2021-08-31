@@ -10,23 +10,30 @@
       class="__category"
       :style="`padding-left: ${level}rem`"
     >
-      <span
-        class="__arrow"
-        :class="{__open: openCategories.includes(c.uid)}"
-      >&#8250;</span>
-      <span
-        v-if="!showCategoryRenameInput || (c.uid !== category.uid)"
-        class="__name"
-      >{{ c.name }}</span>
-      <input
-        v-show="showCategoryRenameInput && c.uid === category.uid"
-        ref="rename"
-        v-model="categoryName"
-        class="__rename"
-        type="text"
-        @keydown="handleKeyDownCategoryRename($event)"
-        @click.stop
-      >
+      <div class="__heading">
+        <div
+          v-if="!showCategoryRenameInput || (c.uid !== category.uid)"
+          class="__row"
+        >
+          <span
+            class="__arrow"
+            :class="{__open: openCategories.includes(c.uid)}"
+          >&#8250;</span>
+          <span
+            v-if="categoryIcon"
+            class="material-icons"
+          >{{ categoryIcon }}</span>
+          <span>{{ c.name }}</span>
+        </div>
+        <input
+          v-show="showCategoryRenameInput && c.uid === category.uid"
+          ref="rename"
+          v-model="categoryRename"
+          type="text"
+          @keydown="handleKeyDownCategoryRename($event)"
+          @click.stop
+        >
+      </div>
       <div
         v-show="!showCategoryRenameInput"
         class="__controls"
@@ -42,9 +49,36 @@
         <span
           class="material-icons __control"
           @click.stop="showSubcategoryTemplate(true, c)"
-        >add_box</span>
+        >{{ addSubcategoryIcon }}</span>
+        <span
+          v-if="nested"
+          class="material-icons __control"
+          @click.stop="showCategoryTemplate(true, c)"
+        >{{ addCategoryIcon }}</span>
       </div>
     </div>
+    <!-- new category template -->
+    <div
+      v-show="showCategoryTemplateInput && c.uid === category.uid"
+      class="__template"
+    >
+      <input
+        ref="name"
+        v-model="categoryName"
+        type="text"
+        @keydown="handleKeyDownCategoryCreate($event)"
+        @click.stop
+      >
+      <span
+        class="material-icons __control"
+        @click.stop="addCategory(category)"
+      >done</span>
+      <span
+        class="material-icons __control"
+        @click.stop="showCategoryTemplate(false)"
+      >close</span>
+    </div>
+    <!-- new subcategory template -->
     <div
       v-show="showSubcategoryTemplateInput && c.uid === category.uid"
       class="__template"
@@ -103,9 +137,25 @@ export default {
       type: Function,
       default: () => console.log('onRemove')
     },
-    onAdd: {
+    onCategoryAdd: {
       type: Function,
-      default: () => console.log('onAdd')
+      default: () => console.log('onCategoryAdd')
+    },
+    onSubcategoryAdd: {
+      type: Function,
+      default: () => console.log('onSubcategoryAdd')
+    },
+    categoryIcon: {
+      type: String,
+      default: ''
+    },
+    addCategoryIcon: {
+      type: String,
+      default: 'add_box'
+    },
+    addSubcategoryIcon: {
+      type: String,
+      default: 'create_new_folder'
     },
     bold: {
       type: Boolean,
@@ -114,21 +164,31 @@ export default {
     level: {
       type: Number,
       default: 1
+    },
+    nested: {
+      type: Boolean,
+      default: false
     }
   },
   data: function () {
     return {
       showCategoryRenameInput: false,
-      categoryName: '',
+      categoryRename: '',
       category: {},
+      showCategoryTemplateInput: false,
+      categoryName: 'CategoryName',
       showSubcategoryTemplateInput: false,
-      subcategoryName: 'Name'
+      subcategoryName: 'SubcategoryName'
     }
   },
   methods: {
     handleKeyDownCategoryRename: function (e) {
-      if (e.keyCode === Key.ENTER) this.renameCategory(this.category, this.categoryName)
+      if (e.keyCode === Key.ENTER) this.renameCategory(this.category, this.categoryRename)
       if (e.keyCode === Key.ESCAPE) this.showCategoryRename(false)
+    },
+    handleKeyDownCategoryCreate: function (e) {
+      if (e.keyCode === Key.ENTER) this.addCategory(this.category)
+      if (e.keyCode === Key.ESCAPE) this.showCategoryTemplate(false)
     },
     handleKeyDownSubcategoryCreate: function (e) {
       if (e.keyCode === Key.ENTER) this.addSubcategory(this.category)
@@ -138,7 +198,7 @@ export default {
       this.showCategoryRenameInput = show
       if (show) {
         this.category = category
-        this.categoryName = category.name
+        this.categoryRename = category.name
         this.$nextTick(() =>
           this.$refs.rename.select()
         )
@@ -148,7 +208,22 @@ export default {
       this.onRename({ [this.categoryKey]: category, name })
       this.showCategoryRenameInput = false
       this.category = {}
-      this.categoryName = ''
+      this.categoryRename = ''
+    },
+    showCategoryTemplate: function (show, category) {
+      this.category = category
+      this.showCategoryTemplateInput = show
+      if (show) {
+        this.$nextTick(() =>
+          this.$refs.name.select()
+        )
+      }
+    },
+    addCategory: function (category) {
+      this.onCategoryAdd({ parent: category, name: this.categoryName })
+      this.openCategory({ [this.categoryKey]: category })
+      this.categoryName = 'CategoryName'
+      this.showCategoryTemplateInput = false
     },
     showSubcategoryTemplate: function (show, category) {
       this.category = category
@@ -160,9 +235,9 @@ export default {
       }
     },
     addSubcategory: function (category) {
-      this.onAdd({ parent: category, name: this.subcategoryName })
+      this.onSubcategoryAdd({ parent: category, name: this.subcategoryName })
       this.openCategory({ [this.categoryKey]: category })
-      this.subcategoryName = 'Name'
+      this.subcategoryName = 'SubcategoryName'
       this.showSubcategoryTemplateInput = false
     }
   }
@@ -192,8 +267,18 @@ export default {
   background-color: var(--hover);
 }
 
-.__category .__name {
+.__category .__heading {
   flex: 1;
+}
+
+.__category .__row {
+  display: flex;
+}
+
+.__category .__row > span.material-icons{
+  line-height: 2rem;
+  font-size: 1rem;
+  margin-right: 0.3rem;
 }
 
 .__category:hover .__controls {
@@ -205,13 +290,6 @@ export default {
   display: flex;
   justify-content: flex-end;
   padding: 0.2rem 0;
-}
-
-.__controls > .__heading {
-  flex: 1;
-  line-height: 1.5rem;
-  font-weight: bold;
-  text-transform: uppercase;
 }
 
 .__control:hover {
@@ -241,9 +319,5 @@ export default {
 
 .__arrow.__open{
   transform: rotate(90deg);
-}
-
-.__rename {
-  flex: 1;
 }
 </style>
