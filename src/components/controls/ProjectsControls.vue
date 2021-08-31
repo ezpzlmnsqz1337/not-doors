@@ -40,7 +40,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations({ ap: 'addProject' }),
+    ...mapMutations('projects', { ap: 'addProject' }),
     handleKeyDown: function (e) {
       if (e.keyCode === Key.ENTER) this.addProject()
       if (e.keyCode === Key.ESCAPE) this.showProjectTemplate(false)

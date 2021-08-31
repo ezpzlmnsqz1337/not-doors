@@ -61,19 +61,19 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getDocumentObjects', 'getActiveDocument'])
+    ...mapGetters('documents', ['getDocumentObjects', 'getActiveDocument'])
   },
   methods: {
-    ...mapActions(['calculateChapters']),
-    ...mapActions({ addAfter: 'addObjectAfter', addBelow: 'addObjectBelow' }),
-    ...mapMutations({ ro: 'removeObject', tot: 'toggleObjectTitle' }),
+    ...mapActions('documents', ['calculateChapters']),
+    ...mapActions('objects', { addAfter: 'addObjectAfter', addBelow: 'addObjectBelow' }),
+    ...mapMutations('objects', { ro: 'removeObject', tot: 'toggleObjectTitle' }),
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },
     addObjectAfter: function () {
       this.addAfter({
-        object: this.object,
-        newObject: {
+        after: this.object,
+        object: {
           type: 'PROSE',
           text: 'Object text'
         }
@@ -83,8 +83,8 @@ export default {
     },
     addObjectBelow: function () {
       this.addBelow({
-        object: this.object,
-        newObject: {
+        parent: this.object,
+        object: {
           type: 'PROSE',
           text: 'Object below text'
         }

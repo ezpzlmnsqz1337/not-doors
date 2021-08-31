@@ -89,8 +89,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(['activeObject', 'activeDocument', 'columns', 'hoverObject']),
-    ...mapGetters(['getObjectById', 'getSortedObjects', 'getDocumentObjects', 'getActiveDocument', 'getActiveObject', 'getRootObject']),
+    ...mapState('documents', ['activeDocument']),
+    ...mapState('objects', ['activeObject', 'hoverObject']),
+    ...mapGetters('documents', ['getSortedObjects', 'getDocumentObjects', 'getActiveDocument', 'getRootObject']),
+    ...mapGetters('objects', ['getObjectById', 'getActiveObject']),
+    ...mapState(['columns']),
     objects: function () {
       return this.getSortedObjects(this.activeDocument)
     },
@@ -115,8 +118,10 @@ export default {
     })
   },
   methods: {
-    ...mapActions(['calculateChapters']),
-    ...mapMutations(['addFirstObjectToDocument', 'setActiveObject', 'setHoverObject', 'setColumnWidth', 'updateObjectsOrder', 'moveObjectAfter', 'moveObjectBelow']),
+    ...mapActions('documents', ['calculateChapters']),
+    ...mapActions('objects', ['addFirstObjectToDocument']),
+    ...mapMutations('objects', ['setActiveObject', 'setHoverObject', 'moveObjectAfter', 'moveObjectBelow']),
+    ...mapMutations(['setColumnWidth']),
     dragStart ({ oldIndex }) {
       this.draggedElement = this.objects.at(oldIndex - 1)
     },

@@ -49,12 +49,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(['openFolders']),
-    ...mapGetters(['getFolders'])
+    ...mapState('folders', ['openFolders']),
+    ...mapGetters('folders', ['getFolders'])
   },
   methods: {
-    ...mapMutations(['openFolder', 'closeFolder', 'addDocument', 'renameFolder']),
-    ...mapActions(['removeFolder', 'toggleFolder'])
+    ...mapMutations('folders', ['openFolder', 'closeFolder', 'renameFolder']),
+    ...mapActions('documents', ['addDocument']),
+    ...mapActions('folders', ['removeFolder', 'toggleFolder'])
   }
 }
 </script>

@@ -29,11 +29,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(['activeDocument']),
-    ...mapGetters(['getDocuments'])
+    ...mapState('documents', ['activeDocument']),
+    ...mapGetters('documents', ['getDocuments'])
   },
   methods: {
-    ...mapMutations(['openDocument']),
+    ...mapMutations('documents', ['openDocument']),
     isActive (documentId) {
       return this.activeDocument === documentId
     }

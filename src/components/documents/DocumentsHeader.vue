@@ -23,11 +23,11 @@ import { mapGetters, mapMutations, mapState } from 'vuex'
 export default {
   name: 'DocumentsHeader',
   computed: {
-    ...mapGetters(['getDocumentById', 'getOpenDocuments']),
-    ...mapState(['activeDocument'])
+    ...mapGetters('documents', ['getDocumentById', 'getOpenDocuments']),
+    ...mapState('documents', ['activeDocument'])
   },
   methods: {
-    ...mapMutations(['closeDocument', 'openDocument'])
+    ...mapMutations('documents', ['closeDocument', 'openDocument'])
   }
 }
 </script>

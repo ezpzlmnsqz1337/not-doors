@@ -60,7 +60,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setObjectProperty']),
+    ...mapMutations('objects', ['setObjectProperty']),
     resize () {
       const text = this.$refs.edit
       setTimeout(() => {

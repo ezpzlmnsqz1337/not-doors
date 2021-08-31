@@ -20,7 +20,8 @@ import { mapMutations, mapState } from 'vuex'
 export default {
   name: 'AppMenu',
   computed: {
-    ...mapState(['activeMenuContent', 'menuItems', 'activeDocument']),
+    ...mapState('documents', ['activeDocument']),
+    ...mapState(['activeMenuContent', 'menuItems']),
     items: function () {
       return this.menuItems.filter(x => x.activeDocument ? this.activeDocument : true)
     }

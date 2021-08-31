@@ -24,8 +24,9 @@ export default {
     Content
   },
   computed: {
-    ...mapGetters(['getMenuItemById', 'getActiveDocument']),
     ...mapState(['activeDocument', 'activeMenuContent']),
+    ...mapGetters('documents', ['getActiveDocument']),
+    ...mapGetters(['getMenuItemById']),
     heading: function () {
       return this.getMenuItemById(this.activeMenuContent).name
     },

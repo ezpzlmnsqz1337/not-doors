@@ -67,7 +67,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getObjectById']),
+    ...mapGetters('objects', ['getObjectById']),
     selected: function () {
       return this.values.filter(x => this.object[this.name].includes(x))
     }
@@ -76,7 +76,7 @@ export default {
     document.addEventListener('click', e => (this.showValues = false))
   },
   methods: {
-    ...mapMutations(['setObjectProperty']),
+    ...mapMutations('objects', ['setObjectProperty']),
     setEnumValue (e) {
       const object = this.getObjectById(this.object.uid)
       let values = [...object[this.name]]

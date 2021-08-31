@@ -37,14 +37,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getObjectById', 'getSortedObjects']),
-    ...mapState(['activeObject', 'hoverObject']),
+    ...mapState('objects', ['activeObject', 'hoverObject']),
+    ...mapGetters('documents', ['getSortedObjects']),
+    ...mapGetters('objects', ['getObjectById']),
     objects: function () {
       return this.getSortedObjects(this.activeDocument.uid).filter(x => !this.onlyHeadings || x.isHeading)
     }
   },
   methods: {
-    ...mapMutations(['setActiveObject', 'setHoverObject']),
+    ...mapMutations('objects', ['setActiveObject', 'setHoverObject']),
     clickBro: function (object) {
       console.log('CLICK')
       this.setActiveObject({ object })
@@ -52,7 +53,7 @@ export default {
     getItem ({ chapter, text, parentId, isHeading }) {
       if (isHeading && chapter) return `${chapter}. ${text}`
       const parent = this.getObjectById(parentId)
-      if (parent.name === 'root') return `${text}`
+      if (parent.root) return `${text}`
       return parent.chapter.split('').reduce(acc => acc + '-', '') + ` ${text}`
     }
   }

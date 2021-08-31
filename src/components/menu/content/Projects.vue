@@ -45,13 +45,14 @@ export default {
     CategoryListItems
   },
   computed: {
-    ...mapGetters(['getProjectById']),
-    ...mapState(['projects', 'openProjects']),
-    ...mapState('users', ['activeUser'])
+    ...mapState('users', ['activeUser']),
+    ...mapState('projects', ['projects', 'openProjects']),
+    ...mapGetters('projects', ['getProjectById'])
   },
   methods: {
-    ...mapMutations(['openProject', 'closeProject', 'addFolder', 'renameProject']),
-    ...mapActions(['removeProject', 'toggleProject'])
+    ...mapMutations('projects', ['openProject', 'closeProject', 'renameProject']),
+    ...mapMutations('folders', ['addFolder']),
+    ...mapActions('projects', ['removeProject', 'toggleProject'])
   }
 }
 </script>

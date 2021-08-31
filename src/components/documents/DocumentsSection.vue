@@ -23,7 +23,7 @@ export default {
     DocumentsContent
   },
   computed: {
-    ...mapState(['openDocuments']),
+    ...mapState('documents', ['openDocuments']),
     areOpenDocuments: function () {
       return this.openDocuments.length > 0
     }
