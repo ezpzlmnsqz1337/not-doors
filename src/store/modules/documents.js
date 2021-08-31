@@ -55,7 +55,7 @@ const actions = {
   removeDocument ({ commit, state, getters }, { document }) {
     if (!document) return
     const index = state.documents.findIndex(x => x.uid === document.uid)
-    if (state.activeDocument === document.uid) commit('closeDocument', { document })
+    commit('closeDocument', { document })
     getters.getDocumentObjects(document.uid).forEach(x => commit('objects/removeObject', { object: x }, { root: true }))
     commit('removeDocument', { index })
   },

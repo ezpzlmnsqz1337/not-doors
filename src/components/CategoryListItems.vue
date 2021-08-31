@@ -63,7 +63,7 @@
       class="__template"
     >
       <input
-        ref="name"
+        ref="categoryName"
         v-model="categoryName"
         type="text"
         @keydown="handleKeyDownCategoryCreate($event)"
@@ -84,7 +84,7 @@
       class="__template"
     >
       <input
-        ref="name"
+        ref="subcategoryName"
         v-model="subcategoryName"
         type="text"
         @keydown="handleKeyDownSubcategoryCreate($event)"
@@ -215,7 +215,7 @@ export default {
       this.showCategoryTemplateInput = show
       if (show) {
         this.$nextTick(() =>
-          this.$refs.name.select()
+          this.$refs.categoryName.select()
         )
       }
     },
@@ -230,7 +230,7 @@ export default {
       this.showSubcategoryTemplateInput = show
       if (show) {
         this.$nextTick(() =>
-          this.$refs.name.select()
+          this.$refs.subcategoryName.select()
         )
       }
     },

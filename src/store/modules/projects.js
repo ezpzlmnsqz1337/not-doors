@@ -14,10 +14,11 @@ const getters = {
 
 // actions
 const actions = {
-  removeProject ({ commit, dispatch, state, rootState }, { project }) {
+  removeProject ({ commit, dispatch, state, rootGetters }, { project }) {
     if (!project) return
     const index = state.projects.findIndex(x => x.uid === project.uid)
-    rootState.folders.folders.filter(x => x.parentId === project.uid).forEach(x => dispatch('folders/removeFolder', { folder: x }, { root: true }))
+    commit('closeProject', { project })
+    rootGetters['folders/getFolders'](project.uid).forEach(x => dispatch('folders/removeFolder', { folder: x }, { root: true }))
     commit('removeProject', { index })
   },
   toggleProject ({ commit, state }, { project }) {
