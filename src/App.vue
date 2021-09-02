@@ -1,17 +1,20 @@
 <template>
   <AppHeader />
   <AppContent />
+  <ActionList />
 </template>
 
 <script>
 import AppHeader from '@/components/app/AppHeader'
 import AppContent from '@/components/app/AppContent'
+import ActionList from '@/components/action-list/ActionList'
 
 export default {
   name: 'App',
   components: {
     AppHeader,
-    AppContent
+    AppContent,
+    ActionList
   }
 }
 </script>

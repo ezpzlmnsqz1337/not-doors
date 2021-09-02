@@ -27,6 +27,7 @@ export default createStore({
   state: {
     columns,
     activeMenuContent: MenuItem.PROJECTS,
+    actionList: [],
     menuItems: [
       { id: MenuItem.PROJECTS, name: 'Projects', icon: 'folder', activeDocument: false },
       { id: MenuItem.CONTENT, name: 'Content', icon: 'list', activeDocument: true }
@@ -46,6 +47,9 @@ export default createStore({
     },
     setColumnWidth (state, { column, width }) {
       column.width = width
+    },
+    setActionList (state, { actions }) {
+      state.actionList = actions
     }
   },
   actions: {},
