@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import createObject from '@/model/object'
 
 const state = () => ({
   objects: [],
@@ -50,16 +50,12 @@ const actions = {
     dispatch('addObjectBelow', {
       parent: parent,
       object: {
-        uid: uuidv4(),
+        ...createObject(),
         chapter: '1',
         id: 1,
         parentId: parent.uid,
         isHeading: true,
-        documentId,
-        classification: [],
-        objects: [],
-        type: 'PROSE',
-        text: 'Dummy text'
+        documentId
       }
     })
   }
@@ -68,7 +64,7 @@ const actions = {
 // mutations
 const mutations = {
   addRootObject (state, { documentId }) {
-    state.objects.push({ uid: uuidv4(), root: true, objects: [], documentId })
+    state.objects.push({ ...createObject(), root: true, documentId })
   },
   removeObject (state, { object }) {
     const { parentId, uid } = object
@@ -108,11 +104,8 @@ const mutations = {
   },
   addObjectToParent (state, { parent, object, index }) {
     object = {
-      ...object,
-      uid: uuidv4(),
-      classification: [],
-      isHeading: false,
-      objects: []
+      ...createObject(),
+      ...object
     }
     state.objects.push(object)
     parent.objects.splice(index, 0, object.uid)

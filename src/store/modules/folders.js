@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import createFolder from '@/model/folder'
 
 const state = () => ({
   folders: [],
@@ -39,7 +39,7 @@ const actions = {
 // mutations
 const mutations = {
   addFolder (state, { parent, name }) {
-    state.folders.push({ uid: uuidv4(), name, parentId: parent.uid })
+    state.folders.push({ ...createFolder(), name, parentId: parent.uid })
   },
   renameFolder (state, { folder, name }) {
     folder.name = name

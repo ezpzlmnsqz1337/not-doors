@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import createDocument from '@/model/document'
 
 const state = () => ({
   documents: [],
@@ -46,11 +46,10 @@ const getters = {
 // actions
 const actions = {
   addDocument ({ commit, rootState }, { parent, name }) {
-    const documentId = uuidv4()
-    const document = { uid: documentId, name, parentId: parent.uid, columns: rootState.columns }
+    const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns }
     commit('addDocument', { document })
     // add root object
-    commit('objects/addRootObject', { documentId }, { root: true })
+    commit('objects/addRootObject', { documentId: document.uid }, { root: true })
   },
   removeDocument ({ commit, state, getters }, { document }) {
     if (!document) return

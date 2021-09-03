@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import createProject from '@/model/project'
 
 const state = () => ({
   projects: [],
@@ -34,7 +34,7 @@ const actions = {
 // mutations
 const mutations = {
   addProject (state, { name }) {
-    state.projects.push({ uid: uuidv4(), name })
+    state.projects.push({ ...createProject(), name })
   },
   renameProject (state, { project, name }) {
     project.name = name

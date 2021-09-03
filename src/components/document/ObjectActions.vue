@@ -73,10 +73,7 @@ export default {
     addObjectAfter: function () {
       this.addAfter({
         after: this.object,
-        object: {
-          type: 'PROSE',
-          text: 'Object text'
-        }
+        object: {}
       })
       this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
@@ -84,10 +81,7 @@ export default {
     addObjectBelow: function () {
       this.addBelow({
         parent: this.object,
-        object: {
-          type: 'PROSE',
-          text: 'Object below text'
-        }
+        object: {}
       })
       this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
