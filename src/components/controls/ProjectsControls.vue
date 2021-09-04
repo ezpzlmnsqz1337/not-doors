@@ -36,7 +36,7 @@ export default {
   data: function () {
     return {
       showTemplate: false,
-      projectName: 'ProjectName'
+      projectName: 'Project'
     }
   },
   methods: {
@@ -55,7 +55,7 @@ export default {
     },
     addProject: function () {
       this.ap({ name: this.projectName })
-      this.projectName = 'ProjectName'
+      this.projectName = 'Project'
       this.showTemplate = false
     }
   }

@@ -1,14 +1,14 @@
 <template>
   <div
-    v-for="c in categories"
+    v-for="c in options.categories"
     :key="`category${c.uid}`"
     class="__item"
-    :class="{__bold: bold}"
-    @click.stop="toggleCategory({[categoryKey]: c})"
+    :class="{__bold: options.bold}"
+    @click.stop="options.category.onToggle({[options.category.key]: c})"
   >
     <div
       class="__category"
-      :style="`padding-left: ${level}rem`"
+      :style="`padding-left: ${options.level}rem`"
     >
       <div class="__heading">
         <div
@@ -17,12 +17,12 @@
         >
           <span
             class="__arrow"
-            :class="{__open: openCategories.includes(c.uid)}"
+            :class="{__open: options.category.openArray.includes(c.uid)}"
           >&#8250;</span>
           <span
-            v-if="categoryIcon"
+            v-if="options.category.icon"
             class="material-icons"
-          >{{ categoryIcon }}</span>
+          >{{ options.category.icon }}</span>
           <span>{{ c.name }}</span>
         </div>
         <input
@@ -44,17 +44,17 @@
         >edit</span>
         <span
           class="material-icons __control"
-          @click.stop="onRemove({[categoryKey]: c})"
+          @click.stop="options.category.onRemove({[options.category.key]: c})"
         >delete</span>
         <span
           class="material-icons __control"
           @click.stop="showSubcategoryTemplate(true, c)"
-        >{{ addSubcategoryIcon }}</span>
+        >{{ options.subcategory.addIcon }}</span>
         <span
-          v-if="nested"
+          v-if="options.nested"
           class="material-icons __control"
           @click.stop="showCategoryTemplate(true, c)"
-        >{{ addCategoryIcon }}</span>
+        >{{ options.category.addIcon }}</span>
       </div>
     </div>
     <!-- new category template -->
@@ -99,7 +99,7 @@
         @click.stop="showSubcategoryTemplate(false)"
       >close</span>
     </div>
-    <slot :[categoryKey]="c" />
+    <slot :[options.category.key]="c" />
   </div>
 </template>
 
@@ -109,65 +109,9 @@ import Key from '@/constants/Key'
 export default {
   name: 'CategoryListItems',
   props: {
-    categories: {
-      type: Array,
-      default: () => []
-    },
-    categoryKey: {
-      type: String,
-      default: 'category'
-    },
-    openCategories: {
-      type: Array,
-      default: () => []
-    },
-    openCategory: {
-      type: Function,
-      default: () => console.log('openCategory')
-    },
-    toggleCategory: {
-      type: Function,
-      default: () => console.log('toggleCategory')
-    },
-    onRename: {
-      type: Function,
-      default: () => console.log('onRename')
-    },
-    onRemove: {
-      type: Function,
-      default: () => console.log('onRemove')
-    },
-    onCategoryAdd: {
-      type: Function,
-      default: () => console.log('onCategoryAdd')
-    },
-    onSubcategoryAdd: {
-      type: Function,
-      default: () => console.log('onSubcategoryAdd')
-    },
-    categoryIcon: {
-      type: String,
-      default: ''
-    },
-    addCategoryIcon: {
-      type: String,
-      default: 'add_box'
-    },
-    addSubcategoryIcon: {
-      type: String,
-      default: 'create_new_folder'
-    },
-    bold: {
-      type: Boolean,
-      default: false
-    },
-    level: {
-      type: Number,
-      default: 1
-    },
-    nested: {
-      type: Boolean,
-      default: false
+    options: {
+      type: Object,
+      default: () => {}
     }
   },
   data: function () {
@@ -176,9 +120,9 @@ export default {
       categoryRename: '',
       category: {},
       showCategoryTemplateInput: false,
-      categoryName: 'CategoryName',
+      categoryName: this.options.category.name || 'CategoryName',
       showSubcategoryTemplateInput: false,
-      subcategoryName: 'SubcategoryName'
+      subcategoryName: this.options.subcategory.name || 'SubcategoryName'
     }
   },
   methods: {
@@ -205,7 +149,8 @@ export default {
       }
     },
     renameCategory (category, name) {
-      this.onRename({ [this.categoryKey]: category, name })
+      const { key, onRename } = this.options.category
+      onRename({ [key]: category, name })
       this.showCategoryRenameInput = false
       this.category = {}
       this.categoryRename = ''
@@ -220,9 +165,10 @@ export default {
       }
     },
     addCategory: function (category) {
-      this.onCategoryAdd({ parent: category, name: this.categoryName })
-      this.openCategory({ [this.categoryKey]: category })
-      this.categoryName = 'CategoryName'
+      const { key, onAdd, onOpen } = this.options.category
+      onAdd({ parent: category, name: this.categoryName })
+      onOpen({ [key]: category })
+      this.categoryName = this.options.category.name || 'CategoryName'
       this.showCategoryTemplateInput = false
     },
     showSubcategoryTemplate: function (show, category) {
@@ -235,9 +181,11 @@ export default {
       }
     },
     addSubcategory: function (category) {
-      this.onSubcategoryAdd({ parent: category, name: this.subcategoryName })
-      this.openCategory({ [this.categoryKey]: category })
-      this.subcategoryName = 'SubcategoryName'
+      const { key, onOpen } = this.options.category
+      const { onAdd } = this.options.subcategory
+      onAdd({ parent: category, name: this.subcategoryName })
+      onOpen({ [key]: category })
+      this.subcategoryName = this.options.subcategory.name || 'SubcategoryName'
       this.showSubcategoryTemplateInput = false
     }
   }

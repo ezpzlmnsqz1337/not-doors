@@ -11,16 +11,7 @@
   >
     <ProjectsControls />
     <CategoryListItems
-      :categories="projects"
-      category-key="project"
-      :open-categories="openProjects"
-      :open-category="openProject"
-      :toggle-category="toggleProject"
-      :on-rename="renameProject"
-      :on-remove="removeProject"
-      :on-subcategory-add="addFolder"
-      add-subcategory-icon="create_new_folder"
-      bold
+      :options="options"
     >
       <template #default="slotProps">
         <Folders
@@ -48,7 +39,27 @@ export default {
   computed: {
     ...mapState('users', ['activeUser']),
     ...mapState('projects', ['projects', 'openProjects']),
-    ...mapGetters('projects', ['getProjectById'])
+    ...mapGetters('projects', ['getProjectById']),
+    options: function () {
+      return {
+        categories: this.projects,
+        category: {
+          key: 'project',
+          openArray: 'openProjects',
+          onOpen: this.openProject,
+          onToggle: this.toggleProject,
+          onRename: this.renameProject,
+          onRemove: this.removeProject,
+          name: 'Project'
+        },
+        subcategory: {
+          addIcon: 'create_new_folder',
+          onAdd: this.addFolder,
+          name: 'Folder'
+        },
+        bold: true
+      }
+    }
   },
   methods: {
     ...mapMutations('projects', ['openProject', 'closeProject', 'renameProject']),

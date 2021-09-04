@@ -46,15 +46,14 @@ export default {
   },
   methods: {
     ...mapMutations('objects', ['setActiveObject', 'setHoverObject']),
-    clickBro: function (object) {
-      console.log('CLICK')
-      this.setActiveObject({ object })
-    },
     getItem ({ chapter, text, parentId, isHeading }) {
-      if (isHeading && chapter) return `${chapter}. ${text}`
+      if (isHeading && chapter) return `${chapter}. ${this.stripTags(text)}`
       const parent = this.getObjectById(parentId)
-      if (parent.root) return `${text}`
-      return parent.chapter.split('').reduce(acc => acc + '-', '') + ` ${text}`
+      if (parent.root) return `${this.stripTags(text)}`
+      return parent.chapter.split('').reduce(acc => acc + '-', '') + ` ${this.stripTags(text)}`
+    },
+    stripTags (text) {
+      return text.replace(/(<([^>]+)>)/gi, '')
     }
   }
 }

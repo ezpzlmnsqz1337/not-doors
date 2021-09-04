@@ -1,20 +1,7 @@
 <template>
   <div class="__folders">
     <CategoryListItems
-      :categories="getFolders(parentId)"
-      category-key="folder"
-      :open-categories="openFolders"
-      :open-category="openFolder"
-      :toggle-category="toggleFolder"
-      :on-rename="renameFolder"
-      :on-remove="removeFolder"
-      :on-category-add="addFolder"
-      :on-subcategory-add="addDocument"
-      add-category-icon="create_new_folder"
-      add-subcategory-icon="note_add"
-      category-icon="folder"
-      :level="level"
-      :nested="true"
+      :options="options"
     >
       <template #default="slotProps">
         <Folders
@@ -55,7 +42,31 @@ export default {
   },
   computed: {
     ...mapState('folders', ['openFolders']),
-    ...mapGetters('folders', ['getFolders'])
+    ...mapGetters('folders', ['getFolders']),
+    options: function () {
+      return {
+        categories: this.getFolders(this.parentId),
+        category: {
+          key: 'folder',
+          openArray: this.openFolders,
+          onOpen: this.openFolder,
+          onToggle: this.toggleFolder,
+          onRename: this.renameFolder,
+          onRemove: this.removeFolder,
+          onAdd: this.addFolder,
+          addIcon: 'create_new_folder',
+          icon: 'folder',
+          name: 'Folder'
+        },
+        subcategory: {
+          onAdd: this.addDocument,
+          addIcon: 'note_add',
+          name: 'Document'
+        },
+        level: this.level,
+        nested: true
+      }
+    }
   },
   methods: {
     ...mapMutations('folders', ['addFolder', 'openFolder', 'closeFolder', 'renameFolder']),
