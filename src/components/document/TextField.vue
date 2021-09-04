@@ -9,7 +9,7 @@
     >
       {{ object.chapter }}.
     </span>
-    <span
+    <div
       v-if="!edit"
       :class="{__heading: object.isHeading}"
       class="__text"
@@ -18,6 +18,7 @@
     <div
       v-if="edit"
       class="__trix"
+      @click.stop
     >
       <input
         :id="object.uid"
@@ -84,7 +85,7 @@ export default {
 }
 
 .__textField .__text {
-  white-space: pre-wrap;
+  display: inline-block;
 }
 
 .__textField .__trix .trix-button-group {
@@ -95,5 +96,9 @@ export default {
   background-color: var(--bg-light1);
   color: black;
   cursor: text;
+}
+
+.__textField .__trix .trix-button-group--file-tools{
+  display: none;
 }
 </style>

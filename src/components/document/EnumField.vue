@@ -24,7 +24,7 @@
           class="__noBreak"
         >
           <input
-            :id="`${object.uid}${index}`"
+            :id="`${object.uid}-${v}`"
             :type="multiple ? 'checkbox' : 'radio'"
             :name="`${object.uid}`"
             :checked="object[name].includes(v)"
@@ -32,7 +32,7 @@
             @input="setEnumValue"
             @click.stop
           >
-          <label :for="`${object.uid}${index}`">{{ v }}</label>
+          <label :for="`${object.uid}-${v}`">{{ v }}</label>
         </div>
       </div>
     </div>
@@ -88,7 +88,7 @@ export default {
           values.push(e.target.value)
         }
       } else {
-        values = e.target.value
+        values = [e.target.value]
       }
       this.setObjectProperty({ object, key: this.name, value: values })
     }
