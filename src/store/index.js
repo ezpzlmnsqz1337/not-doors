@@ -12,7 +12,7 @@ const debug = process.env.NODE_ENV !== 'production'
 
 const logger = createLogger({
   filter (mutation, stateBefore, stateAfter) {
-    return !['setHoverObject'].includes(mutation.type)
+    return !(mutation.type).includes('setHoverObject')
   }
 })
 

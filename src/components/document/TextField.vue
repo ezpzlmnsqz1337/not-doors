@@ -1,5 +1,6 @@
 <template>
   <div
+    class="__textField"
     @click="editText(true)"
   >
     <span
@@ -12,24 +13,31 @@
       v-if="!edit"
       :class="{__heading: object.isHeading}"
       class="__text"
-    >{{ parseText() }}</span>
-    <textarea
-      v-if="edit"
-      ref="edit"
-      v-model.lazy="text"
-      class="__textarea"
-      @blur="editText(false)"
-      @change="resize()"
-      @cut="resize()"
-      @paste="resize()"
-      @drop="resize()"
-      @keydown="resize()"
-      @focus="resize()"
+      v-html="getText()"
     />
+    <div
+      v-if="edit"
+      class="__trix"
+    >
+      <input
+        :id="object.uid"
+        :value="getText()"
+        type="hidden"
+        :name="`content${object.uid}`"
+      >
+      <trix-editor
+        ref="edit"
+        :input="object.uid"
+        @trix-blur="editText(false)"
+        @trix-change="onChange($event)"
+      />
+    </div>
   </div>
 </template>
 
 <script>
+import 'trix'
+import 'trix/dist/trix.css'
 import { mapMutations } from 'vuex'
 
 export default {
@@ -49,56 +57,43 @@ export default {
       edit: false
     }
   },
-  computed: {
-    text: {
-      get: function () {
-        return this.object[this.name]
-      },
-      set: function (value) {
-        this.setObjectProperty({ object: this.object, key: this.name, value })
-      }
-    }
-  },
   methods: {
     ...mapMutations('objects', ['setObjectProperty']),
-    resize () {
-      const text = this.$refs.edit
-      setTimeout(() => {
-        text.style.height = 'auto'
-        text.style.height = text.scrollHeight + 'px'
-      }, 0)
+    getText () {
+      return this.object[this.name]
+    },
+    onChange (e) {
+      this.setObjectProperty({ object: this.object, key: this.name, value: e.target.value })
     },
     editText (edit) {
       this.edit = edit
       if (edit) this.$nextTick(() => this.$refs.edit.focus())
-    },
-    parseText () {
-      return this.object[this.name]
     }
   }
 }
 </script>
 
-<style scoped>
-.__noBreak{
-  white-space: nowrap;
+<style>
+.__textField {
+
 }
 
-.__heading {
+.__textField .__heading {
   font-size: 1rem;
   font-weight: bold;
 }
 
-.__text {
+.__textField .__text {
   white-space: pre-wrap;
 }
 
-.__textarea {
-  outline: none;
-  background-color: var(--bg-light);
-  width: 100%;
-  border: none;
-  resize: vertical;
-  overflow: hidden;
+.__textField .__trix .trix-button-group {
+  background-color: var(--bg-light1);
+}
+
+.__textField .__trix trix-editor {
+  background-color: var(--bg-light1);
+  color: black;
+  cursor: text;
 }
 </style>
