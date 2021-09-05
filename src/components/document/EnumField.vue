@@ -2,7 +2,7 @@
   <div
     ref="enum"
     class="__wrapper"
-    @click.stop="showValues = true"
+    @click.stop="handleOnClick()"
   >
     <div
       class="__normal"
@@ -41,6 +41,8 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
+import eb from '@/eventBus'
+
 export default {
   name: 'EnumField',
   props: {
@@ -73,10 +75,18 @@ export default {
     }
   },
   created: function () {
-    document.addEventListener('click', e => (this.showValues = false))
+    document.addEventListener('click', () => eb.emit('hide-enum-fields', { uid: null, name: null }))
+    eb.on('hide-enum-fields', e => {
+      if (e.uid === this.object.uid && e.name === this.name) return
+      this.showValues = false
+    })
   },
   methods: {
     ...mapMutations('objects', ['setObjectProperty']),
+    handleOnClick (e) {
+      eb.emit('hide-enum-fields', { uid: this.object.uid, name: this.object.name })
+      this.showValues = true
+    },
     setEnumValue (e) {
       const object = this.getObjectById(this.object.uid)
       let values = [...object[this.name]]
