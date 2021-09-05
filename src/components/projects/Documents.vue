@@ -1,19 +1,6 @@
 <template>
   <div class="__documents">
     <CategoryListItems :options="options" />
-    <!-- <div
-      v-for="d in getDocuments(folder.uid)"
-      :key="`doc${d.uid}`"
-      class="__item"
-      :style="`padding-left: ${level}rem`"
-      :class="{__active: isActive(d.uid)}"
-      @click.stop="openDocument({document: d})"
-    >
-      <span
-        class="material-icons"
-      >description</span>
-      <span>{{ d.name }}</span>
-    </div> -->
   </div>
 </template>
 
@@ -84,10 +71,6 @@ export default {
 }
 
 .__item:hover{
-  background-color: var(--hover);
-}
-
-.__item.__active {
   background-color: var(--hover);
 }
 </style>

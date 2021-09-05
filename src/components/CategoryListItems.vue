@@ -3,7 +3,7 @@
     v-for="c in options.categories"
     :key="`category${c.uid}`"
     class="__item"
-    :class="{__bold: options.bold, __active: options.isActive && options.isActive(c.uid)}"
+    :class="{__bold: options.bold, __active: options.category.isActive && options.category.isActive(c.uid)}"
     @click.stop="options.category.onToggle({[options.category.key]: c})"
   >
     <div
@@ -45,7 +45,7 @@
         >edit</span>
         <span
           class="material-icons __control"
-          @click.stop="options.category.onRemove({[options.category.key]: c})"
+          @click.stop="showRemoveCategoryModal(true, c)"
         >delete</span>
         <span
           v-if="options.subcategory"
@@ -104,13 +104,44 @@
     </div>
     <slot :[options.category.key]="c" />
   </div>
+  <Modal
+    v-if="showRemoveModal"
+    @close="showRemoveModal = false"
+  >
+    <template #body>
+      Do you really want to remove this item?
+    </template>
+    <template #footer>
+      <div class="__modalButtons">
+        <Button
+          :type="ButtonType.DANGER"
+          @click="removeCategory()"
+        >
+          Yes
+        </Button>
+        <Button
+          :type="ButtonType.DEFAULT"
+          @click="showRemoveCategoryModal(false)"
+        >
+          No
+        </Button>
+      </div>
+    </template>
+  </Modal>
 </template>
 
 <script>
 import Key from '@/constants/Key'
+import Modal from '@/components/ui/Modal'
+import Button from '@/components/ui/Button'
+import ButtonType from '@/constants/ButtonType'
 
 export default {
   name: 'CategoryListItems',
+  components: {
+    Modal,
+    Button
+  },
   props: {
     options: {
       type: Object,
@@ -119,6 +150,8 @@ export default {
   },
   data: function () {
     return {
+      ButtonType,
+      showRemoveModal: false,
       showCategoryRenameInput: false,
       categoryRename: '',
       category: {},
@@ -150,6 +183,15 @@ export default {
           this.$refs.rename.select()
         )
       }
+    },
+    showRemoveCategoryModal (show, category) {
+      this.showRemoveModal = show
+      this.category = show ? category : {}
+    },
+    removeCategory () {
+      const { key, onRemove } = this.options.category
+      onRemove({ [key]: this.category })
+      this.showRemoveCategoryModal(false)
     },
     renameCategory (category, name) {
       const { key, onRename } = this.options.category
@@ -206,6 +248,10 @@ export default {
 
 .__item.__bold {
   font-weight: bold;
+}
+
+.__item.__active {
+  background-color: var(--hover);
 }
 
 .__category {
@@ -270,5 +316,15 @@ export default {
 
 .__arrow.__open{
   transform: rotate(90deg);
+}
+
+.__modalButtons {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.__modalButtons button{
+  min-width: 5rem;
 }
 </style>
