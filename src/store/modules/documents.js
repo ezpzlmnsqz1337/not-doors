@@ -46,7 +46,7 @@ const getters = {
 // actions
 const actions = {
   addDocument ({ commit, rootState }, { parent, name }) {
-    const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns }
+    const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns.columns.map(x => x.uid) }
     commit('addDocument', { document })
     // add root object
     commit('objects/addRootObject', { documentId: document.uid }, { root: true })

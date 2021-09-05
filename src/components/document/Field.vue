@@ -1,17 +1,17 @@
 <template>
   <div class="__field">
     <TextField
-      v-if="column.type === 'string'"
+      v-if="column.type === ColumnType.TEXT"
       :object="object"
       :name="column.name"
     />
     <NumberField
-      v-if="column.type === 'number'"
+      v-if="column.type === ColumnType.NUMBER"
       :object="object"
       :name="column.name"
     />
     <EnumField
-      v-if="column.type === 'enum'"
+      v-if="column.type === ColumnType.ENUM"
       :object="object"
       :name="column.name"
       :values="column.values"
@@ -24,6 +24,7 @@
 import NumberField from '@/components/document/NumberField'
 import EnumField from '@/components/document/EnumField'
 import TextField from '@/components/document/TextField'
+import ColumnType from '@/constants/ColumnType'
 
 export default {
   name: 'Field',
@@ -40,6 +41,11 @@ export default {
     column: {
       type: Object,
       default: null
+    }
+  },
+  data () {
+    return {
+      ColumnType
     }
   }
 }

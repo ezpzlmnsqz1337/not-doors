@@ -4,8 +4,8 @@ import objects from '@/store/modules/objects'
 import documents from '@/store/modules/documents'
 import folders from '@/store/modules/folders'
 import projects from '@/store/modules/projects'
+import columns from '@/store/modules/columns'
 import MenuItem from '@/constants/MenuItem'
-import { columns } from '@/assets/db/columns'
 import createPersistedState from 'vuex-persistedstate'
 
 const debug = process.env.NODE_ENV !== 'production'
@@ -22,10 +22,10 @@ export default createStore({
     objects,
     documents,
     folders,
-    projects
+    projects,
+    columns
   },
   state: {
-    columns,
     activeMenuContent: MenuItem.PROJECTS,
     actionList: [],
     menuItems: [
@@ -36,17 +36,11 @@ export default createStore({
   getters: {
     getMenuItemById: (state) => (id) => {
       return state.menuItems.find(x => x.id === id)
-    },
-    getColumnById: (state) => (columnId) => {
-      return state.columns.find(x => x.uid === columnId)
     }
   },
   mutations: {
     setActiveMenuContent (state, { type }) {
       state.activeMenuContent = type
-    },
-    setColumnWidth (state, { column, width }) {
-      column.width = width
     },
     setActionList (state, { actions }) {
       state.actionList = actions

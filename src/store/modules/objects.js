@@ -41,16 +41,27 @@ const actions = {
 
     const index = 0
     const id = rootGetters['documents/getNextObjectId'](documentId)
+    const document = rootGetters['documents/getDocumentById'](documentId)
+    const columns = document.columns.map(x => rootGetters['columns/getColumnById'](x))
 
-    object = { ...object, id, documentId, parentId }
+    object = {
+      ...columns.reduce((acc, cur) => ({ ...acc, [cur.name]: cur.default }), {}),
+      ...object,
+      id,
+      documentId,
+      parentId
+    }
     commit('addObjectToParent', { parent, object, index })
   },
   addFirstObjectToDocument ({ dispatch, rootGetters }, { documentId }) {
     const parent = rootGetters['documents/getRootObject'](documentId)
+    const document = rootGetters['documents/getDocumentById'](documentId)
+    const columns = document.columns.map(x => rootGetters['columns/getColumnById'](x))
     dispatch('addObjectBelow', {
       parent: parent,
       object: {
         ...createObject(),
+        ...columns.reduce((acc, cur) => ({ ...acc, [cur.name]: cur.default }), {}),
         chapter: '1',
         id: 1,
         parentId: parent.uid,
