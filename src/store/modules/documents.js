@@ -11,6 +11,9 @@ const getters = {
   getDocumentById: (state) => (documentId) => {
     return state.documents.find(x => x.uid === documentId)
   },
+  getDocumentByName: (state) => (name) => {
+    return state.documents.find(x => x.name === name)
+  },
   getDocuments: (state) => (folderId) => {
     return state.documents.filter(x => x.parentId === folderId)
   },

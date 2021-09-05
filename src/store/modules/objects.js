@@ -11,6 +11,9 @@ const getters = {
   getObjectById: (state) => (objectId) => {
     return state.objects.find(x => x.uid === objectId)
   },
+  getObjectByObjectId: (state) => (documentId, objectId) => {
+    return state.objects.find(x => x.documentId === documentId && x.id === objectId)
+  },
   getActiveObject: (state, getters) => () => {
     return getters.getObjectById(state.activeObject)
   },

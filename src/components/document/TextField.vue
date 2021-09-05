@@ -33,13 +33,29 @@
         @trix-change="onChange($event)"
       />
     </div>
+    <div
+      v-if="parseDocumentLinks()"
+      class="__documentLinks"
+    >
+      <div
+        v-for="(dl, index) in parseDocumentLinks()"
+        :key="index"
+      >
+        <a
+          href="#"
+          @click.stop="goToLink(dl)"
+        >{{ dl.document.name }} {{ dl.object.id }}</a>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import 'trix'
 import 'trix/dist/trix.css'
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+
+const linkRegex = /&lt;[\w_-]*\s{1}\d+&gt;/g
 
 export default {
   name: 'TextField',
@@ -58,8 +74,33 @@ export default {
       edit: false
     }
   },
+  computed: {
+    ...mapGetters('objects', ['getObjectByObjectId']),
+    ...mapGetters('documents', ['getDocumentByName'])
+  },
   methods: {
-    ...mapMutations('objects', ['setObjectProperty']),
+    ...mapMutations('objects', ['setObjectProperty', 'setActiveObject']),
+    ...mapMutations('documents', ['openDocument']),
+    parseDocumentLinks () {
+      const results = this.object[this.name].match(linkRegex)
+      if (!results) return false
+      return results.map(x => {
+        const [name, id] = x.replace('&lt;', '').replace('&gt;', '')
+          .split(' ')
+        const document = this.getDocumentByName(name)
+        if (!document) return false
+        const object = this.getObjectByObjectId(document.uid, parseInt(id))
+        if (!object) return false
+        return {
+          document,
+          object
+        }
+      }).filter(x => x)
+    },
+    goToLink ({ document, object }) {
+      this.openDocument({ document })
+      this.setActiveObject({ object })
+    },
     getText () {
       return this.object[this.name]
     },
@@ -76,7 +117,7 @@ export default {
 
 <style>
 .__textField {
-
+  display: flex;
 }
 
 .__textField .__heading {
@@ -85,7 +126,24 @@ export default {
 }
 
 .__textField .__text {
-  display: inline-block;
+  flex: 3;
+}
+
+.__textField a {
+  color: white;
+}
+
+.__textField a:hover {
+  font-weight: bold;
+}
+
+.__textField .__documentLinks{
+  flex: 1;
+  text-align: center;
+}
+
+.__textField .__trix {
+  flex: 1;
 }
 
 .__textField .__trix .trix-button-group {

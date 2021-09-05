@@ -55,7 +55,6 @@ export default {
     ...mapMutations(['setActionList']),
     ...mapMutations('documents', ['openDocument']),
     handleKeyDown: function (e) {
-      console.log(e.keyCode)
       if (e.keyCode === Key.KEY_E && e.ctrlKey) this.handleOpenDocument(e)
       if (!this.showActionList) return
 
