@@ -82,6 +82,9 @@ const mutations = {
     index = state.openDocuments.indexOf(document.uid)
     if (index !== -1) state.openDocuments.splice(index, 1)
   },
+  renameDocument (state, { document, name }) {
+    document.name = name
+  },
   openDocument (state, { document }) {
     if (!document) return
     const { openDocuments: od } = state

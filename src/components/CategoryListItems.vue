@@ -3,7 +3,7 @@
     v-for="c in options.categories"
     :key="`category${c.uid}`"
     class="__item"
-    :class="{__bold: options.bold}"
+    :class="{__bold: options.bold, __active: options.isActive && options.isActive(c.uid)}"
     @click.stop="options.category.onToggle({[options.category.key]: c})"
   >
     <div
@@ -16,6 +16,7 @@
           class="__row"
         >
           <span
+            v-if="options.category.openArray"
             class="__arrow"
             :class="{__open: options.category.openArray.includes(c.uid)}"
           >&#8250;</span>
@@ -47,11 +48,12 @@
           @click.stop="options.category.onRemove({[options.category.key]: c})"
         >delete</span>
         <span
+          v-if="options.subcategory"
           class="material-icons __control"
           @click.stop="showSubcategoryTemplate(true, c)"
         >{{ options.subcategory.addIcon }}</span>
         <span
-          v-if="options.nested"
+          v-if="options.subcategory && options.nested"
           class="material-icons __control"
           @click.stop="showCategoryTemplate(true, c)"
         >{{ options.category.addIcon }}</span>
@@ -80,6 +82,7 @@
     </div>
     <!-- new subcategory template -->
     <div
+      v-if="options.subcategory"
       v-show="showSubcategoryTemplateInput && c.uid === category.uid"
       class="__template"
     >
@@ -122,7 +125,7 @@ export default {
       showCategoryTemplateInput: false,
       categoryName: this.options.category.name || 'CategoryName',
       showSubcategoryTemplateInput: false,
-      subcategoryName: this.options.subcategory.name || 'SubcategoryName'
+      subcategoryName: this.options.subcategory ? this.options.subcategory.name || 'SubcategoryName' : 'SubcategoryName'
     }
   },
   methods: {
@@ -185,7 +188,7 @@ export default {
       const { onAdd } = this.options.subcategory
       onAdd({ parent: category, name: this.subcategoryName })
       onOpen({ [key]: category })
-      this.subcategoryName = this.options.subcategory.name || 'SubcategoryName'
+      this.subcategoryName = this.options.subcategory ? this.options.subcategory.name || 'SubcategoryName' : 'SubcategoryName'
       this.showSubcategoryTemplateInput = false
     }
   }

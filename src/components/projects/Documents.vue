@@ -1,6 +1,7 @@
 <template>
   <div class="__documents">
-    <div
+    <CategoryListItems :options="options" />
+    <!-- <div
       v-for="d in getDocuments(folder.uid)"
       :key="`doc${d.uid}`"
       class="__item"
@@ -12,15 +13,19 @@
         class="material-icons"
       >description</span>
       <span>{{ d.name }}</span>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
+import CategoryListItems from '@/components/CategoryListItems'
 import { mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'Documents',
+  components: {
+    CategoryListItems
+  },
   props: {
     folder: {
       type: Object,
@@ -33,10 +38,24 @@ export default {
   },
   computed: {
     ...mapState('documents', ['activeDocument']),
-    ...mapGetters('documents', ['getDocuments'])
+    ...mapGetters('documents', ['getDocuments']),
+    options: function () {
+      return {
+        categories: this.getDocuments(this.folder.uid),
+        category: {
+          key: 'document',
+          isActive: this.isActive,
+          onToggle: this.openDocument,
+          onRename: this.renameDocument,
+          onRemove: this.removeDocument,
+          icon: 'description'
+        },
+        level: this.level
+      }
+    }
   },
   methods: {
-    ...mapMutations('documents', ['openDocument']),
+    ...mapMutations('documents', ['openDocument', 'renameDocument', 'removeDocument']),
     isActive (documentId) {
       return this.activeDocument === documentId
     }
