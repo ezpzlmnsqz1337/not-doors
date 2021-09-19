@@ -1,5 +1,6 @@
 import { createStore, createLogger } from 'vuex'
 import users from '@/store/modules/users'
+import panels from '@/store/modules/panels'
 import objects from '@/store/modules/objects'
 import documents from '@/store/modules/documents'
 import folders from '@/store/modules/folders'
@@ -12,7 +13,10 @@ const debug = process.env.NODE_ENV !== 'production'
 
 const logger = createLogger({
   filter (mutation, stateBefore, stateAfter) {
-    return !(mutation.type).includes('setHoverObject')
+    return !(mutation.type).includes('setHoverObject') && !(mutation.type).includes('setPanelWidth') && !(mutation.type).includes('setColumnWidth')
+  },
+  actionFilter (action, state) {
+    return !(action.type).includes('setPanelWidth')
   }
 })
 
@@ -23,7 +27,8 @@ export default createStore({
     documents,
     folders,
     projects,
-    columns
+    columns,
+    panels
   },
   state: {
     activeMenuContent: MenuItem.PROJECTS,

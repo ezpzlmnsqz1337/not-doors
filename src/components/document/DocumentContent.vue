@@ -70,6 +70,7 @@
 <script>
 import Field from '@/components/document/Field'
 import ObjectActions from '@/components/document/ObjectActions'
+import resize from '@/mixins/resize'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import draggable from 'vuedraggable'
 
@@ -80,11 +81,9 @@ export default {
     ObjectActions,
     draggable
   },
+  mixins: [resize],
   data: function () {
     return {
-      resizing: null,
-      startX: 0,
-      startWidth: 0,
       draggedElement: null
     }
   },
@@ -106,12 +105,6 @@ export default {
     }
   },
   mounted: function () {
-    document.addEventListener('mousemove', e => {
-      if (this.resizing) {
-        this.setColumnWidth({ column: this.resizing, width: this.startWidth + (e.pageX - this.startX) })
-      }
-    })
-    document.addEventListener('mouseup', () => this.stopResize())
     document.addEventListener('click', () => {
       this.hideActions()
       this.setActiveObject({ object: null })
@@ -144,8 +137,8 @@ export default {
       this.resizing = column
       this.startWidth = column.width
     },
-    stopResize () {
-      this.resizing = null
+    resizeHandler (element, newWidth) {
+      this.setColumnWidth({ column: element, width: newWidth })
     },
     handleRowClick (object) {
       this.setActiveObject({ object })
