@@ -2,6 +2,7 @@
   <button
     :class="btnClass()"
     :title="title"
+    :disabled="disabled"
     @click.stop="$emit('click')"
   >
     <slot />
@@ -23,6 +24,10 @@ export default {
       default: ''
     },
     block: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     }
@@ -62,6 +67,8 @@ button {
   --btn-success-hover: #0e8b19;
   --btn-danger: #e02c2c;
   --btn-danger-hover: #c71818;
+  --btn-disabled: #a0a0a0;
+  --btn-disabled-text: #cacaca;
 }
 
 button {
@@ -72,6 +79,12 @@ button {
   margin: 0.1rem;
   padding: 0.5rem 0.8rem;
   border-radius: 0.3rem;
+}
+
+button:disabled, button:disabled:hover {
+  cursor: not-allowed;
+  background-color: var(--btn-disabled) !important;
+  color: var(--btn-disabled-text) !important;
 }
 
 button:hover {

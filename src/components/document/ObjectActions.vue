@@ -39,15 +39,11 @@
 </template>
 
 <script>
-import Button from '@/components/ui/Button'
 import ButtonType from '@/constants/ButtonType'
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'ObjectActions',
-  components: {
-    Button
-  },
   props: {
     object: {
       type: Object,

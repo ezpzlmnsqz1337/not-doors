@@ -58,6 +58,13 @@
         v-if="objects.length === 0"
         :active-document="activeDocument"
       />
+      <Button
+        v-if="objects.length > 0"
+        type="primary"
+        @click="showCreateTemplate = true"
+      >
+        Create template
+      </Button>
     </div>
   </PerfectScrollbar>
   <ObjectActions
@@ -65,6 +72,17 @@
     :object="getActiveObject()"
     @hide="hideActions()"
   />
+  <Modal
+    v-if="showCreateTemplate"
+    @close="showCreateTemplate = false"
+  >
+    <template #body>
+      <CreateDocumentTemplate
+        :active-document="activeDocument"
+        @hide="showCreateTemplate = false"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script>
@@ -73,12 +91,14 @@ import ObjectActions from '@/components/document/ObjectActions'
 import resize from '@/mixins/resize'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import draggable from 'vuedraggable'
-import EmptyDocument from '../documents/EmptyDocument'
+import CreateDocumentTemplate from '@/components/documents/CreateDocumentTemplate'
+import EmptyDocument from '@/components/documents/EmptyDocument'
 
 export default {
   name: 'DocumentsContent',
   components: {
     Field,
+    CreateDocumentTemplate,
     EmptyDocument,
     ObjectActions,
     draggable
@@ -86,7 +106,8 @@ export default {
   mixins: [resize],
   data: function () {
     return {
-      draggedElement: null
+      draggedElement: null,
+      showCreateTemplate: false
     }
   },
   computed: {
@@ -114,6 +135,7 @@ export default {
   },
   methods: {
     ...mapActions('documents', ['calculateChapters']),
+    ...mapActions('templates', ['createTemplate']),
     ...mapMutations('objects', ['setActiveObject', 'setHoverObject', 'moveObjectAfter', 'moveObjectBelow']),
     ...mapMutations('columns', ['setColumnWidth']),
     dragStart ({ oldIndex }) {

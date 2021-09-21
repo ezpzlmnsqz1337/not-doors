@@ -1,42 +1,64 @@
 <template>
   <div class="__documentTemplates">
-    Document templates
+    <div class="__heading">
+      Document templates
+    </div>
     <div
       v-for="(t, index) in templates"
       :key="index"
+      class="__template"
+      :class="{__selected: selected === t}"
       @click="selectTemplate(t)"
     >
-      <div>{{ t.name }}</div>
-      <div>{{ t.description }}</div>
+      <div class="__icon">
+        <span class="material-icons-outlined">description</span>
+      </div>
+      <div class="__content">
+        <div class="__name">
+          {{ t.name }}
+        </div>
+        <div class="__description">
+          {{ t.description }}
+        </div>
+      </div>
     </div>
 
-    <Button
-      type="primary"
-      @click="confirm()"
-    >
-      Select
-    </Button>
+    <div class="__buttons">
+      <Button
+        type="danger"
+        @click="$emit('hide')"
+      >
+        Cancel
+      </Button>
+      <Button
+        type="primary"
+        :disabled="selected === null"
+        @click="confirm()"
+      >
+        Select
+      </Button>
+    </div>
   </div>
 </template>
 
 <script>
-import Button from '@/components/ui/Button'
-
+import { mapState } from 'vuex'
 export default {
   name: 'DocumentTemplates',
-  components: {
-    Button
-  },
   props: {
     activeDocument: {
       type: String,
       default: null
     }
   },
+  emits: ['hide'],
   data: function () {
     return {
       selected: null
     }
+  },
+  computed: {
+    ...mapState('templates', ['templates'])
   },
   methods: {
     selectTemplate (template) {
@@ -44,34 +66,58 @@ export default {
     },
     confirm () {
       this.createDocumentFromTemplate({ template: this.selected })
+      this.$emit('hide')
     }
   }
 }
 </script>
 
 <style scoped>
-.__emptyDocument {
-  height: 100%;
-  width: 100%;
-  position: absolute;
+.__template{
   display: flex;
-  align-items: center;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.__middleContent {
-  max-width: 50%;
-  margin: 0 auto;
-  text-align: center;
+.__template.__selected{
+  background-color: var(--active);
+}
+
+.__template:hover{
+  cursor: pointer;
+  background-color: var(--hover);
+  color: var(--text-light1);
 }
 
 .__heading {
-  font-size: 1.5rem;
-  color: var(--text-light2);
-  margin-bottom: 2rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.__icon {
+  display: flex;
+  align-items: center;
+  padding-right: 0.5em;
+}
+
+.__content {
+  flex: auto;
+}
+
+.__name {
+  font-size: 1rem;
+}
+
+.__description {
+
+}
+
+.__buttons {
+  display: flex;
 }
 
 .__buttons button {
-  width: 70%;
-  margin-bottom: 0.5rem;
+  flex: 1;
 }
 </style>

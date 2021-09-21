@@ -5,6 +5,7 @@ import objects from '@/store/modules/objects'
 import documents from '@/store/modules/documents'
 import folders from '@/store/modules/folders'
 import projects from '@/store/modules/projects'
+import templates from '@/store/modules/templates'
 import columns from '@/store/modules/columns'
 import MenuItem from '@/constants/MenuItem'
 import createPersistedState from 'vuex-persistedstate'
@@ -28,7 +29,8 @@ export default createStore({
     folders,
     projects,
     columns,
-    panels
+    panels,
+    templates
   },
   state: {
     activeMenuContent: MenuItem.PROJECTS,

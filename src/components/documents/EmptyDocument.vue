@@ -32,15 +32,11 @@
 
 <script>
 import DocumentTemplates from '@/components/documents/DocumentTemplates'
-import Button from '@/components/ui/Button'
-import Modal from '@/components/ui/Modal'
 import { mapActions } from 'vuex'
 
 export default {
   name: 'EmptyDocument',
   components: {
-    Modal,
-    Button,
     DocumentTemplates
   },
   props: {

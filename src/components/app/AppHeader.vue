@@ -36,13 +36,11 @@
 
 <script>
 import UserLogin from '@/components/UserLogin'
-import Modal from '@/components/ui/Modal'
 import { mapState } from 'vuex'
 
 export default {
   name: 'AppHeader',
   components: {
-    Modal,
     UserLogin
   },
   data: function () {

@@ -92,14 +92,10 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import Button from '@/components/ui/Button'
 import ButtonType from '@/constants/ButtonType'
 
 export default {
   name: 'UserLogin',
-  components: {
-    Button
-  },
   data: function () {
     return {
       email: 'karl.adminman@not-doors.com',

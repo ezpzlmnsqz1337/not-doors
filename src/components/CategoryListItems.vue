@@ -133,14 +133,12 @@
 <script>
 import Key from '@/constants/Key'
 import Modal from '@/components/ui/Modal'
-import Button from '@/components/ui/Button'
 import ButtonType from '@/constants/ButtonType'
 
 export default {
   name: 'CategoryListItems',
   components: {
-    Modal,
-    Button
+    Modal
   },
   props: {
     options: {

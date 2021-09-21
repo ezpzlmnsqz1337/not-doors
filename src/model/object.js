@@ -10,7 +10,7 @@ export default () => ({
    * @type {Number}
    * object id in the document, starts from 0
    */
-  id: null,
+  id: 0,
   /**
    * @type {String}
    * unique identifier of the document that this object belongs to
