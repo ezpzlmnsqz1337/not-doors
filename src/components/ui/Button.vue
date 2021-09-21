@@ -21,6 +21,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['click'],
@@ -36,7 +40,8 @@ export default {
         __primary: this.type === ButtonType.PRIMARY,
         __secondary: this.type === ButtonType.SECONDARY,
         __success: this.type === ButtonType.SUCCESS,
-        __danger: this.type === ButtonType.DANGER
+        __danger: this.type === ButtonType.DANGER,
+        __block: this.block
       }
     }
   }
@@ -113,5 +118,9 @@ button.__danger {
 button.__danger:hover {
   background-color: var(--btn-danger-hover);
   color: var(--btn-text-light);
+}
+
+button.__block {
+  display: block;
 }
 </style>

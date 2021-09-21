@@ -4,7 +4,10 @@
       class="__documentContent"
       @mouseout="setHoverObject({object: null})"
     >
-      <table class="__table">
+      <table
+        v-if="objects.length > 0"
+        class="__table"
+      >
         <tr>
           <th
             v-for="c in columns"
@@ -51,13 +54,10 @@
           </template>
         </draggable>
       </table>
-      <button
-        v-if="!objects.length"
-        class="__add"
-        @click.prevent="addFirstObjectToDocument({documentId: activeDocument})"
-      >
-        +
-      </button>
+      <EmptyDocument
+        v-if="objects.length === 0"
+        :active-document="activeDocument"
+      />
     </div>
   </PerfectScrollbar>
   <ObjectActions
@@ -73,11 +73,13 @@ import ObjectActions from '@/components/document/ObjectActions'
 import resize from '@/mixins/resize'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import draggable from 'vuedraggable'
+import EmptyDocument from '../documents/EmptyDocument'
 
 export default {
   name: 'DocumentsContent',
   components: {
     Field,
+    EmptyDocument,
     ObjectActions,
     draggable
   },
@@ -112,7 +114,6 @@ export default {
   },
   methods: {
     ...mapActions('documents', ['calculateChapters']),
-    ...mapActions('objects', ['addFirstObjectToDocument']),
     ...mapMutations('objects', ['setActiveObject', 'setHoverObject', 'moveObjectAfter', 'moveObjectBelow']),
     ...mapMutations('columns', ['setColumnWidth']),
     dragStart ({ oldIndex }) {
@@ -171,6 +172,8 @@ export default {
 <style scoped>
 .__documentContent {
   position: absolute;
+  min-width: 100%;
+  min-height: 100%;
   margin-bottom: 5rem;
 }
 
