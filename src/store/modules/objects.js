@@ -134,6 +134,9 @@ const mutations = {
   setActiveObject (state, { object }) {
     if (object && state.activeObject === object.uid) return
     state.activeObject = object ? object.uid : null
+  },
+  addExistingObject (state, { object }) {
+    state.objects.push(object)
   }
 }
 

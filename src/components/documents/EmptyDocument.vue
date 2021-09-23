@@ -25,7 +25,7 @@
     @close="showTemplates = false"
   >
     <template #body>
-      <DocumentTemplates />
+      <DocumentTemplates :active-document="activeDocument" />
     </template>
   </Modal>
 </template>

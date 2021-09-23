@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
   name: 'DocumentTemplates',
   props: {
@@ -61,11 +61,12 @@ export default {
     ...mapState('templates', ['templates'])
   },
   methods: {
+    ...mapActions('templates', ['createDocumentFromTemplate']),
     selectTemplate (template) {
       this.selected = template
     },
     confirm () {
-      this.createDocumentFromTemplate({ template: this.selected })
+      this.createDocumentFromTemplate({ documentId: this.activeDocument, templateId: this.selected.uid })
       this.$emit('hide')
     }
   }
