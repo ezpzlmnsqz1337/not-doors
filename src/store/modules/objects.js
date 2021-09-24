@@ -49,8 +49,8 @@ const actions = {
 
     object = {
       ...columns.reduce((acc, cur) => ({ ...acc, [cur.name]: cur.default }), {}),
-      ...object,
       id,
+      ...object,
       documentId,
       parentId
     }

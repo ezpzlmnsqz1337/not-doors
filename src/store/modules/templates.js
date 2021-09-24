@@ -25,14 +25,15 @@ const actions = {
     console.log('parent', parent)
     const template = getters.getTemplateById(templateId)
     dispatch('refreshIdentifiers', { objects: template.objects }).then(refreshed => {
-      refreshed.forEach(x => {
-        x.documentId = documentId
-        if (!x.parentId) {
-          dispatch('objects/addObjectBelow', { parent, object: x }, { root: true })
-        } else {
-          commit('objects/addExistingObject', { object: x }, { root: true })
-        }
-      })
+      refreshed.sort((a, b) => b.id - a.id)
+        .forEach(x => {
+          x.documentId = documentId
+          if (!x.parentId) {
+            dispatch('objects/addObjectBelow', { parent, object: x }, { root: true })
+          } else {
+            commit('objects/addExistingObject', { object: x }, { root: true })
+          }
+        })
     })
   },
   refreshIdentifiers ({ state }, { objects }) {
