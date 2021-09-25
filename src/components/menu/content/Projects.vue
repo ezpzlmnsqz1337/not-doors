@@ -61,10 +61,16 @@ export default {
       }
     }
   },
+  updated: function () {
+    console.log('updated')
+  },
+  mounted: function () {
+    this.bindProjects()
+  },
   methods: {
     ...mapMutations('projects', ['openProject', 'closeProject', 'renameProject']),
     ...mapMutations('folders', ['addFolder']),
-    ...mapActions('projects', ['removeProject', 'toggleProject'])
+    ...mapActions('projects', ['removeProject', 'toggleProject', 'renameProject', 'bindProjects'])
   }
 }
 </script>

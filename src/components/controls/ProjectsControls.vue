@@ -29,7 +29,7 @@
 
 <script>
 import Key from '@/constants/Key'
-import { mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'ProjectControls',
@@ -40,7 +40,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('projects', { ap: 'addProject' }),
+    ...mapActions('projects', { ap: 'addProject' }),
     handleKeyDown: function (e) {
       if (e.keyCode === Key.ENTER) this.addProject()
       if (e.keyCode === Key.ESCAPE) this.showProjectTemplate(false)

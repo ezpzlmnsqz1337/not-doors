@@ -1,4 +1,6 @@
 import createDocument from '@/model/document'
+import { db } from '@/firebase'
+import { firestoreAction } from 'vuexfire'
 
 const state = () => ({
   documents: [],
@@ -50,7 +52,7 @@ const getters = {
 const actions = {
   addDocument ({ commit, rootState }, { parent, name }) {
     const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns.columns.map(x => x.uid) }
-    commit('addDocument', { document })
+    db.collection('documents').add(document)
     // add root object
     commit('objects/addRootObject', { documentId: document.uid }, { root: true })
   },
@@ -70,14 +72,24 @@ const actions = {
         const childrenHeadings = x.objects.map(y => rootGetters['objects/getObjectById'](y)).filter(y => y.isHeading)
         dispatch('calculateChapters', { headings: childrenHeadings, chapter: x.chapter })
       })
-  }
+  },
+  bindDocuments: firestoreAction(({ bindFirestoreRef }) => {
+    // return the promise returned by `bindFirestoreRef`
+    var citiesRef = db.collection('cities')
+    citiesRef.doc('SF').set({
+      name: 'San Francisco',
+      state: 'CA',
+      country: 'USA',
+      capital: false,
+      population: 860000,
+      regions: ['west_coast', 'norcal']
+    })
+    return bindFirestoreRef('documents', db.collection('documents'))
+  })
 }
 
 // mutations
 const mutations = {
-  addDocument (state, { document }) {
-    state.documents.push(document)
-  },
   removeDocument (state, { document }) {
     if (!document) return
     let index = state.documents.findIndex(x => x.uid === document.uid)

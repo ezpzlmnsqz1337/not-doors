@@ -1,4 +1,6 @@
 import createProject from '@/model/project'
+import { db } from '@/firebase'
+import { firestoreAction } from 'vuexfire'
 
 const state = () => ({
   projects: [],
@@ -16,10 +18,18 @@ const getters = {
 const actions = {
   removeProject ({ commit, dispatch, state, rootGetters }, { project }) {
     if (!project) return
-    const index = state.projects.findIndex(x => x.uid === project.uid)
     commit('closeProject', { project })
     rootGetters['folders/getFolders'](project.uid).forEach(x => dispatch('folders/removeFolder', { folder: x }, { root: true }))
-    commit('removeProject', { index })
+
+    db.collection('projects').doc(project.uid)
+      .delete()
+  },
+  renameProject ({ dispatch }, { project, name }) {
+    db.collection('projects').doc(project.uid)
+      .update({ name })
+      .then(() => {
+        dispatch('bindProjects')
+      })
   },
   toggleProject ({ commit, state }, { project }) {
     const isOpen = state.openProjects.includes(project.uid)
@@ -28,14 +38,23 @@ const actions = {
     } else {
       commit('closeProject', { project })
     }
-  }
+  },
+  addProject ({ dispatch }, { name }) {
+    const project = { ...createProject(), name }
+    db.collection('projects').doc(project.uid)
+      .set(project)
+      .then(() => {
+        dispatch('bindProjects')
+      })
+  },
+  bindProjects: firestoreAction(({ bindFirestoreRef, firestoreBind }) => {
+    // return the promise returned by `bindFirestoreRef`
+    return bindFirestoreRef('projects', db.collection('projects'), { wait: true })
+  })
 }
 
 // mutations
 const mutations = {
-  addProject (state, { name }) {
-    state.projects.push({ ...createProject(), name })
-  },
   renameProject (state, { project, name }) {
     project.name = name
   },

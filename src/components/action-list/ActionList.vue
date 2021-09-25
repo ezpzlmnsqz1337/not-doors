@@ -129,6 +129,7 @@ export default {
 }
 
 .__item:hover {
+  cursor: pointer;
   background-color: var(--hover);
 }
 </style>
