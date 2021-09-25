@@ -16,21 +16,20 @@ const getters = {
 
 // actions
 const actions = {
-  removeProject ({ commit, dispatch, state, rootGetters }, { project }) {
+  removeProject: firestoreAction(async ({ commit, dispatch, state, rootGetters }, { project }) => {
     if (!project) return
     commit('closeProject', { project })
     rootGetters['folders/getFolders'](project.uid).forEach(x => dispatch('folders/removeFolder', { folder: x }, { root: true }))
 
-    db.collection('projects').doc(project.uid)
+    await db.collection('projects').doc(project.uid)
       .delete()
-  },
-  renameProject ({ dispatch }, { project, name }) {
-    db.collection('projects').doc(project.uid)
+    dispatch('bindProjects')
+  }),
+  renameProject: firestoreAction(async ({ dispatch }, { project, name }) => {
+    await db.collection('projects').doc(project.uid)
       .update({ name })
-      .then(() => {
-        dispatch('bindProjects')
-      })
-  },
+    dispatch('bindProjects')
+  }),
   toggleProject ({ commit, state }, { project }) {
     const isOpen = state.openProjects.includes(project.uid)
     if (!isOpen) {
@@ -39,17 +38,15 @@ const actions = {
       commit('closeProject', { project })
     }
   },
-  addProject ({ dispatch }, { name }) {
+  addProject: firestoreAction(async ({ dispatch }, { name }) => {
     const project = { ...createProject(), name }
-    db.collection('projects').doc(project.uid)
+    await db.collection('projects').doc(project.uid)
       .set(project)
-      .then(() => {
-        dispatch('bindProjects')
-      })
-  },
-  bindProjects: firestoreAction(({ bindFirestoreRef, firestoreBind }) => {
+    dispatch('bindProjects')
+  }),
+  bindProjects: firestoreAction(({ bindFirestoreRef }) => {
     // return the promise returned by `bindFirestoreRef`
-    return bindFirestoreRef('projects', db.collection('projects'), { wait: true })
+    return bindFirestoreRef('projects', db.collection('projects'))
   })
 }
 

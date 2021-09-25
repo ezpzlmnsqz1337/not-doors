@@ -1,4 +1,6 @@
 import createFolder from '@/model/folder'
+import { db } from '@/firebase'
+import { firestoreAction } from 'vuexfire'
 
 const state = () => ({
   folders: [],
@@ -17,15 +19,27 @@ const getters = {
 
 // actions
 const actions = {
-  removeFolder ({ commit, dispatch, getters, state, rootGetters }, { folder }) {
+  removeFolder: firestoreAction(async ({ commit, dispatch, getters, rootGetters }, { folder, name }) => {
     if (!folder) return
-    const index = state.folders.findIndex(x => x.uid === folder.uid)
     commit('closeFolder', { folder })
     getters.getFolders(folder.uid).forEach(x => dispatch('removeFolder', { folder: x }))
     rootGetters['documents/getDocuments'](folder.uid)
       .forEach(x => dispatch('documents/removeDocument', { document: x }, { root: true }))
-    commit('removeFolder', { index })
-  },
+    await db.collection('folders').doc(folder.uid)
+      .delete()
+    dispatch('bindFolders')
+  }),
+  renameFolder: firestoreAction(async ({ dispatch }, { folder, name }) => {
+    await db.collection('folders').doc(folder.uid)
+      .update({ name })
+    dispatch('bindFolders')
+  }),
+  addFolder: firestoreAction(async ({ dispatch }, { name, parent }) => {
+    const folder = { ...createFolder(), name, parentId: parent.uid }
+    await db.collection('folders').doc(folder.uid)
+      .set(folder)
+    dispatch('bindFolders')
+  }),
   toggleFolder ({ commit, state }, { folder }) {
     const isOpen = state.openFolders.includes(folder.uid)
     if (!isOpen) {
@@ -33,20 +47,15 @@ const actions = {
     } else {
       commit('closeFolder', { folder })
     }
-  }
+  },
+  bindFolders: firestoreAction(({ bindFirestoreRef }) => {
+    // return the promise returned by `bindFirestoreRef`
+    return bindFirestoreRef('folders', db.collection('folders'))
+  })
 }
 
 // mutations
 const mutations = {
-  addFolder (state, { parent, name }) {
-    state.folders.push({ ...createFolder(), name, parentId: parent.uid })
-  },
-  renameFolder (state, { folder, name }) {
-    folder.name = name
-  },
-  removeFolder (state, { index }) {
-    state.folders.splice(index, 1)
-  },
   openFolder ({ openFolders }, { folder }) {
     if (!folder) return
     if (!openFolders.includes(folder.uid)) openFolders.push(folder.uid)

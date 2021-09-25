@@ -50,19 +50,27 @@ const getters = {
 
 // actions
 const actions = {
-  addDocument ({ commit, rootState }, { parent, name }) {
+  addDocument: firestoreAction(async ({ commit, rootState, dispatch }, { parent, name }) => {
     const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns.columns.map(x => x.uid) }
-    db.collection('documents').add(document)
+    await db.collection('documents').doc(document.uid)
+      .set(document)
+    dispatch('bindDocuments')
     // add root object
     commit('objects/addRootObject', { documentId: document.uid }, { root: true })
-  },
-  removeDocument ({ commit, state, getters }, { document }) {
+  }),
+  removeDocument: firestoreAction(async ({ commit, dispatch, getters }, { document }) => {
     if (!document) return
-    const index = state.documents.findIndex(x => x.uid === document.uid)
     commit('closeDocument', { document })
     getters.getDocumentObjects(document.uid).forEach(x => commit('objects/removeObject', { object: x }, { root: true }))
-    commit('removeDocument', { index })
-  },
+    await db.collection('documents').doc(document.uid)
+      .delete()
+    dispatch('bindDocuments')
+  }),
+  renameDocument: firestoreAction(async ({ dispatch }, { document, name }) => {
+    await db.collection('documents').doc(document.uid)
+      .update({ name })
+    dispatch('bindDocuments')
+  }),
   calculateChapters ({ getters, dispatch, commit, rootGetters }, { document = null, headings, chapter = '' }) {
     headings = headings || getters.getTopLevelObjects(document.uid).filter(x => x.isHeading)
     headings
@@ -74,32 +82,12 @@ const actions = {
       })
   },
   bindDocuments: firestoreAction(({ bindFirestoreRef }) => {
-    // return the promise returned by `bindFirestoreRef`
-    var citiesRef = db.collection('cities')
-    citiesRef.doc('SF').set({
-      name: 'San Francisco',
-      state: 'CA',
-      country: 'USA',
-      capital: false,
-      population: 860000,
-      regions: ['west_coast', 'norcal']
-    })
     return bindFirestoreRef('documents', db.collection('documents'))
   })
 }
 
 // mutations
 const mutations = {
-  removeDocument (state, { document }) {
-    if (!document) return
-    let index = state.documents.findIndex(x => x.uid === document.uid)
-    state.documents.splice(index, 1)
-    index = state.openDocuments.indexOf(document.uid)
-    if (index !== -1) state.openDocuments.splice(index, 1)
-  },
-  renameDocument (state, { document, name }) {
-    document.name = name
-  },
   openDocument (state, { document }) {
     if (!document) return
     const { openDocuments: od } = state

@@ -1,45 +1,35 @@
 <template>
-  <Button @click="addStuff()">
-    Add
-  </Button>
-  <div style="color: red">
-    {{ stuff }}
-  </div>
-  <div style="color: green">
-    {{ stuff }}
-  </div>
-  <!-- <AppHeader />
+  <AppHeader />
   <AppContent />
-  <ActionList /> -->
+  <ActionList />
 </template>
 
 <script>
-// import AppHeader from '@/components/app/AppHeader'
-// import AppContent from '@/components/app/AppContent'
-// import ActionList from '@/components/action-list/ActionList'
+import AppHeader from '@/components/app/AppHeader'
+import AppContent from '@/components/app/AppContent'
+import ActionList from '@/components/action-list/ActionList'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'App',
   components: {
-    // AppHeader,
-    // AppContent,
-    // ActionList
+    AppHeader,
+    AppContent,
+    ActionList
   },
   computed: {
     ...mapState(['stuff']),
     ...mapGetters(['getStuff'])
   },
-  mounted: async function () {
-    // await this.bindDocuments()
-    console.log('Bef: ', this.stuff)
-    const s = await this.bindStuff()
-    setInterval(() => console.log(s), 1500)
-    console.log('aft: ', this.stuff)
+  mounted: function () {
+    this.bindProjects()
+    this.bindDocuments()
+    this.bindFolders()
   },
   methods: {
     ...mapActions('documents', ['bindDocuments']),
-    ...mapActions(['bindStuff', 'addStuff'])
+    ...mapActions('folders', ['bindFolders']),
+    ...mapActions('projects', ['bindProjects'])
   }
 }
 </script>

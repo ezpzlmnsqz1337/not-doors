@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     ...mapMutations('projects', ['openProject', 'closeProject', 'renameProject']),
-    ...mapMutations('folders', ['addFolder']),
+    ...mapActions('folders', ['addFolder']),
     ...mapActions('projects', ['removeProject', 'toggleProject', 'renameProject', 'bindProjects'])
   }
 }

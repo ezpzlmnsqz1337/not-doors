@@ -8,8 +8,10 @@ import projects from '@/store/modules/projects'
 import templates from '@/store/modules/templates'
 import users from '@/store/modules/users'
 import { createLogger, createStore } from 'vuex'
-import { vuexfireMutations, firestoreAction } from 'vuexfire'
-import { db } from '@/firebase'
+import { vuexfireMutations, firestoreOptions } from 'vuexfire'
+
+// always wait for bindings to be resolved
+firestoreOptions.wait = true
 
 const debug = process.env.NODE_ENV !== 'production'
 
@@ -39,8 +41,7 @@ export default createStore({
     menuItems: [
       { id: MenuItem.PROJECTS, name: 'Projects', icon: 'folder', activeDocument: false },
       { id: MenuItem.CONTENT, name: 'Content', icon: 'list', activeDocument: true }
-    ],
-    stuff: []
+    ]
   },
   getters: {
     getMenuItemById: (state) => (id) => {
@@ -59,17 +60,7 @@ export default createStore({
     },
     ...vuexfireMutations
   },
-  actions: {
-    bindStuff: firestoreAction(({ bindFirestoreRef }) => {
-      // return the promise returned by `bindFirestoreRef`
-      return bindFirestoreRef('stuff', db.collection('stuff'), { wait: true })
-    }),
-    addStuff: firestoreAction(({ bindFirestoreRef }) => {
-      // return the promise returned by `bindFirestoreRef`
-      return db.collection('stuff').doc('penis' + Math.random())
-        .set({ name: 'huge', easy: 'yes' })
-    })
-  },
+  actions: {},
   strict: debug,
   plugins: debug ? [logger] : []
 })
