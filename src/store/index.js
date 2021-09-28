@@ -8,10 +8,6 @@ import projects from '@/store/modules/projects'
 import templates from '@/store/modules/templates'
 import users from '@/store/modules/users'
 import { createLogger, createStore } from 'vuex'
-import { vuexfireMutations, firestoreOptions } from 'vuexfire'
-
-// always wait for bindings to be resolved
-firestoreOptions.wait = true
 
 const debug = process.env.NODE_ENV !== 'production'
 
@@ -57,8 +53,7 @@ export default createStore({
     },
     setActionList (state, { actions }) {
       state.actionList = actions
-    },
-    ...vuexfireMutations
+    }
   },
   actions: {},
   strict: debug,

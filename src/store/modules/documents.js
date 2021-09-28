@@ -1,6 +1,8 @@
 import createDocument from '@/model/document'
 import { db } from '@/firebase'
-import { firestoreAction } from 'vuexfire'
+import { collection, onSnapshot } from 'firebase/firestore'
+
+const subs = []
 
 const state = () => ({
   documents: [],
@@ -50,27 +52,27 @@ const getters = {
 
 // actions
 const actions = {
-  addDocument: firestoreAction(async ({ commit, rootState, dispatch }, { parent, name }) => {
+  async addDocument ({ commit, rootState, dispatch }, { parent, name }) {
     const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns.columns.map(x => x.uid) }
     await db.collection('documents').doc(document.uid)
       .set(document)
     dispatch('bindDocuments')
     // add root object
     commit('objects/addRootObject', { documentId: document.uid }, { root: true })
-  }),
-  removeDocument: firestoreAction(async ({ commit, dispatch, getters }, { document }) => {
+  },
+  async removeDocument ({ commit, dispatch, getters }, { document }) {
     if (!document) return
     commit('closeDocument', { document })
     getters.getDocumentObjects(document.uid).forEach(x => commit('objects/removeObject', { object: x }, { root: true }))
     await db.collection('documents').doc(document.uid)
       .delete()
     dispatch('bindDocuments')
-  }),
-  renameDocument: firestoreAction(async ({ dispatch }, { document, name }) => {
+  },
+  async renameDocument ({ dispatch }, { document, name }) {
     await db.collection('documents').doc(document.uid)
       .update({ name })
     dispatch('bindDocuments')
-  }),
+  },
   calculateChapters ({ getters, dispatch, commit, rootGetters }, { document = null, headings, chapter = '' }) {
     headings = headings || getters.getTopLevelObjects(document.uid).filter(x => x.isHeading)
     headings
@@ -81,9 +83,28 @@ const actions = {
         dispatch('calculateChapters', { headings: childrenHeadings, chapter: x.chapter })
       })
   },
-  bindDocuments: firestoreAction(({ bindFirestoreRef }) => {
-    return bindFirestoreRef('documents', db.collection('documents'))
-  })
+  bindDocuments ({ state }) {
+    subs.push({
+      name: 'documents',
+      unsub: onSnapshot(collection(db, 'documents'),
+        snapshot => snapshot.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            console.log('New document: ', change.doc.data())
+          }
+          if (change.type === 'modified') {
+            console.log('Modified document: ', change.doc.data())
+          }
+          if (change.type === 'removed') {
+            console.log('Removed document: ', change.doc.data())
+          }
+        })
+      )
+    })
+  },
+  unsubscribe () {
+    subs.forEach(x => x.unsub())
+    subs.splice(0)
+  }
 }
 
 // mutations

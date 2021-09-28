@@ -1,6 +1,7 @@
 import createFolder from '@/model/folder'
 import { db } from '@/firebase'
-import { firestoreAction } from 'vuexfire'
+import { collection, doc, deleteDoc, updateDoc, setDoc, query, where, getDocs } from 'firebase/firestore'
+import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
   folders: [],
@@ -19,27 +20,25 @@ const getters = {
 
 // actions
 const actions = {
-  removeFolder: firestoreAction(async ({ commit, dispatch, getters, rootGetters }, { folder, name }) => {
+  async removeFolder ({ commit, dispatch, getters, rootGetters }, { folder }) {
     if (!folder) return
     commit('closeFolder', { folder })
-    getters.getFolders(folder.uid).forEach(x => dispatch('removeFolder', { folder: x }))
-    rootGetters['documents/getDocuments'](folder.uid)
-      .forEach(x => dispatch('documents/removeDocument', { document: x }, { root: true }))
-    await db.collection('folders').doc(folder.uid)
-      .delete()
-    dispatch('bindFolders')
-  }),
-  renameFolder: firestoreAction(async ({ dispatch }, { folder, name }) => {
-    await db.collection('folders').doc(folder.uid)
-      .update({ name })
-    dispatch('bindFolders')
-  }),
-  addFolder: firestoreAction(async ({ dispatch }, { name, parent }) => {
+    const queryFolders = query(collection(db, 'folders'), where('parentId', '==', folder.uid))
+    const folderFolders = await getDocs(queryFolders)
+    folderFolders.forEach(x => dispatch('removeFolder', { folder: x }))
+
+    const queryDocuments = query(collection(db, 'documents'), where('parentId', '==', folder.uid))
+    const folderDocuments = await getDocs(queryDocuments)
+    folderDocuments.forEach(x => dispatch('documents/removeDocument', { document: x }, { root: true }))
+    await deleteDoc(doc(db, 'folders', folder.uid))
+  },
+  async renameFolder ({ dispatch }, { folder, name }) {
+    await updateDoc(doc(db, 'folders', folder.uid), { name })
+  },
+  async addFolder ({ dispatch }, { name, parent }) {
     const folder = { ...createFolder(), name, parentId: parent.uid }
-    await db.collection('folders').doc(folder.uid)
-      .set(folder)
-    dispatch('bindFolders')
-  }),
+    setDoc(doc(db, 'folders', folder.uid), folder)
+  },
   toggleFolder ({ commit, state }, { folder }) {
     const isOpen = state.openFolders.includes(folder.uid)
     if (!isOpen) {
@@ -48,10 +47,9 @@ const actions = {
       commit('closeFolder', { folder })
     }
   },
-  bindFolders: firestoreAction(({ bindFirestoreRef }) => {
-    // return the promise returned by `bindFirestoreRef`
-    return bindFirestoreRef('folders', db.collection('folders'))
-  })
+  bindFolders ({ commit }) {
+    bindFirestoreCollection(commit, 'folders', collection(db, 'folders'))
+  }
 }
 
 // mutations
@@ -63,7 +61,8 @@ const mutations = {
   closeFolder ({ openFolders }, { folder }) {
     const index = openFolders.findIndex(x => x === folder.uid)
     if (index !== -1) openFolders.splice(index, 1)
-  }
+  },
+  ...vuexMutations
 }
 
 export default {
