@@ -65,9 +65,9 @@ const actions = {
   async removeDocument ({ commit, dispatch }, { document }) {
     if (!document) return
     commit('closeDocument', { document })
-    const q = query(collection(db, 'documents'), where('parentId', '==', document.uid))
+    const q = query(collection(db, 'objects'), where('documentId', '==', document.uid))
     const documentObjects = await getDocs(q)
-    documentObjects.forEach(x => dispatch('objects/removeObject', { object: x.data() }, { root: true }))
+    documentObjects.forEach(async x => await dispatch('objects/removeObject', { object: x.data() }, { root: true }))
     await deleteDoc(doc(db, 'documents', document.uid))
   },
   calculateChapters ({ getters, dispatch, commit, rootGetters }, { document = null, headings, chapter = '' }) {

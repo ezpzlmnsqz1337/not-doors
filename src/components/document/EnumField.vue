@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import eb from '@/eventBus'
 
 export default {
@@ -82,7 +82,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations('objects', ['setObjectProperty']),
+    ...mapActions('objects', ['setObjectProperty']),
     handleOnClick (e) {
       eb.emit('hide-enum-fields', { uid: this.object.uid, name: this.object.name })
       this.showValues = true

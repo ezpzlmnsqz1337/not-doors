@@ -53,7 +53,7 @@
 <script>
 import 'trix'
 import 'trix/dist/trix.css'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 const linkRegex = /&lt;[\w_-]*\s{1}\d+&gt;/g
 
@@ -80,6 +80,7 @@ export default {
   },
   methods: {
     ...mapMutations('objects', ['setObjectProperty', 'setActiveObject']),
+    ...mapActions('objects', ['setObjectProperty']),
     ...mapMutations('documents', ['openDocument']),
     parseDocumentLinks () {
       const results = this.object[this.name].match(linkRegex)

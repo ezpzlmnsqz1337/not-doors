@@ -1,6 +1,6 @@
 import createObject from '@/model/object'
 import { db } from '@/firebase'
-import { doc, collection, getDoc, updateDoc, setDoc } from 'firebase/firestore'
+import { doc, collection, getDoc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore'
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
@@ -82,16 +82,20 @@ const actions = {
     const docRef = doc(db, 'objects', object.uid)
     await setDoc(docRef, object)
   },
-  removeObject (state, { object }) {
+  async removeObject ({ commit }, { object }) {
     const { parentId, uid } = object
-    const parent = state.objects.find(x => x.uid === parentId)
+    const objRef = doc(db, 'objects', uid)
 
-    const index = state.objects.findIndex(x => x.uid === uid)
-    state.objects.splice(index, 1)
+    await deleteDoc(objRef)
 
+    if (!parentId) return
+    const parentRef = doc(db, 'objects', parentId)
+    const parent = (await getDoc(parentRef)).data()
     if (!parent) return
+
     const indexInParent = parent.objects.indexOf(uid)
     parent.objects.splice(indexInParent, 1)
+    await updateDoc(parentRef, { objects: parent.objects })
   },
   async toggleObjectTitle ({ commit }, { object }) {
     const isHeading = !object.isHeading
@@ -110,8 +114,8 @@ const actions = {
     const newParentRef = doc(db, 'objects', after.uid)
     const newParent = (await getDoc(newParentRef)).data()
     const i = newParent.objects.indexOf(after.uid) + 1
-    const newObjects = [...newParent.objects].splice(i, 0, object.uid)
-    await updateDoc(newParentRef, { objects: newObjects })
+    newParent.objects.splice(i, 0, object.uid)
+    await updateDoc(newParentRef, { objects: newParent.objects })
 
     const objRef = doc(db, 'objects', object.uid)
     await updateDoc(objRef, { parentId: after.parentId })

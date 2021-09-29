@@ -136,7 +136,8 @@ export default {
   methods: {
     ...mapActions('documents', ['calculateChapters']),
     ...mapActions('templates', ['createTemplate']),
-    ...mapMutations('objects', ['setActiveObject', 'setHoverObject', 'moveObjectAfter', 'moveObjectBelow']),
+    ...mapActions('objects', ['moveObjectAfter', 'moveObjectBelow']),
+    ...mapMutations('objects', ['setActiveObject', 'setHoverObject']),
     ...mapMutations('columns', ['setColumnWidth']),
     dragStart ({ oldIndex }) {
       this.draggedElement = this.objects.at(oldIndex - 1)
@@ -149,7 +150,7 @@ export default {
       if (newIndex === 1) {
         this.moveObjectBelow({ below: this.getRootObject(this.activeDocument), object })
       } else if (parent.isHeading) {
-        this.moveObjectBelow({ below: parent, object })
+        this.moveObjectBelow({ parent: parent, object })
       } else {
         this.moveObjectAfter({ after: parent, object })
       }

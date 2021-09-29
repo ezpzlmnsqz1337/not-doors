@@ -62,7 +62,8 @@ export default {
   methods: {
     ...mapActions('documents', ['calculateChapters']),
     ...mapActions('objects', { addAfter: 'addObjectAfter', addBelow: 'addObjectBelow' }),
-    ...mapMutations('objects', { ro: 'removeObject', tot: 'toggleObjectTitle' }),
+    ...mapActions('objects', { ro: 'removeObject' }),
+    ...mapMutations('objects', { tot: 'toggleObjectTitle' }),
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },

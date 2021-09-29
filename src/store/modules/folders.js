@@ -20,24 +20,24 @@ const getters = {
 
 // actions
 const actions = {
+  async addFolder ({ dispatch }, { name, parent }) {
+    const folder = { ...createFolder(), name, parentId: parent.uid }
+    setDoc(doc(db, 'folders', folder.uid), folder)
+  },
+  async renameFolder ({ dispatch }, { folder, name }) {
+    await updateDoc(doc(db, 'folders', folder.uid), { name })
+  },
   async removeFolder ({ commit, dispatch, getters, rootGetters }, { folder }) {
     if (!folder) return
     commit('closeFolder', { folder })
     const queryFolders = query(collection(db, 'folders'), where('parentId', '==', folder.uid))
     const folderFolders = await getDocs(queryFolders)
-    folderFolders.forEach(x => dispatch('removeFolder', { folder: x }))
+    folderFolders.forEach(async x => await dispatch('removeFolder', { folder: x.data() }))
 
     const queryDocuments = query(collection(db, 'documents'), where('parentId', '==', folder.uid))
     const folderDocuments = await getDocs(queryDocuments)
-    folderDocuments.forEach(x => dispatch('documents/removeDocument', { document: x }, { root: true }))
+    folderDocuments.forEach(async x => await dispatch('documents/removeDocument', { document: x.data() }, { root: true }))
     await deleteDoc(doc(db, 'folders', folder.uid))
-  },
-  async renameFolder ({ dispatch }, { folder, name }) {
-    await updateDoc(doc(db, 'folders', folder.uid), { name })
-  },
-  async addFolder ({ dispatch }, { name, parent }) {
-    const folder = { ...createFolder(), name, parentId: parent.uid }
-    setDoc(doc(db, 'folders', folder.uid), folder)
   },
   toggleFolder ({ commit, state }, { folder }) {
     const isOpen = state.openFolders.includes(folder.uid)
