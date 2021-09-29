@@ -1,8 +1,7 @@
 import createDocument from '@/model/document'
 import { db } from '@/firebase'
-import { collection, onSnapshot } from 'firebase/firestore'
-
-const subs = []
+import { doc, query, where, collection, getDocs, deleteDoc, updateDoc, setDoc } from 'firebase/firestore'
+import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
   documents: [],
@@ -52,58 +51,37 @@ const getters = {
 
 // actions
 const actions = {
-  async addDocument ({ commit, rootState, dispatch }, { parent, name }) {
+  async addDocument ({ rootState, dispatch }, { parent, name }) {
     const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns.columns.map(x => x.uid) }
-    await db.collection('documents').doc(document.uid)
-      .set(document)
-    dispatch('bindDocuments')
+    const docRef = doc(db, 'documents', document.uid)
+    await setDoc(docRef, document)
     // add root object
-    commit('objects/addRootObject', { documentId: document.uid }, { root: true })
-  },
-  async removeDocument ({ commit, dispatch, getters }, { document }) {
-    if (!document) return
-    commit('closeDocument', { document })
-    getters.getDocumentObjects(document.uid).forEach(x => commit('objects/removeObject', { object: x }, { root: true }))
-    await db.collection('documents').doc(document.uid)
-      .delete()
-    dispatch('bindDocuments')
+    dispatch('objects/addRootObject', { documentId: document.uid }, { root: true })
   },
   async renameDocument ({ dispatch }, { document, name }) {
-    await db.collection('documents').doc(document.uid)
-      .update({ name })
-    dispatch('bindDocuments')
+    const docRef = doc(db, 'documents', document.uid)
+    await updateDoc(docRef, { name })
+  },
+  async removeDocument ({ commit, dispatch }, { document }) {
+    if (!document) return
+    commit('closeDocument', { document })
+    const q = query(collection(db, 'documents'), where('parentId', '==', document.uid))
+    const documentObjects = await getDocs(q)
+    documentObjects.forEach(x => dispatch('objects/removeObject', { object: x.data() }, { root: true }))
+    await deleteDoc(doc(db, 'documents', document.uid))
   },
   calculateChapters ({ getters, dispatch, commit, rootGetters }, { document = null, headings, chapter = '' }) {
     headings = headings || getters.getTopLevelObjects(document.uid).filter(x => x.isHeading)
     headings
       .forEach((x, index) => {
         const ch = chapter ? `${chapter}.${index + 1}` : `${index + 1}`
-        commit('objects/setObjectChapter', { object: x, chapter: ch }, { root: true })
+        dispatch('objects/setObjectChapter', { object: x, chapter: ch }, { root: true })
         const childrenHeadings = x.objects.map(y => rootGetters['objects/getObjectById'](y)).filter(y => y.isHeading)
         dispatch('calculateChapters', { headings: childrenHeadings, chapter: x.chapter })
       })
   },
-  bindDocuments ({ state }) {
-    subs.push({
-      name: 'documents',
-      unsub: onSnapshot(collection(db, 'documents'),
-        snapshot => snapshot.docChanges().forEach(change => {
-          if (change.type === 'added') {
-            console.log('New document: ', change.doc.data())
-          }
-          if (change.type === 'modified') {
-            console.log('Modified document: ', change.doc.data())
-          }
-          if (change.type === 'removed') {
-            console.log('Removed document: ', change.doc.data())
-          }
-        })
-      )
-    })
-  },
-  unsubscribe () {
-    subs.forEach(x => x.unsub())
-    subs.splice(0)
+  bindDocuments ({ commit }) {
+    bindFirestoreCollection(commit, 'documents', collection(db, 'documents'))
   }
 }
 
@@ -111,8 +89,7 @@ const actions = {
 const mutations = {
   openDocument (state, { document }) {
     if (!document) return
-    const { openDocuments: od } = state
-    if (!od.includes(document.uid)) od.push(document.uid)
+    if (!state.openDocuments.includes(document.uid)) state.openDocuments.push(document.uid)
     state.activeDocument = document.uid
   },
   closeDocument (state, { document }) {
@@ -121,7 +98,8 @@ const mutations = {
     if (index === -1) return
     od.splice(index, 1)
     state.activeDocument = od.length > 0 ? od.at(0) : null
-  }
+  },
+  ...vuexMutations
 }
 
 export default {

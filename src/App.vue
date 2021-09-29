@@ -21,13 +21,15 @@ export default {
   mounted: function () {
     this.bindProjects()
     this.bindFolders()
-    // this.bindDocuments()
+    this.bindDocuments()
+    this.bindObjects()
   },
   unmounted: function () {
     unsubscribeAll()
   },
   methods: {
-    // ...mapActions('documents', ['bindDocuments']),
+    ...mapActions('objects', ['bindObjects']),
+    ...mapActions('documents', ['bindDocuments']),
     ...mapActions('folders', ['bindFolders']),
     ...mapActions('projects', ['bindProjects'])
   }

@@ -45,7 +45,7 @@ export default {
         categories: this.projects,
         category: {
           key: 'project',
-          openArray: 'openProjects',
+          openArray: this.openProjects,
           onOpen: this.openProject,
           onToggle: this.toggleProject,
           onRename: this.renameProject,

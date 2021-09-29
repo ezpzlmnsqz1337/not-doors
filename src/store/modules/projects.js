@@ -17,6 +17,15 @@ const getters = {
 
 // actions
 const actions = {
+  async addProject ({ dispatch }, { name }) {
+    const project = { ...createProject(), name }
+    const docRef = doc(db, 'projects', project.uid)
+    await setDoc(docRef, project)
+  },
+  async renameProject ({ dispatch }, { project, name }) {
+    const docRef = doc(db, 'projects', project.uid)
+    await updateDoc(docRef, { name })
+  },
   async removeProject ({ commit, dispatch }, { project }) {
     if (!project) return
     commit('closeProject', { project })
@@ -26,10 +35,6 @@ const actions = {
 
     await deleteDoc(doc(db, 'projects', project.uid))
   },
-  async renameProject ({ dispatch }, { project, name }) {
-    const docRef = doc(db, 'projects', project.uid)
-    await updateDoc(docRef, { name })
-  },
   toggleProject ({ commit, state }, { project }) {
     const isOpen = state.openProjects.includes(project.uid)
     if (!isOpen) {
@@ -37,11 +42,6 @@ const actions = {
     } else {
       commit('closeProject', { project })
     }
-  },
-  async addProject ({ dispatch }, { name }) {
-    const project = { ...createProject(), name }
-    const docRef = doc(db, 'projects', project.uid)
-    await setDoc(docRef, project)
   },
   bindProjects ({ commit }) {
     bindFirestoreCollection(commit, 'projects', collection(db, 'projects'))

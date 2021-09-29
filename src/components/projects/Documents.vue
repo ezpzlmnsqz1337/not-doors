@@ -6,7 +6,7 @@
 
 <script>
 import CategoryListItems from '@/components/CategoryListItems'
-import { mapGetters, mapMutations, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'Documents',
@@ -42,7 +42,8 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('documents', ['openDocument', 'renameDocument', 'removeDocument']),
+    ...mapMutations('documents', ['openDocument']),
+    ...mapActions('documents', ['renameDocument', 'removeDocument']),
     isActive (documentId) {
       return this.activeDocument === documentId
     }

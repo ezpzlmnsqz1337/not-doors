@@ -1,4 +1,7 @@
 import createObject from '@/model/object'
+import { db } from '@/firebase'
+import { doc, collection, getDoc, updateDoc, setDoc } from 'firebase/firestore'
+import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
   objects: [],
@@ -27,7 +30,7 @@ const getters = {
 
 // actions
 const actions = {
-  addObjectAfter ({ commit, getters, rootGetters }, { after, object }) {
+  addObjectAfter ({ dispatch, getters, rootGetters }, { after, object }) {
     const { parentId, documentId, uid } = after
 
     const parent = getters.getObjectById(parentId)
@@ -37,9 +40,9 @@ const actions = {
     const id = rootGetters['documents/getNextObjectId'](documentId)
     object = { ...object, id, documentId, parentId }
 
-    commit('addObjectToParent', { parent, object, index })
+    dispatch('addObjectToParent', { parent, object, index })
   },
-  addObjectBelow ({ commit, getters, rootGetters }, { parent, object }) {
+  addObjectBelow ({ dispatch, rootGetters }, { parent, object }) {
     const { documentId, uid: parentId } = parent
 
     const index = 0
@@ -54,7 +57,7 @@ const actions = {
       documentId,
       parentId
     }
-    commit('addObjectToParent', { parent, object, index })
+    dispatch('addObjectToParent', { parent, object, index })
   },
   addFirstObjectToDocument ({ dispatch, rootGetters }, { documentId }) {
     const parent = rootGetters['documents/getRootObject'](documentId)
@@ -72,13 +75,12 @@ const actions = {
         documentId
       }
     })
-  }
-}
+  },
 
-// mutations
-const mutations = {
-  addRootObject (state, { documentId }) {
-    state.objects.push({ ...createObject(), root: true, documentId })
+  async addRootObject ({ commit }, { documentId }) {
+    const object = { ...createObject(), root: true, documentId }
+    const docRef = doc(db, 'objects', object.uid)
+    await setDoc(docRef, object)
   },
   removeObject (state, { object }) {
     const { parentId, uid } = object
@@ -91,42 +93,69 @@ const mutations = {
     const indexInParent = parent.objects.indexOf(uid)
     parent.objects.splice(indexInParent, 1)
   },
-  toggleObjectTitle (state, { object }) {
-    object.isHeading = !object.isHeading
+  async toggleObjectTitle ({ commit }, { object }) {
+    const isHeading = !object.isHeading
+    const docRef = doc(db, 'objects', object.uid)
+    await updateDoc(docRef, { isHeading })
   },
-  setObjectProperty (state, { object, key, value }) {
-    object[key] = value
+  async setObjectProperty ({ commit }, { object, key, value }) {
+    const docRef = doc(db, 'objects', object.uid)
+    await updateDoc(docRef, { [key]: value })
   },
-  moveObjectAfter (state, { after, object }) {
-    const oldParent = state.objects.find(x => x.uid === object.parentId)
-    const i1 = oldParent.objects.indexOf(object.uid)
-    oldParent.objects.splice(i1, 1)
+  async moveObjectAfter ({ commit }, { after, object }) {
+    const oldParentRef = doc(db, 'objects', object.parentId)
+    const oldParent = (await getDoc(oldParentRef)).data()
+    await updateDoc(oldParentRef, { objects: oldParent.objects.filter(x => x !== object.uid) })
 
-    const newParent = state.objects.find(x => x.uid === after.parentId)
-    const i2 = newParent.objects.indexOf(after.uid) + 1
-    newParent.objects.splice(i2, 0, object.uid)
+    const newParentRef = doc(db, 'objects', after.uid)
+    const newParent = (await getDoc(newParentRef)).data()
+    const i = newParent.objects.indexOf(after.uid) + 1
+    const newObjects = [...newParent.objects].splice(i, 0, object.uid)
+    await updateDoc(newParentRef, { objects: newObjects })
 
-    object.parentId = after.parentId
+    const objRef = doc(db, 'objects', object.uid)
+    await updateDoc(objRef, { parentId: after.parentId })
   },
-  moveObjectBelow (state, { below, object }) {
-    const oldParent = state.objects.find(x => x.uid === object.parentId)
-    const i1 = oldParent.objects.indexOf(object.uid)
-    oldParent.objects.splice(i1, 1)
+  async moveObjectBelow ({ commit }, { parent, object }) {
+    const oldParentRef = doc(db, 'objects', object.parentId)
+    const oldParent = (await getDoc(oldParentRef)).data()
+    await updateDoc(oldParentRef, { objects: oldParent.objects.filter(x => x !== object.uid) })
 
-    below.objects.splice(0, 0, object.uid)
-    object.parentId = below.uid
+    const newParentRef = doc(db, 'objects', parent.uid)
+    const newParent = (await getDoc(newParentRef)).data()
+    await updateDoc(newParentRef, { objects: [object.uid, ...newParent.objects] })
+
+    const objRef = doc(db, 'objects', object.uid)
+    await updateDoc(objRef, { parentId: parent.uid })
   },
-  addObjectToParent (state, { parent, object, index }) {
+  async addObjectToParent ({ commit }, { parent, object, index }) {
     object = {
       ...createObject(),
       ...object
     }
-    state.objects.push(object)
-    parent.objects.splice(index, 0, object.uid)
+    const objRef = doc(db, 'objects', object.uid)
+    await setDoc(objRef, object)
+
+    const parentRef = doc(db, 'objects', parent.uid)
+    const parentObjects = [...parent.objects]
+    parentObjects.splice(index, 0, object.uid)
+    await updateDoc(parentRef, { objects: parentObjects })
   },
-  setObjectChapter (state, { object, chapter }) {
-    object.chapter = chapter
+  async setObjectChapter ({ state }, { object, chapter }) {
+    const objRef = doc(db, 'objects', object.uid)
+    await updateDoc(objRef, { chapter })
   },
+  async addExistingObject ({ state }, { object }) {
+    const objRef = doc(db, 'objects', object.uid)
+    await setDoc(objRef, object)
+  },
+  bindObjects ({ commit }) {
+    bindFirestoreCollection(commit, 'objects', collection(db, 'objects'))
+  }
+}
+
+// mutations
+const mutations = {
   setHoverObject (state, { object }) {
     if (object && state.hoverObject === object.uid) return
     state.hoverObject = object ? object.uid : null
@@ -135,9 +164,7 @@ const mutations = {
     if (object && state.activeObject === object.uid) return
     state.activeObject = object ? object.uid : null
   },
-  addExistingObject (state, { object }) {
-    state.objects.push(object)
-  }
+  ...vuexMutations
 }
 
 export default {
