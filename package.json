@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "debounce": "^1.2.1",
     "firebase": "9.1.0",
     "material-icons": "^1.2.0",
     "random-avatar-generator": "^2.0.0",

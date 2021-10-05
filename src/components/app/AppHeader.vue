@@ -34,7 +34,7 @@
     </div>
   </div>
   <Modal
-    v-if="showLogin"
+    v-if="showLogin || !activeUser"
     @close="showLogin = false"
   >
     <template #body>
@@ -54,7 +54,7 @@ export default {
   },
   data: function () {
     return {
-      showLogin: this.activeUser !== null
+      showLogin: false
     }
   },
   computed: {

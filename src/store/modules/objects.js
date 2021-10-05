@@ -86,16 +86,16 @@ const actions = {
     const { parentId, uid } = object
     const objRef = doc(db, 'objects', uid)
 
+    if (parentId) {
+      const parentRef = doc(db, 'objects', parentId)
+      const parent = (await getDoc(parentRef)).data()
+      if (parent) {
+        const indexInParent = parent.objects.indexOf(uid)
+        parent.objects.splice(indexInParent, 1)
+        await updateDoc(parentRef, { objects: parent.objects })
+      }
+    }
     await deleteDoc(objRef)
-
-    if (!parentId) return
-    const parentRef = doc(db, 'objects', parentId)
-    const parent = (await getDoc(parentRef)).data()
-    if (!parent) return
-
-    const indexInParent = parent.objects.indexOf(uid)
-    parent.objects.splice(indexInParent, 1)
-    await updateDoc(parentRef, { objects: parent.objects })
   },
   async toggleObjectTitle ({ commit }, { object }) {
     const isHeading = !object.isHeading
