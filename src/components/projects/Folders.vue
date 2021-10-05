@@ -69,9 +69,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('folders', ['addFolder', 'openFolder', 'closeFolder', 'renameFolder']),
+    ...mapMutations('folders', ['openFolder', 'closeFolder']),
     ...mapActions('documents', ['addDocument']),
-    ...mapActions('folders', ['removeFolder', 'toggleFolder'])
+    ...mapActions('folders', ['addFolder', 'removeFolder', 'toggleFolder', 'renameFolder'])
   }
 }
 </script>

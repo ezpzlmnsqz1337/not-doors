@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import ButtonType from '@/constants/ButtonType'
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -51,18 +50,14 @@ export default {
     }
   },
   emits: ['hide'],
-  data: function () {
-    return {
-      ButtonType
-    }
-  },
   computed: {
     ...mapGetters('documents', ['getDocumentObjects', 'getActiveDocument'])
   },
   methods: {
     ...mapActions('documents', ['calculateChapters']),
     ...mapActions('objects', { addAfter: 'addObjectAfter', addBelow: 'addObjectBelow' }),
-    ...mapMutations('objects', { ro: 'removeObject', tot: 'toggleObjectTitle' }),
+    ...mapActions('objects', { ro: 'removeObject' }),
+    ...mapMutations('objects', { tot: 'toggleObjectTitle' }),
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },

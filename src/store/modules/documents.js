@@ -1,4 +1,7 @@
 import createDocument from '@/model/document'
+import { db } from '@/firebase'
+import { doc, query, where, collection, getDocs, deleteDoc, updateDoc, setDoc } from 'firebase/firestore'
+import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
   documents: [],
@@ -48,50 +51,45 @@ const getters = {
 
 // actions
 const actions = {
-  addDocument ({ commit, rootState }, { parent, name }) {
+  async addDocument ({ rootState, dispatch }, { parent, name }) {
     const document = { ...createDocument(), name, parentId: parent.uid, columns: rootState.columns.columns.map(x => x.uid) }
-    commit('addDocument', { document })
+    const docRef = doc(db, 'documents', document.uid)
+    await setDoc(docRef, document)
     // add root object
-    commit('objects/addRootObject', { documentId: document.uid }, { root: true })
+    dispatch('objects/addRootObject', { documentId: document.uid }, { root: true })
   },
-  removeDocument ({ commit, state, getters }, { document }) {
+  async renameDocument ({ dispatch }, { document, name }) {
+    const docRef = doc(db, 'documents', document.uid)
+    await updateDoc(docRef, { name })
+  },
+  async removeDocument ({ commit, dispatch }, { document }) {
     if (!document) return
-    const index = state.documents.findIndex(x => x.uid === document.uid)
     commit('closeDocument', { document })
-    getters.getDocumentObjects(document.uid).forEach(x => commit('objects/removeObject', { object: x }, { root: true }))
-    commit('removeDocument', { index })
+    const q = query(collection(db, 'objects'), where('documentId', '==', document.uid))
+    const documentObjects = await getDocs(q)
+    documentObjects.forEach(async x => await dispatch('objects/removeObject', { object: x.data() }, { root: true }))
+    await deleteDoc(doc(db, 'documents', document.uid))
   },
   calculateChapters ({ getters, dispatch, commit, rootGetters }, { document = null, headings, chapter = '' }) {
     headings = headings || getters.getTopLevelObjects(document.uid).filter(x => x.isHeading)
     headings
       .forEach((x, index) => {
         const ch = chapter ? `${chapter}.${index + 1}` : `${index + 1}`
-        commit('objects/setObjectChapter', { object: x, chapter: ch }, { root: true })
+        dispatch('objects/setObjectChapter', { object: x, chapter: ch }, { root: true })
         const childrenHeadings = x.objects.map(y => rootGetters['objects/getObjectById'](y)).filter(y => y.isHeading)
         dispatch('calculateChapters', { headings: childrenHeadings, chapter: x.chapter })
       })
+  },
+  bindDocuments ({ commit }) {
+    bindFirestoreCollection(commit, 'documents', collection(db, 'documents'))
   }
 }
 
 // mutations
 const mutations = {
-  addDocument (state, { document }) {
-    state.documents.push(document)
-  },
-  removeDocument (state, { document }) {
-    if (!document) return
-    let index = state.documents.findIndex(x => x.uid === document.uid)
-    state.documents.splice(index, 1)
-    index = state.openDocuments.indexOf(document.uid)
-    if (index !== -1) state.openDocuments.splice(index, 1)
-  },
-  renameDocument (state, { document, name }) {
-    document.name = name
-  },
   openDocument (state, { document }) {
     if (!document) return
-    const { openDocuments: od } = state
-    if (!od.includes(document.uid)) od.push(document.uid)
+    if (!state.openDocuments.includes(document.uid)) state.openDocuments.push(document.uid)
     state.activeDocument = document.uid
   },
   closeDocument (state, { document }) {
@@ -100,7 +98,8 @@ const mutations = {
     if (index === -1) return
     od.splice(index, 1)
     state.activeDocument = od.length > 0 ? od.at(0) : null
-  }
+  },
+  ...vuexMutations
 }
 
 export default {

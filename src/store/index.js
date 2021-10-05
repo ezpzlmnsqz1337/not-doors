@@ -1,14 +1,13 @@
-import { createStore, createLogger } from 'vuex'
-import users from '@/store/modules/users'
-import panels from '@/store/modules/panels'
-import objects from '@/store/modules/objects'
+import MenuItem from '@/constants/MenuItem'
+import columns from '@/store/modules/columns'
 import documents from '@/store/modules/documents'
 import folders from '@/store/modules/folders'
+import objects from '@/store/modules/objects'
+import panels from '@/store/modules/panels'
 import projects from '@/store/modules/projects'
 import templates from '@/store/modules/templates'
-import columns from '@/store/modules/columns'
-import MenuItem from '@/constants/MenuItem'
-import createPersistedState from 'vuex-persistedstate'
+import users from '@/store/modules/users'
+import { createLogger, createStore } from 'vuex'
 
 const debug = process.env.NODE_ENV !== 'production'
 
@@ -43,6 +42,9 @@ export default createStore({
   getters: {
     getMenuItemById: (state) => (id) => {
       return state.menuItems.find(x => x.id === id)
+    },
+    getStuff: (state) => () => {
+      return state.stuff
     }
   },
   mutations: {
@@ -55,5 +57,5 @@ export default createStore({
   },
   actions: {},
   strict: debug,
-  plugins: debug ? [logger, createPersistedState()] : []
+  plugins: debug ? [logger] : []
 })

@@ -1,8 +1,10 @@
 import createColumn from '@/model/column'
-import { columns } from '@/assets/db/columns'
+import { db } from '@/firebase'
+import { collection } from 'firebase/firestore'
+import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
-  columns
+  columns: []
 })
 
 // getters
@@ -14,6 +16,9 @@ const getters = {
 
 // actions
 const actions = {
+  bindColumns ({ commit }) {
+    bindFirestoreCollection(commit, 'columns', collection(db, 'columns'))
+  }
 }
 
 // mutations
@@ -30,7 +35,8 @@ const mutations = {
   },
   setColumnWidth (state, { column, width }) {
     column.width = width
-  }
+  },
+  ...vuexMutations
 }
 
 export default {

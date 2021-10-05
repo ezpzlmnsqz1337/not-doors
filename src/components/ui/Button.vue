@@ -33,12 +33,6 @@ export default {
     }
   },
   emits: ['click'],
-  data: function () {
-    return {
-    }
-  },
-  computed: {
-  },
   methods: {
     btnClass: function () {
       return {

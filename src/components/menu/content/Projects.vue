@@ -45,7 +45,7 @@ export default {
         categories: this.projects,
         category: {
           key: 'project',
-          openArray: 'openProjects',
+          openArray: this.openProjects,
           onOpen: this.openProject,
           onToggle: this.toggleProject,
           onRename: this.renameProject,
@@ -63,8 +63,8 @@ export default {
   },
   methods: {
     ...mapMutations('projects', ['openProject', 'closeProject', 'renameProject']),
-    ...mapMutations('folders', ['addFolder']),
-    ...mapActions('projects', ['removeProject', 'toggleProject'])
+    ...mapActions('folders', ['addFolder']),
+    ...mapActions('projects', ['removeProject', 'toggleProject', 'renameProject'])
   }
 }
 </script>

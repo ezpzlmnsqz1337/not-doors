@@ -1,4 +1,7 @@
 import createProject from '@/model/project'
+import { db } from '@/firebase'
+import { doc, query, where, collection, getDocs, deleteDoc, updateDoc, setDoc } from 'firebase/firestore'
+import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
   projects: [],
@@ -14,12 +17,23 @@ const getters = {
 
 // actions
 const actions = {
-  removeProject ({ commit, dispatch, state, rootGetters }, { project }) {
+  async addProject ({ dispatch }, { name }) {
+    const project = { ...createProject(), name }
+    const docRef = doc(db, 'projects', project.uid)
+    await setDoc(docRef, project)
+  },
+  async renameProject ({ dispatch }, { project, name }) {
+    const docRef = doc(db, 'projects', project.uid)
+    await updateDoc(docRef, { name })
+  },
+  async removeProject ({ commit, dispatch }, { project }) {
     if (!project) return
-    const index = state.projects.findIndex(x => x.uid === project.uid)
     commit('closeProject', { project })
-    rootGetters['folders/getFolders'](project.uid).forEach(x => dispatch('folders/removeFolder', { folder: x }, { root: true }))
-    commit('removeProject', { index })
+    const q = query(collection(db, 'folders'), where('parentId', '==', project.uid))
+    const projectFolders = await getDocs(q)
+    projectFolders.forEach(x => dispatch('folders/removeFolder', { folder: x.data() }, { root: true }))
+
+    await deleteDoc(doc(db, 'projects', project.uid))
   },
   toggleProject ({ commit, state }, { project }) {
     const isOpen = state.openProjects.includes(project.uid)
@@ -28,20 +42,14 @@ const actions = {
     } else {
       commit('closeProject', { project })
     }
+  },
+  bindProjects ({ commit }) {
+    bindFirestoreCollection(commit, 'projects', collection(db, 'projects'))
   }
 }
 
 // mutations
 const mutations = {
-  addProject (state, { name }) {
-    state.projects.push({ ...createProject(), name })
-  },
-  renameProject (state, { project, name }) {
-    project.name = name
-  },
-  removeProject (state, { index }) {
-    state.projects.splice(index, 1)
-  },
   openProject ({ openProjects }, { project }) {
     if (!project) return
     if (!openProjects.includes(project.uid)) openProjects.push(project.uid)
@@ -49,7 +57,8 @@ const mutations = {
   closeProject ({ openProjects }, { project }) {
     const index = openProjects.findIndex(x => x === project.uid)
     if (index !== -1) openProjects.splice(index, 1)
-  }
+  },
+  ...vuexMutations
 }
 
 export default {

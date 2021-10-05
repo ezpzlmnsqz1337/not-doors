@@ -8,6 +8,8 @@
 import AppHeader from '@/components/app/AppHeader'
 import AppContent from '@/components/app/AppContent'
 import ActionList from '@/components/action-list/ActionList'
+import { mapActions } from 'vuex'
+import { unsubscribeAll } from '@/vuex-firestore-binding'
 
 export default {
   name: 'App',
@@ -15,6 +17,25 @@ export default {
     AppHeader,
     AppContent,
     ActionList
+  },
+  mounted: function () {
+    this.bindProjects()
+    this.bindFolders()
+    this.bindDocuments()
+    this.bindObjects()
+    this.bindColumns()
+    this.bindUsers()
+  },
+  unmounted: function () {
+    unsubscribeAll()
+  },
+  methods: {
+    ...mapActions('objects', ['bindObjects']),
+    ...mapActions('documents', ['bindDocuments']),
+    ...mapActions('folders', ['bindFolders']),
+    ...mapActions('projects', ['bindProjects']),
+    ...mapActions('columns', ['bindColumns']),
+    ...mapActions('users', ['bindUsers'])
   }
 }
 </script>

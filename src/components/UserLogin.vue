@@ -34,10 +34,10 @@
       class="__activeUser"
     >
       <div class="__image">
-        <span class="material-icons-outlined">account_circle</span>
+        <img :src="activeUser.photoURL">
       </div>
       <div class="__name">
-        {{ activeUser.name }}
+        {{ activeUser.displayName }}
       </div>
       <div class="__email">
         <a :href="`mailto:${activeUser.email}`">{{ activeUser.email }}</a>
@@ -92,15 +92,13 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import ButtonType from '@/constants/ButtonType'
 
 export default {
   name: 'UserLogin',
   data: function () {
     return {
-      email: 'karl.adminman@not-doors.com',
-      password: 'yourmom',
-      ButtonType
+      email: '',
+      password: ''
     }
   },
   computed: {
@@ -146,8 +144,14 @@ h3 {
   text-align: center;
 }
 
-.__image > span {
-  font-size: 3rem;
+.__activeUser  .__image {
+  width: 5rem;
+  margin: 0 auto;
+}
+
+.__activeUser .__image > img {
+  width: 100%;
+  height: 100%;
 }
 
 .__activeUser .__name {
@@ -191,6 +195,10 @@ h3 {
 
 .__availableUser > .__image {
   margin-right: 1rem;
+}
+
+.__availableUser > .__image > span {
+  font-size: 3rem;
 }
 
 .__availableUser > .__right {
