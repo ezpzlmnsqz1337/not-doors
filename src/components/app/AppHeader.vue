@@ -11,7 +11,13 @@
         v-if="activeUser"
         class="__name"
       >
-        {{ activeUser.name }}
+        {{ activeUser.displayName }}
+      </div>
+      <div
+        v-if="activeUser"
+        class="__icon"
+      >
+        <img :src="activeUser.photoURL">
       </div>
       <div
         v-if="!activeUser"
@@ -19,7 +25,10 @@
       >
         Login
       </div>
-      <div class="__icon">
+      <div
+        v-if="!activeUser"
+        class="__icon"
+      >
         <span class="material-icons-outlined">account_circle</span>
       </div>
     </div>
@@ -45,7 +54,7 @@ export default {
   },
   data: function () {
     return {
-      showLogin: false
+      showLogin: this.activeUser !== null
     }
   },
   computed: {
@@ -86,10 +95,16 @@ export default {
 
 .__user > div {
   display: inline-block;
-  line-height: 2rem;
+  line-height: 2.1rem;
   font-size: 1rem;
   font-weight: bold;
   vertical-align: top;
+  height: 100%;
+}
+
+.__icon > img {
+  width: 1.5rem;
+  margin-left: 1rem;
   height: 100%;
 }
 

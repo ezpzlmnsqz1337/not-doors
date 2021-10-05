@@ -1,8 +1,12 @@
 import { users } from '@/assets/db/users'
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'firebase/auth'
+import { AvatarGenerator } from 'random-avatar-generator'
+
+const generator = new AvatarGenerator()
 
 const state = () => ({
   users,
-  activeUser: users.at(0)
+  activeUser: null
 })
 
 // getters
@@ -12,15 +16,40 @@ const getters = {
 
 // actions
 const actions = {
-  login ({ commit, state }, { email, password }) {
-    // fake login for now
-    const user = state.users.find(x => x.email === email && x.password === password)
-    if (!user) return
-    commit('setUser', { user })
+  login ({ commit, dispatch }, { email, password }) {
+    const auth = getAuth()
+    signInWithEmailAndPassword(auth, email, password)
+      .then(userCredential => {
+        console.log(userCredential)
+      })
+      .catch(error => {
+        console.log('Error when logging in.')
+        console.log('Error code: ', error.code, ', error message: ', error.message)
+      })
   },
   logout ({ commit }) {
-    // fake logout for now
-    commit('setUser', { user: null })
+    const auth = getAuth()
+    signOut(auth)
+      .then(() => {
+        commit('setUser', { user: null })
+      })
+      .catch((error) => {
+        console.log('Error when logging out.')
+        console.log('Error code: ', error.code, ', error message: ', error.message)
+      })
+  },
+  updateUser () {
+    const auth = getAuth()
+    const names = auth.currentUser.email.split('@')[0].split('.')
+    const firstName = names[0].charAt(0).toUpperCase() + names[0].slice(1)
+    const lastName = names[1].charAt(0).toUpperCase() + names[1].slice(1)
+    updateProfile(auth.currentUser, {
+      displayName: `${firstName} ${lastName}`, photoURL: generator.generateRandomAvatar(auth.currentUser.uid)
+    })
+  },
+  bindUsers ({ commit }) {
+    const auth = getAuth()
+    onAuthStateChanged(auth, user => commit('setUser', { user }))
   }
 }
 

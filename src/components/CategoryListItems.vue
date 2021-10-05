@@ -133,7 +133,6 @@
 <script>
 import Key from '@/constants/Key'
 import Modal from '@/components/ui/Modal'
-import ButtonType from '@/constants/ButtonType'
 
 export default {
   name: 'CategoryListItems',
@@ -148,7 +147,6 @@ export default {
   },
   data: function () {
     return {
-      ButtonType,
       showRemoveModal: false,
       showCategoryRenameInput: false,
       categoryRename: '',

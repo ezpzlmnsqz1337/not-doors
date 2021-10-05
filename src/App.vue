@@ -24,6 +24,7 @@ export default {
     this.bindDocuments()
     this.bindObjects()
     this.bindColumns()
+    this.bindUsers()
   },
   unmounted: function () {
     unsubscribeAll()
@@ -33,7 +34,8 @@ export default {
     ...mapActions('documents', ['bindDocuments']),
     ...mapActions('folders', ['bindFolders']),
     ...mapActions('projects', ['bindProjects']),
-    ...mapActions('columns', ['bindColumns'])
+    ...mapActions('columns', ['bindColumns']),
+    ...mapActions('users', ['bindUsers'])
   }
 }
 </script>

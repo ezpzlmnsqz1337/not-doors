@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import ButtonType from '@/constants/ButtonType'
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -51,11 +50,6 @@ export default {
     }
   },
   emits: ['hide'],
-  data: function () {
-    return {
-      ButtonType
-    }
-  },
   computed: {
     ...mapGetters('documents', ['getDocumentObjects', 'getActiveDocument'])
   },
