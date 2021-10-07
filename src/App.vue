@@ -10,6 +10,7 @@ import AppContent from '@/components/app/AppContent'
 import ActionList from '@/components/action-list/ActionList'
 import { mapActions } from 'vuex'
 import { unsubscribeAll } from '@/vuex-firestore-binding'
+import { getAuth, onAuthStateChanged } from '@firebase/auth'
 
 export default {
   name: 'App',
@@ -19,11 +20,18 @@ export default {
     ActionList
   },
   mounted: function () {
-    this.bindProjects()
-    this.bindFolders()
-    this.bindDocuments()
-    this.bindObjects()
-    this.bindColumns()
+    const auth = getAuth()
+    onAuthStateChanged(auth, () => {
+      if (auth.currentUser) {
+        this.bindProjects()
+        this.bindFolders()
+        this.bindDocuments()
+        this.bindObjects()
+        this.bindColumns()
+      } else {
+        unsubscribeAll()
+      }
+    })
     this.bindUsers()
   },
   unmounted: function () {
