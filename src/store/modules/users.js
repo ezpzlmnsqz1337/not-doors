@@ -20,7 +20,7 @@ const actions = {
     const auth = getAuth()
     signInWithEmailAndPassword(auth, email, password)
       .then(userCredential => {
-        console.log(userCredential)
+        console.log('Logged in!')
       })
       .catch(error => {
         console.log('Error when logging in.')
