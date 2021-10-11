@@ -1,13 +1,19 @@
 <template>
-  <div class="__documentsSection">
+  <div
+    class="__documentsSection"
+  >
     <div
-      v-if="!areOpenDocuments"
-      class="__placeholder"
+      v-if="activeUser"
     >
-      No open documents
+      <div
+        v-if="!areOpenDocuments"
+        class="__placeholder"
+      >
+        No open documents
+      </div>
+      <DocumentsHeader v-if="areOpenDocuments" />
+      <DocumentsContent v-if="areOpenDocuments" />
     </div>
-    <DocumentsHeader v-if="areOpenDocuments" />
-    <DocumentsContent v-if="areOpenDocuments" />
   </div>
 </template>
 
@@ -23,6 +29,7 @@ export default {
     DocumentsContent
   },
   computed: {
+    ...mapState('users', ['activeUser']),
     ...mapState('documents', ['openDocuments']),
     areOpenDocuments: function () {
       return this.openDocuments.length > 0
@@ -33,8 +40,13 @@ export default {
 
 <style scoped>
 .__documentsSection {
-  flex: 1;
   background-color: var(--bg-dark5);
+  flex: 1;
+}
+
+.__documentsSection > div {
+  width: 100%;
+  height: 100%;
 }
 
 .__placeholder {

@@ -3,7 +3,7 @@ import { onSnapshot } from 'firebase/firestore'
 const subs = []
 
 export const unsubscribeAll = () => {
-  subs.forEach(x => x.ubsubscribe())
+  subs.forEach(x => x.unsubscribe())
 }
 
 export const unsubscribe = key => {
@@ -15,6 +15,7 @@ export const unsubscribe = key => {
 
 export const bindFirestoreCollection = (commit, key, collectionRef) => {
   unsubscribe(key)
+  commit('clearFirestoreCollection', { key })
   const unsub = onSnapshot(collectionRef,
     snapshot => snapshot.docChanges().forEach(change => {
       if (change.type === 'added') {
@@ -32,6 +33,9 @@ export const bindFirestoreCollection = (commit, key, collectionRef) => {
 }
 
 export const vuexMutations = {
+  clearFirestoreCollection (state, { key }) {
+    state[key].splice(0)
+  },
   addFirestoreDocument (state, { key, data }) {
     state[key].push(data)
   },

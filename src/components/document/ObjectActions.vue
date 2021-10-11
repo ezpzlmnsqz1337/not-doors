@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'ObjectActions',
@@ -55,34 +55,32 @@ export default {
   },
   methods: {
     ...mapActions('documents', ['calculateChapters']),
-    ...mapActions('objects', { addAfter: 'addObjectAfter', addBelow: 'addObjectBelow' }),
-    ...mapActions('objects', { ro: 'removeObject' }),
-    ...mapMutations('objects', { tot: 'toggleObjectTitle' }),
+    ...mapActions('objects', { addAfter: 'addObjectAfter', addBelow: 'addObjectBelow', ro: 'removeObject', tot: 'toggleObjectTitle' }),
     getActions: function () {
       return this.actions.filter(x => x.condition())
     },
-    addObjectAfter: function () {
-      this.addAfter({
+    addObjectAfter: async function () {
+      await this.addAfter({
         after: this.object,
         object: {}
       })
       this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
     },
-    addObjectBelow: function () {
-      this.addBelow({
+    addObjectBelow: async function () {
+      await this.addBelow({
         parent: this.object,
         object: {}
       })
       this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
     },
-    toggleObjectTitle: function () {
-      this.tot({ object: this.object })
+    toggleObjectTitle: async function () {
+      await this.tot({ object: this.object })
       this.calculateChapters({ document: this.getActiveDocument() })
     },
-    deleteObject: function () {
-      this.ro({ object: this.object })
+    deleteObject: async function () {
+      await this.ro({ object: this.object })
       this.calculateChapters({ document: this.getActiveDocument() })
       this.$emit('hide')
     }

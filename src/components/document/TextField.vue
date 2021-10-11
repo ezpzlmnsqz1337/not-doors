@@ -71,12 +71,21 @@ export default {
   },
   data: function () {
     return {
-      edit: false
+      edit: false,
+      debouncedSet: null
     }
   },
   computed: {
     ...mapGetters('objects', ['getObjectByObjectId']),
     ...mapGetters('documents', ['getDocumentByName'])
+  },
+  mounted: function () {
+    this.debouncedSet = this.debounce(
+      function (e) {
+        this.setObjectProperty({ object: this.object, key: this.name, value: e.target.value })
+      },
+      1000
+    )
   },
   methods: {
     ...mapMutations('objects', ['setObjectProperty', 'setActiveObject']),
@@ -106,7 +115,7 @@ export default {
       return this.object[this.name]
     },
     onChange (e) {
-      this.setObjectProperty({ object: this.object, key: this.name, value: e.target.value })
+      this.debouncedSet(e)
     },
     editText (edit) {
       this.edit = edit

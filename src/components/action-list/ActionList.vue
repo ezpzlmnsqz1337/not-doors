@@ -79,10 +79,10 @@ export default {
       this.filter = ''
     },
     moveDown: function () {
-      this.selectedIndex = (this.selectedIndex + 1) % (this.filteredActionList.length + 1)
+      this.selectedIndex = (this.selectedIndex + 1) % (this.filteredActionList.length)
     },
     moveUp: function () {
-      this.selectedIndex = (this.selectedIndex - 1) < 0 ? this.filteredActionList.length : (this.selectedIndex - 1)
+      this.selectedIndex = (this.selectedIndex - 1) < 0 ? this.filteredActionList.length - 1 : (this.selectedIndex - 1)
     },
     handleOpenDocument: function (e) {
       e.preventDefault()

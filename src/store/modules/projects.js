@@ -44,12 +44,16 @@ const actions = {
     }
   },
   bindProjects ({ commit }) {
+    commit('reset')
     bindFirestoreCollection(commit, 'projects', collection(db, 'projects'))
   }
 }
 
 // mutations
 const mutations = {
+  reset (state) {
+    state.openProjects.splice(0)
+  },
   openProject ({ openProjects }, { project }) {
     if (!project) return
     if (!openProjects.includes(project.uid)) openProjects.push(project.uid)
