@@ -1,6 +1,9 @@
 import { v4 as uuidv4 } from 'uuid'
 import createObject from '@/model/object'
 import createTemplate from '@/model/template'
+import { db } from '@/firebase'
+import { doc, collection, setDoc } from 'firebase/firestore'
+import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 
 const state = () => ({
   templates: []
@@ -13,30 +16,29 @@ const getters = {
 
 // actions
 const actions = {
-  createTemplate ({ commit, dispatch, getters, rootGetters }, { name, description, documentId }) {
+  async createTemplate ({ commit, dispatch, getters, rootGetters }, { name, description, documentId }) {
     const objects = rootGetters['documents/getSortedObjects'](documentId)
-    dispatch('refreshIdentifiers', { objects }).then(refreshed => {
-      const template = { name, description, objects: refreshed }
-      commit('addTemplate', { template })
-    })
+    const refreshed = await dispatch('refreshIdentifiers', { objects })
+    const template = { ...createTemplate(), name, description, objects: refreshed }
+    const docRef = doc(db, 'templates', template.uid)
+    await setDoc(docRef, template)
   },
-  createDocumentFromTemplate ({ commit, dispatch, getters, rootGetters }, { documentId, templateId }) {
+  async createDocumentFromTemplate ({ commit, dispatch, getters, rootGetters }, { documentId, templateId }) {
     const parent = rootGetters['documents/getRootObject'](documentId)
     console.log('parent', parent)
     const template = getters.getTemplateById(templateId)
-    dispatch('refreshIdentifiers', { objects: template.objects }).then(refreshed => {
-      refreshed.sort((a, b) => b.id - a.id)
-        .forEach(x => {
-          x.documentId = documentId
-          if (!x.parentId) {
-            dispatch('objects/addObjectBelow', { parent, object: x }, { root: true })
-          } else {
-            commit('objects/addExistingObject', { object: x }, { root: true })
-          }
-        })
-    })
+    const refreshed = await dispatch('refreshIdentifiers', { objects: template.objects })
+    refreshed.sort((a, b) => b.id - a.id)
+      .forEach(async x => {
+        x.documentId = documentId
+        if (!x.parentId) {
+          await dispatch('objects/addObjectBelow', { parent, object: x }, { root: true })
+        } else {
+          await dispatch('objects/addExistingObject', { object: x }, { root: true })
+        }
+      })
   },
-  refreshIdentifiers ({ state }, { objects }) {
+  async refreshIdentifiers ({ state }, { objects }) {
     let id = 1
     objects = objects.map(x => ({ ...createObject(), ...x, documentId: null, id: id++ }))
     console.log(objects)
@@ -62,15 +64,15 @@ const actions = {
       x.uid = uuid
     })
     return objects
+  },
+  bindTemplates ({ commit }) {
+    bindFirestoreCollection(commit, 'templates', collection(db, 'templates'))
   }
 }
 
 // mutations
 const mutations = {
-  addTemplate (state, { template }) {
-    state.templates.push({ ...createTemplate(), ...template })
-    console.log(state.templates)
-  }
+  ...vuexMutations
 }
 
 export default {

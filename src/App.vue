@@ -28,6 +28,7 @@ export default {
         this.bindDocuments()
         this.bindObjects()
         this.bindColumns()
+        this.bindTemplates()
       } else {
         unsubscribeAll()
       }
@@ -43,7 +44,8 @@ export default {
     ...mapActions('folders', ['bindFolders']),
     ...mapActions('projects', ['bindProjects']),
     ...mapActions('columns', ['bindColumns']),
-    ...mapActions('users', ['bindUsers'])
+    ...mapActions('users', ['bindUsers']),
+    ...mapActions('templates', ['bindTemplates'])
   }
 }
 </script>
