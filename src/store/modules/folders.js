@@ -48,12 +48,16 @@ const actions = {
     }
   },
   bindFolders ({ commit }) {
+    commit('reset')
     bindFirestoreCollection(commit, 'folders', collection(db, 'folders'))
   }
 }
 
 // mutations
 const mutations = {
+  reset (state) {
+    state.openFolders.splice(0)
+  },
   openFolder ({ openFolders }, { folder }) {
     if (!folder) return
     if (!openFolders.includes(folder.uid)) openFolders.push(folder.uid)

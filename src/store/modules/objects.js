@@ -154,12 +154,17 @@ const actions = {
     await setDoc(objRef, object)
   },
   bindObjects ({ commit }) {
+    commit('reset')
     bindFirestoreCollection(commit, 'objects', collection(db, 'objects'))
   }
 }
 
 // mutations
 const mutations = {
+  reset (state) {
+    state.activeObject = null
+    state.hoverObject = null
+  },
   setHoverObject (state, { object }) {
     if (object && state.hoverObject === object.uid) return
     state.hoverObject = object ? object.uid : null

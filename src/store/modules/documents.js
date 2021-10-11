@@ -81,12 +81,17 @@ const actions = {
       })
   },
   bindDocuments ({ commit }) {
+    commit('reset')
     bindFirestoreCollection(commit, 'documents', collection(db, 'documents'))
   }
 }
 
 // mutations
 const mutations = {
+  reset (state) {
+    state.activeDocument = null
+    state.openDocuments.splice(0)
+  },
   openDocument (state, { document }) {
     if (!document) return
     if (!state.openDocuments.includes(document.uid)) state.openDocuments.push(document.uid)

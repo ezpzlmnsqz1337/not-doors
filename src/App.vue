@@ -20,20 +20,21 @@ export default {
     ActionList
   },
   mounted: function () {
+    this.bindUsers()
     const auth = getAuth()
     onAuthStateChanged(auth, () => {
       if (auth.currentUser) {
-        this.bindProjects()
-        this.bindFolders()
-        this.bindDocuments()
-        this.bindObjects()
+        this.bindUsers()
         this.bindColumns()
+        this.bindObjects()
+        this.bindDocuments()
+        this.bindFolders()
+        this.bindProjects()
         this.bindTemplates()
       } else {
         unsubscribeAll()
       }
     })
-    this.bindUsers()
   },
   unmounted: function () {
     unsubscribeAll()
